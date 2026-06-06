@@ -1,0 +1,258 @@
+const audioFiles = [
+  { id: 1, title: 'Morning Lecture - Chapter 1', size: '24.5 MB', subtitle: true, pin: true, bitrate: '128 kbps', duration: '12:34', durationSec: 754 },
+  { id: 2, title: 'Podcast Episode 42', size: '67.2 MB', subtitle: false, pin: false, bitrate: '192 kbps', duration: '45:12', durationSec: 2712 },
+  { id: 3, title: 'Music - Relaxing Piano', size: '8.1 MB', subtitle: false, pin: true, bitrate: '320 kbps', duration: '5:23', durationSec: 323 },
+  { id: 4, title: 'Interview - Tech Talk', size: '31.8 MB', subtitle: true, pin: false, bitrate: '128 kbps', duration: '18:07', durationSec: 1087 },
+  { id: 5, title: 'Audiobook - The Great Gatsby', size: '142.3 MB', subtitle: true, pin: true, bitrate: '256 kbps', duration: '1:23:45', durationSec: 5025 },
+  { id: 6, title: 'Language Lesson - Spanish', size: '15.4 MB', subtitle: true, pin: false, bitrate: '128 kbps', duration: '9:48', durationSec: 588 },
+  { id: 7, title: 'Ambient Sounds - Rain', size: '52.7 MB', subtitle: false, pin: true, bitrate: '192 kbps', duration: '32:10', durationSec: 1930 },
+  { id: 8, title: 'News Briefing Daily', size: '11.3 MB', subtitle: false, pin: false, bitrate: '128 kbps', duration: '7:15', durationSec: 435 }
+];
+
+let currentFilter = null;
+let searchQuery = '';
+
+function renderAudioList() {
+  const list = document.getElementById('audioList');
+  if (!list) return;
+
+  let filtered = [...audioFiles];
+
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(a => a.title.toLowerCase().includes(q));
+  }
+
+  if (currentFilter === 'size-desc') {
+    filtered.sort((a, b) => parseFloat(b.size) - parseFloat(a.size));
+  } else if (currentFilter === 'size-asc') {
+    filtered.sort((a, b) => parseFloat(a.size) - parseFloat(b.size));
+  } else if (currentFilter === 'subtitle-yes') {
+    filtered = filtered.filter(a => a.subtitle);
+  } else if (currentFilter === 'subtitle-no') {
+    filtered = filtered.filter(a => !a.subtitle);
+  } else if (currentFilter === 'pinned') {
+    filtered = filtered.filter(a => a.pin);
+  }
+
+  list.innerHTML = '';
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-list">No lessons found</div>';
+    return;
+  }
+
+  filtered.forEach(audio => {
+    const card = document.createElement('div');
+    card.className = 'edu-card' + (audio.pin ? ' pinned' : '');
+    card.setAttribute('data-id', audio.id);
+
+    card.innerHTML =
+      '<div class="card-content">' +
+        '<div class="flex items-center justify-center w-12 h-12 rounded-lg bg-muted/50 shrink-0"><svg class="w-7 h-7 text-mid" viewBox="0 0 256 256" fill="currentColor"><path d="M224,64H154.67L126.93,43.2a16.12,16.12,0,0,0-9.6-3.2H72A16,16,0,0,0,56,56V72H40A16,16,0,0,0,24,88V200a16,16,0,0,0,16,16H192.89A15.13,15.13,0,0,0,208,200.89V184h16.89A15.13,15.13,0,0,0,240,168.89V80A16,16,0,0,0,224,64ZM192,200H40V88H85.33l29.87,22.4A8,8,0,0,0,120,112h72Zm32-32H208V112a16,16,0,0,0-16-16H122.67L94.93,75.2a16.12,16.12,0,0,0-9.6-3.2H72V56h45.33L147.2,78.4A8,8,0,0,0,152,80h72Z"/></svg></div>' +
+        '<div class="min-w-0">' +
+          '<h3 class="card-title">' + escapeHtml(audio.title) + '</h3>' +
+          '<div class="card-meta">' +
+            '<span class="card-meta-text">' + escapeHtml(audio.duration) + '</span>' +
+            '<span class="card-meta-sep"></span>' +
+            '<span class="card-meta-text">' + escapeHtml(audio.size) + '</span>' +
+            '<span class="card-meta-sep"></span>' +
+            '<span class="card-meta-text">Translation: ' + (audio.subtitle ? 'Yes' : 'No') + '</span>' +
+          '</div>' +
+          '</div>' +
+        '</div>' +
+        '<svg class="w-4 h-4 text-mid shrink-0" viewBox="0 0 256 256" fill="currentColor"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg>';
+
+    list.appendChild(card);
+  });
+
+  initLongPress();
+}
+
+function initLongPress() {
+  document.querySelectorAll('.edu-card').forEach(function(card) {
+    let pressTimer;
+    let longPressed = false;
+
+    function handleLongPress() {
+      longPressed = true;
+      var id = parseInt(card.getAttribute('data-id'));
+      var audio = null;
+      for (var i = 0; i < audioFiles.length; i++) {
+        if (audioFiles[i].id === id) {
+          audio = audioFiles[i];
+          break;
+        }
+      }
+      if (audio) {
+        audio.pin = !audio.pin;
+        var pinStatusText = card.querySelector('.pin-status-text');
+        if (pinStatusText) {
+          pinStatusText.textContent = audio.pin ? 'Pinned: Yes' : 'Pinned: No';
+        }
+        if (audio.pin) {
+          card.classList.add('pinned');
+        } else {
+          card.classList.remove('pinned');
+        }
+      }
+    }
+
+    function startPress() {
+      longPressed = false;
+      pressTimer = setTimeout(handleLongPress, 500);
+    }
+
+    function cancelPress() {
+      clearTimeout(pressTimer);
+    }
+
+    function handleClick(e) {
+      if (longPressed) {
+        e.stopImmediatePropagation();
+        longPressed = false;
+        return;
+      }
+      var id = parseInt(card.getAttribute('data-id'));
+      for (var i = 0; i < audioFiles.length; i++) {
+        if (audioFiles[i].id === id) {
+          openPlayer(audioFiles[i]);
+          break;
+        }
+      }
+    }
+
+    card.addEventListener('mousedown', startPress);
+    card.addEventListener('mouseup', cancelPress);
+    card.addEventListener('mouseleave', cancelPress);
+    card.addEventListener('touchstart', startPress, { passive: true });
+    card.addEventListener('touchend', cancelPress);
+    card.addEventListener('touchcancel', cancelPress);
+    card.addEventListener('touchmove', cancelPress, { passive: true });
+    card.addEventListener('click', handleClick);
+  });
+}
+
+function openPlayer(audio) {
+  var homeView = document.getElementById('homeView');
+  var playerView = document.getElementById('playerView');
+  var audioTitle = document.getElementById('audioTitle');
+  var totalTime = document.getElementById('totalTime');
+  var contentArea = document.getElementById('contentArea');
+  var playerBottom = document.getElementById('playerBottom');
+  var headerTitle = document.getElementById('headerTitle');
+  var capsuleMenu = document.getElementById('capsuleMenu');
+
+  setCurrentAudioTitle(audio.title);
+  homeView.classList.add('hidden');
+  playerView.classList.remove('hidden');
+  contentArea.classList.remove('hidden');
+  playerBottom.classList.remove('hidden');
+  if (capsuleMenu) capsuleMenu.classList.remove('hidden');
+  audioTitle.textContent = audio.title;
+  totalTime.textContent = audio.duration;
+  if (headerTitle) headerTitle.textContent = audio.title;
+  setCurrentPlaybackTime(0);
+  setTotalDuration(audio.durationSec);
+  updateProgressUI();
+  updateDropdownValues();
+  updateSpeedIndicator();
+  renderNotes();
+  renderLoops();
+  switchTab('clean');
+}
+
+function goHome() {
+  var homeView = document.getElementById('homeView');
+  var playerView = document.getElementById('playerView');
+  var contentArea = document.getElementById('contentArea');
+  var playerBottom = document.getElementById('playerBottom');
+  var capsuleMenu = document.getElementById('capsuleMenu');
+
+  homeView.classList.remove('hidden');
+  playerView.classList.add('hidden');
+  contentArea.classList.add('hidden');
+  playerBottom.classList.add('hidden');
+  if (capsuleMenu) capsuleMenu.classList.add('hidden');
+  var nav = document.getElementById('navPage');
+  if (nav) nav.classList.remove('show');
+  setPlaying(false);
+  clearPreviewEndTime();
+  updatePlayBtnUI();
+
+  if (getAudioMode()) {
+    setAudioMode(false);
+    playerView.classList.remove('audio-mode');
+    var badge = document.getElementById('audioModeBadge');
+    if (badge) badge.classList.add('hidden');
+    updateCapsuleAudioState();
+  }
+}
+
+function toggleFilterDropdown(e) {
+  var dropdown = document.getElementById('filterDropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('hidden');
+  }
+}
+
+document.addEventListener('click', function(e) {
+  var dropdown = document.getElementById('filterDropdown');
+  var toggle = document.getElementById('filterToggleBtn');
+  if (!dropdown || dropdown.classList.contains('hidden')) return;
+  if (!dropdown.contains(e.target) && !toggle.contains(e.target)) {
+    dropdown.classList.add('hidden');
+  }
+});
+
+function applyFilter(filter) {
+  if (currentFilter === filter || filter === 'all') {
+    currentFilter = null;
+  } else {
+    currentFilter = filter;
+  }
+
+  var options = document.querySelectorAll('[data-filter]');
+  options.forEach(function(opt) {
+    opt.classList.remove('active');
+  });
+
+  if (currentFilter) {
+    var activeBtn = document.querySelector('[data-filter="' + currentFilter + '"]');
+    if (activeBtn) {
+      activeBtn.classList.add('active');
+    }
+  } else {
+    var allBtn = document.querySelector('[data-filter="all"]');
+    if (allBtn) {
+      allBtn.classList.add('active');
+    }
+  }
+
+  renderAudioList();
+}
+
+function initAudioList() {
+  var searchInput = document.getElementById('searchInput');
+  var filterToggleBtn = document.getElementById('filterToggleBtn');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+      searchQuery = e.target.value;
+      renderAudioList();
+    });
+  }
+
+  if (filterToggleBtn) {
+    filterToggleBtn.addEventListener('click', toggleFilterDropdown);
+  }
+
+  var filterOptions = document.querySelectorAll('.filter-option[data-filter]');
+  filterOptions.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      applyFilter(btn.getAttribute('data-filter'));
+    });
+  });
+
+  renderAudioList();
+}
