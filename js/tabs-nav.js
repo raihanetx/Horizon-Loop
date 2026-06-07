@@ -2,24 +2,64 @@ function switchTab(tab) {
   clearSelection();
   setActiveTab(tab);
 
+  // Get all tab content containers
   const tabContents = document.querySelectorAll('.tab-content');
-  tabContents.forEach(element => {
+  
+  // Hide all tab contents using inline style (more reliable than CSS class)
+  tabContents.forEach(function(element) {
+    element.style.display = 'none';
     element.classList.remove('active');
   });
 
+  // Show only the selected tab
   if (tab === 'clean') {
-    getElementById('cleanContainer').classList.add('active');
+    var cleanContainer = getElementById('cleanContainer');
+    if (cleanContainer) {
+      cleanContainer.style.display = 'flex';
+      cleanContainer.style.flexDirection = 'column';
+      cleanContainer.style.flex = '1';
+      cleanContainer.style.minHeight = '0';
+      cleanContainer.classList.add('active');
+    }
     updateCleanDialogue();
   } else if (tab === 'save') {
-    getElementById('dialogueContainer').classList.add('active');
+    var dialogueContainer = getElementById('dialogueContainer');
+    if (dialogueContainer) {
+      dialogueContainer.style.display = 'flex';
+      dialogueContainer.style.flexDirection = 'column';
+      dialogueContainer.style.flex = '1';
+      dialogueContainer.style.minHeight = '0';
+      dialogueContainer.classList.add('active');
+    }
     renderDialogues();
   } else if (tab === 'speed') {
-    getElementById('speedContainer').classList.add('active');
+    var speedContainer = getElementById('speedContainer');
+    if (speedContainer) {
+      speedContainer.style.display = 'flex';
+      speedContainer.style.flexDirection = 'column';
+      speedContainer.style.flex = '1';
+      speedContainer.style.minHeight = '0';
+      speedContainer.classList.add('active');
+    }
     updateSpeedTab();
   } else if (tab === 'loop') {
-    getElementById('loopContainer').classList.add('active');
+    var loopContainer = getElementById('loopContainer');
+    if (loopContainer) {
+      loopContainer.style.display = 'flex';
+      loopContainer.style.flexDirection = 'column';
+      loopContainer.style.flex = '1';
+      loopContainer.style.minHeight = '0';
+      loopContainer.classList.add('active');
+    }
   } else if (tab === 'notes') {
-    getElementById('notesContainer').classList.add('active');
+    var notesContainer = getElementById('notesContainer');
+    if (notesContainer) {
+      notesContainer.style.display = 'flex';
+      notesContainer.style.flexDirection = 'column';
+      notesContainer.style.flex = '1';
+      notesContainer.style.minHeight = '0';
+      notesContainer.classList.add('active');
+    }
   }
 
   var mainHeader = document.querySelector('#playerView > .player-header');
