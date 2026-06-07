@@ -115,7 +115,7 @@ fun DialogueTab(
         }
     } else {
         LazyColumn(
-            modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp).padding(bottom = 20.dp),
+            modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(top = 0.dp)
         ) {
