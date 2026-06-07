@@ -1,0 +1,16 @@
+package com.horizonloop.app.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+val Deep = Color(0xFF18181b)
+val Surface = Color(0xFF202023)
+val Muted = Color(0xFF27272a)
+val Mid = Color(0xFF71717a)
+val Dark = Color(0xFFE4E4E7)
+val Accent = Color(0xFF10B981)
+
+val White15 = Color(0x26FFFFFF)
+val White6 = Color(0x0FFFFFFF)
+val White8 = Color(0x14FFFFFF)
+val White12 = Color(0x1FFFFFFF)
+val White20 = Color(0x33FFFFFF)
