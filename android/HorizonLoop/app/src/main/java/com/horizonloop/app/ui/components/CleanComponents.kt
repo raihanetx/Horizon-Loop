@@ -233,14 +233,7 @@ fun CleanTab(
             
             Spacer(modifier = Modifier.weight(1f))
             
-            // Gesture hint at bottom
-            Text(
-                text = "Hold Left half to slow down • Hold Right to speed up",
-                fontSize = 9.sp,
-                fontWeight = FontWeight.Bold,
-                color = White15.copy(alpha = 0.2f),
-                textAlign = TextAlign.Center
-            )
+
         }
     }
 }
