@@ -1,66 +1,47 @@
-function switchTab(tab) {
-  clearSelection();
-  setActiveTab(tab);
-
-  // Get all tab content containers
-  const tabContents = document.querySelectorAll('.tab-content');
-  
-  // Hide all tab contents using inline style (more reliable than CSS class)
-  tabContents.forEach(function(element) {
-    element.style.display = 'none';
-    element.classList.remove('active');
-  });
-
-  // Show only the selected tab
-  if (tab === 'clean') {
-    var cleanContainer = getElementById('cleanContainer');
-    if (cleanContainer) {
-      cleanContainer.style.display = 'flex';
-      cleanContainer.style.flexDirection = 'column';
-      cleanContainer.style.flex = '1';
-      cleanContainer.style.minHeight = '0';
-      cleanContainer.classList.add('active');
-    }
-    updateCleanDialogue();
-  } else if (tab === 'save') {
-    var dialogueContainer = getElementById('dialogueContainer');
-    if (dialogueContainer) {
-      dialogueContainer.style.display = 'flex';
-      dialogueContainer.style.flexDirection = 'column';
-      dialogueContainer.style.flex = '1';
-      dialogueContainer.style.minHeight = '0';
-      dialogueContainer.classList.add('active');
-    }
-    renderDialogues();
-  } else if (tab === 'speed') {
-    var speedContainer = getElementById('speedContainer');
-    if (speedContainer) {
-      speedContainer.style.display = 'flex';
-      speedContainer.style.flexDirection = 'column';
-      speedContainer.style.flex = '1';
-      speedContainer.style.minHeight = '0';
-      speedContainer.classList.add('active');
-    }
-    updateSpeedTab();
-  } else if (tab === 'loop') {
-    var loopContainer = getElementById('loopContainer');
-    if (loopContainer) {
-      loopContainer.style.display = 'flex';
-      loopContainer.style.flexDirection = 'column';
-      loopContainer.style.flex = '1';
-      loopContainer.style.minHeight = '0';
-      loopContainer.classList.add('active');
-    }
-  } else if (tab === 'notes') {
-    var notesContainer = getElementById('notesContainer');
-    if (notesContainer) {
-      notesContainer.style.display = 'flex';
-      notesContainer.style.flexDirection = 'column';
-      notesContainer.style.flex = '1';
-      notesContainer.style.minHeight = '0';
-      notesContainer.classList.add('active');
-    }
+// Helper function to show a tab content container
+  function showTabContent(el) {
+    if (!el) return;
+    el.style.display = 'flex !important';
+    el.style.flexDirection = 'column';
+    el.style.flex = '1';
+    el.style.minHeight = '0';
+    el.classList.add('active');
   }
+
+  // Helper function to hide a tab content container
+  function hideTabContent(el) {
+    if (!el) return;
+    el.style.display = 'none !important';
+    el.classList.remove('active');
+  }
+
+  function switchTab(tab) {
+    clearSelection();
+    setActiveTab(tab);
+
+    // Get all tab content containers
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    // Hide all tab contents using inline style with !important to override CSS
+    tabContents.forEach(function(element) {
+      hideTabContent(element);
+    });
+
+    // Show only the selected tab
+    if (tab === 'clean') {
+      showTabContent(getElementById('cleanContainer'));
+      updateCleanDialogue();
+    } else if (tab === 'save') {
+      showTabContent(getElementById('dialogueContainer'));
+      renderDialogues();
+    } else if (tab === 'speed') {
+      showTabContent(getElementById('speedContainer'));
+      updateSpeedTab();
+    } else if (tab === 'loop') {
+      showTabContent(getElementById('loopContainer'));
+    } else if (tab === 'notes') {
+      showTabContent(getElementById('notesContainer'));
+    }
 
   var mainHeader = document.querySelector('#playerView > .player-header');
   if (mainHeader) {
