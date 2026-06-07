@@ -137,7 +137,7 @@ fun LoopsTab(
         }
         FloatingActionButton(
             onClick = { showDialog = true },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 20.dp, end = 16.dp).size(48.dp),
+            modifier = Modifier.align(Alignment.TopEnd).padding(top = 12.dp, end = 16.dp).size(48.dp),
             containerColor = Muted,
             contentColor = Dark
         ) {
