@@ -1,0 +1,106 @@
+[
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.horizonloop.app-main-6:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_settings.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_settings.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_more_vert.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_more_vert.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_music_note.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_music_note.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_delete.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_delete.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_play.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_play.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.horizonloop.app-main-6:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_list.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_list.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_volume_up.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_volume_up.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_filter.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_filter.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_subtitles.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_subtitles.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_arrow_back.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_arrow_back.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_play_triangle.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_play_triangle.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_home.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_home.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_translate.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_translate.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_save.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_save.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_audio_mode.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_audio_mode.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_search.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_search.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_loop.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_loop.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_chevron_right.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_chevron_right.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_pause.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_pause.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_edit.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_edit.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_note.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_note.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_speed.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_speed.xml"
+    },
+    {
+        "merged": "com.horizonloop.app-merged_res-4:/drawable_ic_add.xml.flat",
+        "source": "com.horizonloop.app-main-6:/drawable/ic_add.xml"
+    }
+]
