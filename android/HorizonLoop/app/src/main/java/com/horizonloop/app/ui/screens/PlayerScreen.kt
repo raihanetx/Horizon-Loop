@@ -80,7 +80,7 @@ fun PlayerScreen(
     onDismissCapsule: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.fillMaxSize().background(Deep)) {
+    Box(modifier = modifier.fillMaxSize().background(Surface)) {
         Column(modifier = Modifier.fillMaxSize()) {
             PlayerHeader(title = title, onBack = onBack, onMenuClick = onMenuClick)
             TabContent(

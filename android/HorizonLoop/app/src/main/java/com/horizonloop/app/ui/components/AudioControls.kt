@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horizonloop.app.ui.theme.Dark
 import com.horizonloop.app.ui.theme.Deep
+
 import com.horizonloop.app.ui.theme.Mid
 import com.horizonloop.app.ui.theme.Muted
 import com.horizonloop.app.ui.theme.Surface
@@ -59,7 +60,6 @@ fun AudioControls(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(Deep)
             .padding(horizontal = 16.dp)
             .padding(top = 8.dp, bottom = 16.dp)
     ) {
