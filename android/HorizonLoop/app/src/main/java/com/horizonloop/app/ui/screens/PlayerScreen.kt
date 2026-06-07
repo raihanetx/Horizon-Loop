@@ -188,7 +188,7 @@ private fun TabContent(
     onDialogueSelect: (Dialogue) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.fillMaxSize().background(Surface)) {
+    Box(modifier = modifier.fillMaxSize()) {
         when (activeTab) {
             ActiveTab.CLEAN -> CleanTab(
                 dialogue = currentDialogue,
