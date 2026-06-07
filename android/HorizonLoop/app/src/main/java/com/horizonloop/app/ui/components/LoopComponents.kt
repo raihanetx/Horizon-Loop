@@ -13,10 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.AlertDialog
+import com.horizonloop.app.ui.theme.AppIcons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -36,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.horizonloop.app.data.Loop
 import com.horizonloop.app.ui.theme.Dark
 import com.horizonloop.app.ui.theme.Deep
@@ -76,7 +74,7 @@ fun LoopCard(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Default.PlayArrow,
+            imageVector = AppIcons.Play,
             contentDescription = null,
             tint = Mid,
             modifier = Modifier.size(24.dp)
@@ -119,6 +117,8 @@ fun LoopsTab(
     var start by remember { mutableStateOf("") }
     var end by remember { mutableStateOf("") }
     var count by remember { mutableStateOf("1") }
+    var previewLoop by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var showPreview by remember { mutableStateOf(false) }
 
     Box(modifier = modifier.fillMaxWidth()) {
         if (loops.isEmpty()) {
@@ -137,20 +137,57 @@ fun LoopsTab(
         }
         FloatingActionButton(
             onClick = { showDialog = true },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),
+            modifier = Modifier.align(Alignment.TopEnd).padding(top = 12.dp, end = 16.dp).size(48.dp),
             containerColor = Muted,
             contentColor = Dark
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Add Loop")
+            Icon(AppIcons.Add, contentDescription = "Add Loop", modifier = Modifier.size(20.dp))
         }
     }
     if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            containerColor = Surface,
-            title = { Text("New Log Entry", fontWeight = FontWeight.SemiBold, color = Dark) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Dialog(onDismissRequest = { showDialog = false; name = ""; start = ""; end = ""; count = "1"; previewLoop = emptyMap(); showPreview = false }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Surface)
+                    .padding(20.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Add Loop",
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Dark
+                    )
+
+                    if (showPreview && previewLoop.isNotEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Muted.copy(alpha = 0.15f))
+                                .padding(16.dp)
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(
+                                    text = previewLoop["name"] ?: "",
+                                    fontSize = 13.sp,
+                                    color = Dark,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = "Time: ${previewLoop["start"] ?: "—"} - ${previewLoop["end"] ?: "—"} | Loop: ${previewLoop["count"] ?: "1"} time(s)",
+                                    fontSize = 11.sp,
+                                    color = Mid
+                                )
+                            }
+                        }
+                    }
+
                     OutlinedTextField(
                         value = name, onValueChange = { name = it },
                         modifier = Modifier.fillMaxWidth(),
@@ -159,9 +196,11 @@ fun LoopsTab(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = Dark, unfocusedTextColor = Dark,
                             focusedBorderColor = Mid, unfocusedBorderColor = Muted, cursorColor = Dark
-                        )
+                        ),
+                        shape = RoundedCornerShape(12.dp)
                     )
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         OutlinedTextField(
                             value = start, onValueChange = { start = it },
                             modifier = Modifier.weight(1f),
@@ -170,7 +209,8 @@ fun LoopsTab(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = Dark, unfocusedTextColor = Dark,
                                 focusedBorderColor = Mid, unfocusedBorderColor = Muted, cursorColor = Dark
-                            )
+                            ),
+                            shape = RoundedCornerShape(12.dp)
                         )
                         OutlinedTextField(
                             value = end, onValueChange = { end = it },
@@ -180,9 +220,11 @@ fun LoopsTab(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = Dark, unfocusedTextColor = Dark,
                                 focusedBorderColor = Mid, unfocusedBorderColor = Muted, cursorColor = Dark
-                            )
+                            ),
+                            shape = RoundedCornerShape(12.dp)
                         )
                     }
+
                     OutlinedTextField(
                         value = count, onValueChange = { count = it },
                         modifier = Modifier.fillMaxWidth(),
@@ -191,25 +233,50 @@ fun LoopsTab(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = Dark, unfocusedTextColor = Dark,
                             focusedBorderColor = Mid, unfocusedBorderColor = Muted, cursorColor = Dark
-                        )
+                        ),
+                        shape = RoundedCornerShape(12.dp)
                     )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        if (name.isNotBlank()) {
-                            onAddLoop(name.trim(), start, end, count.toIntOrNull() ?: 1)
-                            name = ""; start = ""; end = ""; count = "1"
-                            showDialog = false
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End)
+                    ) {
+                        TextButton(onClick = { showDialog = false; name = ""; start = ""; end = ""; count = "1"; previewLoop = emptyMap(); showPreview = false }) {
+                            Text("Cancel", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                         }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Mid, contentColor = Deep)
-                ) { Text("Save", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("Cancel", color = Mid) }
+                        TextButton(
+                            onClick = {
+                                if (name.isNotBlank()) {
+                                    previewLoop = mapOf(
+                                        "name" to name,
+                                        "start" to start.ifBlank { "—" },
+                                        "end" to end.ifBlank { "—" },
+                                        "count" to count.ifBlank { "1" }
+                                    )
+                                    showPreview = true
+                                }
+                            }
+                        ) {
+                            Text("Preview", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                        Button(
+                            onClick = {
+                                if (name.isNotBlank()) {
+                                    onAddLoop(name.trim(), start, end, count.toIntOrNull() ?: 1)
+                                    name = ""; start = ""; end = ""; count = "1"
+                                    previewLoop = emptyMap()
+                                    showPreview = false
+                                    showDialog = false
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Mid, contentColor = Deep),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Save", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+                }
             }
-        )
+        }
     }
 }

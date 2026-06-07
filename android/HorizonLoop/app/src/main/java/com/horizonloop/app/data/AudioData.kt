@@ -26,5 +26,10 @@ val dialogues = listOf(
     Dialogue(12, "22:15", "I really enjoyed the movie. It was fantastic!", "আমি সত্যি উপভোগ করেছি ছবিটি কেমন ছিল!"),
     Dialogue(13, "24:40", "Could you please help me carry this bag?", "আপনি কি এই ব্যাগটি বহুতে আমাকে সাহায্য করতে পারেন?"),
     Dialogue(14, "26:50", "I am learning English to improve my skills.", "আমি আমার দক্ষতা বৃদ্ধির জন্য ইংরেজি শিখছি।"),
-    Dialogue(15, "28:35", "Happy birthday! Wish you all the best.", "শুভ জন্মদিন! আপনার সব কিছু ভালো হোক।")
+    Dialogue(15, "28:35", "Happy birthday! Wish you all the best.", "শুভ জন্মদিন! আপনার সব কিছু ভালো হোক।"),
+    Dialogue(16, "30:00", "Thank you very much for your help.", "আপনার সাহায্যের জন্য অনেক ধন্যবাদ।"),
+    Dialogue(17, "32:15", "Where is the nearest ATM from here?", "এখান থেকে নিকটতম এটিএম কোথায়?"),
+    Dialogue(18, "34:40", "I need to make a phone call.", "আমাকে একটি ফোন করতে হবে।"),
+    Dialogue(19, "36:20", "The weather is nice today.", "আজ আবহাওয়া ভালো।"),
+    Dialogue(20, "38:05", "I am looking for a good restaurant.", "আমি একটি ভালো রেস্তোরাঁ খুঁজছি।")
 )

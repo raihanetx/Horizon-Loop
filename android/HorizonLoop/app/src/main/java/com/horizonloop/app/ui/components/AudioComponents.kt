@@ -12,9 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.MusicNote
+import com.horizonloop.app.ui.theme.AppIcons
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horizonloop.app.data.Audio
 import com.horizonloop.app.ui.theme.Dark
-import com.horizonloop.app.ui.theme.Deep
 import com.horizonloop.app.ui.theme.Mid
 import com.horizonloop.app.ui.theme.Muted
 import com.horizonloop.app.ui.theme.Surface
@@ -41,24 +38,25 @@ fun AudioListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .height(88.dp)
+            .clip(RoundedCornerShape(16.dp))
             .background(Surface)
             .clickable(onClick = onClick)
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .size(56.dp)
+                .clip(RoundedCornerShape(12.dp))
                 .background(Muted.copy(alpha = 0.5f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = Icons.Default.MusicNote,
+                imageVector = AppIcons.MusicNote,
                 contentDescription = null,
                 tint = Mid,
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(32.dp)
             )
         }
         Spacer(modifier = Modifier.width(12.dp))
@@ -80,29 +78,8 @@ fun AudioListItem(
                     color = Mid
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .height(10.dp)
-                        .background(Dark.copy(alpha = 0.3f))
-                )
-                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = audio.size,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Mid
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .height(10.dp)
-                        .background(Dark.copy(alpha = 0.3f))
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Translation: ${if (audio.subtitle) "Yes" else "No"}",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
                     color = Mid
@@ -110,7 +87,7 @@ fun AudioListItem(
             }
         }
         Icon(
-            imageVector = Icons.Default.ChevronRight,
+            imageVector = AppIcons.ChevronRight,
             contentDescription = null,
             tint = Mid,
             modifier = Modifier.size(16.dp)

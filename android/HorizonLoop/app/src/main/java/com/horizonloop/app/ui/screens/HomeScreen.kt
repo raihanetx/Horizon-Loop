@@ -1,6 +1,7 @@
 package com.horizonloop.app.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,10 +19,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
+import com.horizonloop.app.ui.theme.AppIcons
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -50,6 +48,7 @@ import com.horizonloop.app.ui.theme.Deep
 import com.horizonloop.app.ui.theme.Mid
 import com.horizonloop.app.ui.theme.Muted
 import com.horizonloop.app.ui.theme.Surface
+import com.horizonloop.app.ui.theme.White12
 
 @Composable
 fun HomeScreen(
@@ -68,7 +67,7 @@ fun HomeScreen(
         modifier = modifier
             .fillMaxSize()
             .background(Deep)
-            .padding(15.dp)
+            .padding(12.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -76,15 +75,33 @@ fun HomeScreen(
             verticalAlignment = Alignment.Top
         ) {
             Column {
-                Text("Horizon Loop", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Dark)
-                Text("Master English by Listening", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, letterSpacing = 1.sp)
+                Text(
+                    "Horizon Loop",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Dark,
+                    letterSpacing = (-0.5).sp
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    "Master English by Listening",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Mid,
+                    letterSpacing = 1.sp
+                )
             }
             Row {
-                IconButton(onClick = { showFilters = !showFilters }) {
-                    Icon(Icons.Default.FilterList, contentDescription = "Filter", tint = Dark)
+                IconButton(
+                    onClick = { showFilters = !showFilters }
+                ) {
+                    Icon(AppIcons.Filter, contentDescription = "Filter", tint = Dark, modifier = Modifier.size(22.dp))
                 }
-                IconButton(onClick = onSettingsClick) {
-                    Icon(Icons.Default.Settings, contentDescription = "Settings", tint = Dark)
+                Spacer(modifier = Modifier.width(4.dp))
+                IconButton(
+                    onClick = onSettingsClick
+                ) {
+                    Icon(AppIcons.Settings, contentDescription = "Settings", tint = Dark, modifier = Modifier.size(22.dp))
                 }
             }
         }
@@ -92,16 +109,18 @@ fun HomeScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(50))
-                .background(Mid.copy(alpha = 0.12f))
+                .clip(RoundedCornerShape(50.dp))
+                .background(White12)
                 .padding(horizontal = 16.dp, vertical = 10.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Search, contentDescription = null, tint = Mid, modifier = Modifier.size(16.dp))
+                Icon(AppIcons.Search, contentDescription = null, tint = Mid, modifier = Modifier.size(16.dp))
                 BasicTextField(
                     value = searchQuery,
                     onValueChange = onSearchChange,
-                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp),
                     textStyle = TextStyle(fontSize = 14.sp, color = Dark),
                     cursorBrush = SolidColor(Dark),
                     decorationBox = { innerTextField ->
@@ -146,12 +165,20 @@ fun HomeScreen(
 private fun FilterChip(label: String, isActive: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(if (isActive) Dark else Muted.copy(alpha = 0.12f))
+            .clip(RoundedCornerShape(50.dp))
+            .then(
+                if (isActive) Modifier.background(Dark)
+                else Modifier.border(1.dp, Mid.copy(alpha = 0.4f), RoundedCornerShape(50.dp))
+            )
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = if (isActive) Deep else Mid)
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = if (isActive) Deep else Mid
+        )
     }
 }
 
@@ -165,10 +192,10 @@ fun SettingsDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Settings", color = Dark) },
+        title = { Text("Settings", color = Dark, fontWeight = FontWeight.SemiBold) },
         text = {
             Column {
-                Text("OpenAI API Key", fontSize = 12.sp, color = Mid, modifier = Modifier.padding(bottom = 4.dp))
+                Text("OpenAI API Key", fontSize = 11.sp, color = Mid, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp, modifier = Modifier.padding(bottom = 4.dp))
                 OutlinedTextField(
                     value = apiKey,
                     onValueChange = onApiKeyChange,
@@ -178,7 +205,7 @@ fun SettingsDialog(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Translation Engine", fontSize = 12.sp, color = Mid, modifier = Modifier.padding(bottom = 4.dp))
+                Text("Translation Engine", fontSize = 11.sp, color = Mid, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp, modifier = Modifier.padding(bottom = 4.dp))
                 Row {
                     Button(
                         onClick = { onEngineChange("gpt-4o-mini") },
@@ -198,7 +225,12 @@ fun SettingsDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Close", color = Dark)
+                Text("Save", color = Deep, fontWeight = FontWeight.SemiBold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel", color = Mid)
             }
         },
         containerColor = Surface

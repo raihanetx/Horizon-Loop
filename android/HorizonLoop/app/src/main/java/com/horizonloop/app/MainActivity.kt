@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
                             activeTab = viewModel.activeTab,
                             isPlaying = viewModel.isPlaying,
                             isAudioMode = viewModel.audioMode,
+                            isTranslating = viewModel.isTranslating,
                             currentTime = viewModel.formatTime(viewModel.currentPlaybackTime),
                             totalTime = viewModel.formatTime(viewModel.totalDuration),
                             progress = viewModel.getProgressPercent(),
@@ -64,6 +65,7 @@ class MainActivity : ComponentActivity() {
                             dialogues = viewModel.translatedDialogues.ifEmpty { com.horizonloop.app.data.dialogues },
                             currentDialogue = viewModel.getCurrentDialogue(),
                             showCapsuleMenu = viewModel.showCapsuleMenu,
+                            selectedDialogueIds = viewModel.selectedDialogueIds,
                             onBack = { viewModel.goHome() },
                             onMenuClick = { viewModel.toggleShowCapsuleMenu() },
                             onTabClick = { viewModel.activeTab = it },
@@ -76,6 +78,7 @@ class MainActivity : ComponentActivity() {
                             onAddLoop = { name, start, end, count -> viewModel.addLoop(name, start, end, count) },
                             onPlayLoop = { viewModel.playLoop(it) },
                             onSpeedChange = { viewModel.setSpeed(it) },
+                            onDialogueSelect = { viewModel.selectDialogue(it) },
                             onDismissCapsule = { viewModel.hideCapsuleMenu() }
                         )
                     }

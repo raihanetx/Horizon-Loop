@@ -29,6 +29,8 @@ class AppViewModel : ViewModel() {
     var showHomeView by mutableStateOf(true)
     var showCapsuleMenu by mutableStateOf(false)
     var translatedDialogues by mutableStateOf<List<Dialogue>>(emptyList())
+    var isTranslating by mutableStateOf(false)
+    var selectedDialogueIds by mutableStateOf<Set<Int>>(emptySet())
 
     val speeds = listOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
     var currentSpeedIndex by mutableStateOf(2)
@@ -151,7 +153,20 @@ class AppViewModel : ViewModel() {
     }
 
     fun startTranslation() {
-        translatedDialogues = dialogues.take(10)
+        isTranslating = true
+        // Simulate async translation processing
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            translatedDialogues = dialogues.take(10)
+            isTranslating = false
+        }, 2000) // 2 second delay to show loading animation
+    }
+
+    fun selectDialogue(dialogue: Dialogue) {
+        selectedDialogueIds = if (dialogue.id in selectedDialogueIds) {
+            selectedDialogueIds - dialogue.id
+        } else {
+            selectedDialogueIds + dialogue.id
+        }
     }
 
     fun getCurrentDialogue(): Dialogue? {
