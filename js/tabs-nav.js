@@ -1,17 +1,17 @@
 // Helper function to show a tab content container
   function showTabContent(el) {
     if (!el) return;
-    el.style.display = 'flex !important';
-    el.style.flexDirection = 'column';
-    el.style.flex = '1';
-    el.style.minHeight = '0';
+    el.style.setProperty('display', 'flex', 'important');
+    el.style.setProperty('flex-direction', 'column', 'important');
+    el.style.setProperty('flex', '1', 'important');
+    el.style.setProperty('min-height', '0', 'important');
     el.classList.add('active');
   }
 
   // Helper function to hide a tab content container
   function hideTabContent(el) {
     if (!el) return;
-    el.style.display = 'none !important';
+    el.style.setProperty('display', 'none', 'important');
     el.classList.remove('active');
   }
 
