@@ -80,7 +80,7 @@ fun PlayerScreen(
     onDismissCapsule: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.fillMaxSize().background(Surface)) {
+    Box(modifier = modifier.fillMaxSize().background(Deep)) {
         Column(modifier = Modifier.fillMaxSize()) {
             PlayerHeader(title = title, onBack = onBack, onMenuClick = onMenuClick)
             TabContent(
@@ -141,7 +141,7 @@ fun PlayerScreen(
 @Composable
 private fun PlayerHeader(title: String, onBack: () -> Unit, onMenuClick: () -> Unit) {
     Box(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth().background(Surface).padding(horizontal = 4.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
