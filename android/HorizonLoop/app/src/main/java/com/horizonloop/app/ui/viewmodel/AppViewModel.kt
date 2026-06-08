@@ -218,7 +218,8 @@ class AppViewModel : ViewModel() {
                     }
                     
                     val chunkFile = File(chunkPath)
-                    val requestFile = chunkFile.asRequestBody("audio/mpeg".toMediaTypeOrNull())
+                    val mimeType = if (chunkPath.endsWith(".m4a")) "audio/mp4" else "audio/mpeg"
+                    val requestFile = chunkFile.asRequestBody(mimeType.toMediaTypeOrNull())
                     val body = MultipartBody.Part.createFormData("file", chunkFile.name, requestFile)
                     val modelBody = "whisper-1".toRequestBody("text/plain".toMediaTypeOrNull())
                     
