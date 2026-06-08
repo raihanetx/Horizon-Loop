@@ -324,7 +324,7 @@ class AppViewModel : ViewModel() {
                     val chunkFile = File(chunkPath)
                     logTranslation("Uploading: ${chunkFile.name} (${chunkFile.length() / 1024} KB)")
                     
-                    val mimeType = if (chunkPath.endsWith(".m4a")) "audio/mp4" else "audio/mpeg"
+                    val mimeType = if (chunkPath.endsWith(".m4a")) "audio/m4a" else "audio/mpeg"
                     val requestFile = chunkFile.asRequestBody(mimeType.toMediaTypeOrNull())
                     val body = MultipartBody.Part.createFormData("file", chunkFile.name, requestFile)
                     val modelBody = sttModel.toRequestBody("text/plain".toMediaTypeOrNull())
