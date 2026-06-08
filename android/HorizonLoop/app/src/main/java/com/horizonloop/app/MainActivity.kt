@@ -121,7 +121,7 @@ class MainActivity : ComponentActivity() {
                             currentFilter = viewModel.currentFilter,
                             onSearchChange = { viewModel.searchQuery = it },
                             onFilterChange = { viewModel.currentFilter = it },
-                            onAudioClick = { viewModel.openPlayer(it) },
+                            onAudioClick = { viewModel.openPlayer(it, this@MainActivity) },
                             onSettingsClick = { showSettings = true },
                             isScanning = viewModel.isScanning,
                             scanError = viewModel.scanError
@@ -143,7 +143,7 @@ class MainActivity : ComponentActivity() {
                             activeLoopId = viewModel.activeLoopId,
                             notes = viewModel.notes,
                             loops = viewModel.loops,
-                            dialogues = viewModel.translatedDialogues.ifEmpty { com.horizonloop.app.data.dialogues },
+                            dialogues = viewModel.translatedDialogues,
                             currentDialogue = viewModel.getCurrentDialogue(),
                             showCapsuleMenu = viewModel.showCapsuleMenu,
                             selectedDialogueIds = viewModel.selectedDialogueIds,

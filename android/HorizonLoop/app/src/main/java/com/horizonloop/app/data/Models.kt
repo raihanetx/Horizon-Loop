@@ -1,5 +1,7 @@
 package com.horizonloop.app.data
 
+import android.content.Context
+
 data class Audio(
     val id: Int,
     val title: String,
@@ -9,9 +11,10 @@ data class Audio(
     val bitrate: String,
     val duration: String,
     val durationSec: Double,
-    val filePath: String = "",  // Path to the actual audio/video file for extraction
-    val mimeType: String = "",   // MIME type (video/* or audio/*)
-    val contentUri: String = ""  // Content URI for MediaStore access
+    val filePath: String = "",
+    val mimeType: String = "",
+    val contentUri: String = "",
+    val context: Context? = null  // Added for MediaPlaybackManager
 )
 
 data class Note(

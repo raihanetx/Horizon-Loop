@@ -92,7 +92,8 @@ object VideoScanner {
                             durationSec = durationSec,
                             filePath = filePath,
                             mimeType = mimeType,
-                            contentUri = contentUri.toString()
+                            contentUri = contentUri.toString(),
+                            context = context
                         )
                     )
                     id++
@@ -187,7 +188,8 @@ object VideoScanner {
                             durationSec = durationSec,
                             filePath = filePath,
                             mimeType = mimeType,
-                            contentUri = contentUri.toString()
+                            contentUri = contentUri.toString(),
+                            context = context
                         )
                     )
                     id++
