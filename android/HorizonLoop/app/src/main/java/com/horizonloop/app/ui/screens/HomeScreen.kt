@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.BasicTextField
 import com.horizonloop.app.ui.theme.AppIcons
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -59,6 +60,8 @@ fun HomeScreen(
     onFilterChange: (FilterType) -> Unit,
     onAudioClick: (Audio) -> Unit,
     onSettingsClick: () -> Unit,
+    isScanning: Boolean = false,
+    scanError: String? = null,
     modifier: Modifier = Modifier
 ) {
     var showFilters by remember { mutableStateOf(false) }
@@ -69,6 +72,40 @@ fun HomeScreen(
             .background(Deep)
             .padding(12.dp)
     ) {
+        // Show error message if scan failed
+        scanError?.let { error ->
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = error,
+                fontSize = 12.sp,
+                color = Surface,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Mid.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                    .padding(12.dp)
+            )
+        }
+        
+        // Show scanning indicator
+        if (isScanning) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    color = Mid,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Scanning device for media...",
+                    fontSize = 12.sp,
+                    color = Mid
+                )
+            }
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,

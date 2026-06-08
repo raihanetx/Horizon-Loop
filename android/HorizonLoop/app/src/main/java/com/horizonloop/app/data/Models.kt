@@ -9,7 +9,9 @@ data class Audio(
     val bitrate: String,
     val duration: String,
     val durationSec: Double,
-    val filePath: String = ""  // Path to the actual audio/video file for extraction
+    val filePath: String = "",  // Path to the actual audio/video file for extraction
+    val mimeType: String = "",   // MIME type (video/* or audio/*)
+    val contentUri: String = ""  // Content URI for MediaStore access
 )
 
 data class Note(

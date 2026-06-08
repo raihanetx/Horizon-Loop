@@ -36,13 +36,18 @@ class AppViewModel : ViewModel() {
     var isTranslating by mutableStateOf(false)
     var translationProgress by mutableStateOf("")
     var selectedDialogueIds by mutableStateOf<Set<Int>>(emptySet())
+    
+    // Real scanned media files from device
+    var scannedAudioFiles by mutableStateOf<List<Audio>>(emptyList())
+    var isScanning by mutableStateOf(false)
+    var scanError by mutableStateOf<String?>(null)
 
     val speeds = listOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
     var currentSpeedIndex by mutableStateOf(2)
 
     val filteredAudioFiles: List<Audio>
         get() {
-            var result = audioFiles
+            var result = scannedAudioFiles
             if (searchQuery.isNotBlank()) {
                 result = result.filter { it.title.contains(searchQuery, ignoreCase = true) }
             }
@@ -56,6 +61,29 @@ class AppViewModel : ViewModel() {
             }
             return result
         }
+    
+    /**
+     * Scan device for videos and audio files using MediaStore
+     */
+    fun scanDeviceMedia(context: Context) {
+        viewModelScope.launch {
+            isScanning = true
+            scanError = null
+            try {
+                val files = VideoScanner.scanAllMedia(context)
+                scannedAudioFiles = files
+            } catch (e: Exception) {
+                android.util.Log.e("AppViewModel", "Error scanning media: ${e.message}")
+                scanError = "Failed to scan: ${e.message}"
+            }
+            isScanning = false
+        }
+    }
+    
+    /**
+     * Check if we have any media files to display
+     */
+    fun hasMediaFiles(): Boolean = scannedAudioFiles.isNotEmpty()
 
     fun toggleShowCapsuleMenu() { showCapsuleMenu = !showCapsuleMenu }
     fun hideCapsuleMenu() { showCapsuleMenu = false }
@@ -63,7 +91,9 @@ class AppViewModel : ViewModel() {
     fun openPlayer(audio: Audio) {
         showHomeView = false
         currentAudioTitle = audio.title
-        currentAudioFilePath = audio.filePath
+        // Use contentUri for scoped storage compatibility (Android 10+)
+        // Fall back to filePath for legacy access
+        currentAudioFilePath = if (audio.contentUri.isNotBlank()) audio.contentUri else audio.filePath
         totalDuration = audio.durationSec
         currentPlaybackTime = 0.0
         activeTab = ActiveTab.CLEAN

@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:2:1-26:12
-INJECTED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:2:1-26:12
-INJECTED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:2:1-26:12
-INJECTED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:2:1-26:12
+ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:2:1-27:12
+INJECTED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:2:1-27:12
+INJECTED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:2:1-27:12
+INJECTED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:2:1-27:12
 MERGED from [androidx.compose.material3:material3:1.1.2] /root/.gradle/caches/transforms-3/b11e3839754ed9999d8477bd0cba4940/transformed/jetified-material3-1.1.2/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-common:2.7.5] /root/.gradle/caches/transforms-3/e0cd913cfb9697fcfccee2e29ec90a16/transformed/navigation-common-2.7.5/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-runtime:2.7.5] /root/.gradle/caches/transforms-3/6238109ce66abe56bfd97fd01dca58aa/transformed/navigation-runtime-2.7.5/AndroidManifest.xml:17:1-22:12
@@ -68,16 +68,22 @@ ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:
 	android:name
 		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:4:22-64
 uses-permission#android.permission.READ_EXTERNAL_STORAGE
-ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:5:5-80
+ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:5:5-107
+	android:maxSdkVersion
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:5:78-104
 	android:name
 		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:5:22-77
 uses-permission#android.permission.READ_MEDIA_VIDEO
 ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:6:5-75
 	android:name
 		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:6:22-72
+uses-permission#android.permission.READ_MEDIA_AUDIO
+ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:7:5-75
+	android:name
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:7:22-72
 application
-ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:8:5-24:19
-INJECTED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:8:5-24:19
+ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:9:5-25:19
+INJECTED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:9:5-25:19
 MERGED from [androidx.emoji2:emoji2:1.4.0] /root/.gradle/caches/transforms-3/264dba49f298894bec55111cb56ef216/transformed/jetified-emoji2-1.4.0/AndroidManifest.xml:23:5-33:19
 MERGED from [androidx.emoji2:emoji2:1.4.0] /root/.gradle/caches/transforms-3/264dba49f298894bec55111cb56ef216/transformed/jetified-emoji2-1.4.0/AndroidManifest.xml:23:5-33:19
 MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /root/.gradle/caches/transforms-3/a50dadad1ec4747f853ab0d54cf9683f/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:23:5-33:19
@@ -99,35 +105,35 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] /root/.gradle/caches/transf
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.12.0] /root/.gradle/caches/transforms-3/97415b8e2c2b19b88cea32d17b874052/transformed/core-1.12.0/AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:13:9-35
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:14:9-35
 	android:label
-		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:11:9-41
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:12:9-41
 	android:roundIcon
-		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:12:9-54
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:13:9-54
 	android:icon
-		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:10:9-43
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:11:9-43
 	android:allowBackup
-		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:9:9-35
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:10:9-35
 	android:theme
-		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:14:9-49
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:15:9-49
 activity#com.horizonloop.app.MainActivity
-ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:15:9-23:20
+ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:16:9-24:20
 	android:exported
-		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:17:13-36
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:18:13-36
 	android:theme
-		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:18:13-53
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:19:13-53
 	android:name
-		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:16:13-41
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:17:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:19:13-22:29
+ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:20:13-23:29
 action#android.intent.action.MAIN
-ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:20:17-69
+ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:21:17-69
 	android:name
-		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:20:25-66
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:21:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:21:17-77
+ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:22:17-77
 	android:name
-		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:21:27-74
+		ADDED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml:22:27-74
 uses-sdk
 INJECTED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /data/workspace/android/HorizonLoop/app/src/main/AndroidManifest.xml

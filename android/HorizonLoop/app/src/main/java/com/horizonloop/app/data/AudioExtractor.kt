@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMuxer
+import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -15,10 +16,13 @@ object AudioExtractor {
     
     /**
      * Extract audio from video file using Android's built-in MediaExtractor
-     * @param videoPath Path to the video file
+     * Supports both file paths (legacy) and content URIs (scoped storage)
+     * 
+     * @param context Android context
+     * @param videoPath Path to the video file OR content URI string
      * @param outputDir Directory to save the extracted audio
      * @param onProgress Callback for progress updates (0.0 to 1.0)
-     * @return Path to extracted MP3 file, or null if failed
+     * @return Path to extracted audio file (.m4a), or null if failed
      */
     suspend fun extractAudio(
         context: Context,
@@ -30,10 +34,25 @@ object AudioExtractor {
         var muxer: MediaMuxer? = null
         
         try {
-            val outputFile = File(outputDir, "temp_audio_${System.currentTimeMillis()}.mp3")
+            val outputFile = File(outputDir, "temp_audio_${System.currentTimeMillis()}.m4a")
             
             extractor = MediaExtractor()
-            extractor.setDataSource(videoPath)
+            
+            // Check if this is a content URI or file path
+            if (videoPath.startsWith("content://")) {
+                // Use content resolver for scoped storage
+                val uri = Uri.parse(videoPath)
+                val fd = context.contentResolver.openFileDescriptor(uri, "r")
+                if (fd == null) {
+                    android.util.Log.e("AudioExtractor", "Failed to open content URI")
+                    return@withContext null
+                }
+                extractor.setDataSource(fd.fileDescriptor)
+                fd.close()
+            } else {
+                // Use file path directly (legacy)
+                extractor.setDataSource(videoPath)
+            }
             
             // Find the first audio track
             var audioTrackIndex = -1
@@ -42,10 +61,17 @@ object AudioExtractor {
             for (i in 0 until extractor.trackCount) {
                 val format = extractor.getTrackFormat(i)
                 val mime = format.getString(MediaFormat.KEY_MIME) ?: ""
-                if (mime.startsWith("audio/")) {
-                    audioTrackIndex = i
-                    audioFormat = format
-                    break
+                if (mime.startsWith("audio/") || mime.startsWith("video/")) {
+                    // Check if track has audio
+                    if (mime.startsWith("audio/") || format.containsKey(MediaFormat.KEY_DURATION)) {
+                        try {
+                            audioTrackIndex = i
+                            audioFormat = format
+                            break
+                        } catch (e: Exception) {
+                            continue
+                        }
+                    }
                 }
             }
             
@@ -54,8 +80,7 @@ object AudioExtractor {
                 return@withContext null
             }
             
-            // Create muxer with MP4 output (can be converted to MP3 later if needed)
-            // Using MUXER_OUTPUT_MPEG_4 for simplicity - most players support this
+            // Create muxer with M4A output
             muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
             
             val muxerTrackIndex = muxer.addTrack(audioFormat)
@@ -99,11 +124,7 @@ object AudioExtractor {
             
             onProgress(1f)
             
-            // Rename to .m4a (Android's default audio format)
-            val m4aFile = File(outputDir, "temp_audio_${System.currentTimeMillis()}.m4a")
-            outputFile.renameTo(m4aFile)
-            
-            m4aFile.absolutePath
+            return@withContext outputFile.absolutePath
             
         } catch (e: Exception) {
             android.util.Log.e("AudioExtractor", "Extraction error: ${e.message}")
@@ -129,29 +150,35 @@ object AudioExtractor {
         val fileSizeMB = audioFile.length() / (1024 * 1024)
         
         if (fileSizeMB <= MAX_FILE_SIZE_MB) {
-            // No need to split
             return@withContext listOf(audioPath)
         }
         
-        // For files > 25MB, we'd need to do chunking
-        // For now, just return the original - the API will handle what it can
         listOf(audioPath)
     }
     
     /**
      * Get duration of audio/video file using MediaExtractor
      */
-    fun getDuration(filePath: String): Double {
+    fun getDuration(context: Context, pathOrUri: String): Double {
         var extractor: MediaExtractor? = null
         return try {
             extractor = MediaExtractor()
-            extractor.setDataSource(filePath)
+            
+            if (pathOrUri.startsWith("content://")) {
+                val fd = context.contentResolver.openFileDescriptor(Uri.parse(pathOrUri), "r")
+                fd?.let {
+                    extractor.setDataSource(it.fileDescriptor)
+                    it.close()
+                }
+            } else {
+                extractor.setDataSource(pathOrUri)
+            }
             
             for (i in 0 until extractor.trackCount) {
                 val format = extractor.getTrackFormat(i)
                 if (format.containsKey(MediaFormat.KEY_DURATION)) {
                     val durationUs = format.getLong(MediaFormat.KEY_DURATION)
-                    return durationUs / 1_000_000.0 // Convert to seconds
+                    return durationUs / 1_000_000.0
                 }
             }
             0.0
