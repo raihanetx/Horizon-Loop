@@ -36,6 +36,7 @@ import com.horizonloop.app.data.Note
 import com.horizonloop.app.ui.components.AudioControls
 import com.horizonloop.app.ui.components.CapsuleMenu
 import com.horizonloop.app.ui.components.CleanTab
+import com.horizonloop.app.ui.components.TranslationDebugPanel
 import com.horizonloop.app.ui.components.DialogueTab
 import com.horizonloop.app.ui.components.LoopsTab
 import com.horizonloop.app.ui.components.NotesTab
@@ -67,6 +68,9 @@ fun PlayerScreen(
     currentDialogue: Dialogue?,
     showCapsuleMenu: Boolean,
     selectedDialogueIds: Set<Int>,
+    showTranslationDebug: Boolean,
+    translationSteps: List<com.horizonloop.app.data.TranslationStep>,
+    translationLog: List<String>,
     onBack: () -> Unit,
     onMenuClick: () -> Unit,
     onTabClick: (ActiveTab) -> Unit,
@@ -83,6 +87,7 @@ fun PlayerScreen(
     onSpeedChange: (Int) -> Unit,
     onDialogueSelect: (Dialogue) -> Unit,
     onDismissCapsule: () -> Unit,
+    onDismissTranslationDebug: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize().background(Deep)) {
@@ -145,6 +150,15 @@ fun PlayerScreen(
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
+        
+        // Translation Debug Panel - shows step-by-step progress
+        TranslationDebugPanel(
+            steps = translationSteps,
+            log = translationLog,
+            isVisible = showTranslationDebug,
+            onDismiss = onDismissTranslationDebug,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 

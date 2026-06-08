@@ -121,6 +121,9 @@ class MainActivity : ComponentActivity() {
                             currentDialogue = viewModel.getCurrentDialogue(),
                             showCapsuleMenu = viewModel.showCapsuleMenu,
                             selectedDialogueIds = viewModel.selectedDialogueIds,
+                            showTranslationDebug = viewModel.showTranslationDebug,
+                            translationSteps = viewModel.translationSteps,
+                            translationLog = viewModel.translationLog,
                             onBack = { viewModel.goHome() },
                             onMenuClick = { viewModel.toggleShowCapsuleMenu() },
                             onTabClick = { viewModel.activeTab = it },
@@ -136,7 +139,8 @@ class MainActivity : ComponentActivity() {
                             onPlayLoop = { viewModel.playLoop(it) },
                             onSpeedChange = { viewModel.setSpeed(it) },
                             onDialogueSelect = { viewModel.selectDialogue(it) },
-                            onDismissCapsule = { viewModel.hideCapsuleMenu() }
+                            onDismissCapsule = { viewModel.hideCapsuleMenu() },
+                            onDismissTranslationDebug = { viewModel.showTranslationDebug = false }
                         )
                     }
                     if (showSettings) {

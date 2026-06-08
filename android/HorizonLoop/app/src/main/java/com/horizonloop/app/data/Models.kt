@@ -46,3 +46,15 @@ enum class ActiveTab(val value: String) {
 enum class FilterType {
     ALL, SIZE_DESC, SIZE_ASC, SUBTITLE_YES, SUBTITLE_NO, PINNED
 }
+
+enum class StepStatus {
+    PENDING, IN_PROGRESS, COMPLETED, FAILED
+}
+
+data class TranslationStep(
+    val stepNumber: Int,
+    val title: String,
+    val status: StepStatus = StepStatus.PENDING,
+    val detail: String? = null,
+    val icon: String = "→"
+)

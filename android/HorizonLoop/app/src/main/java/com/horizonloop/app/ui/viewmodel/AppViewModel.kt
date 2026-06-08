@@ -15,6 +15,8 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class AppViewModel : ViewModel() {
     var activeTab by mutableStateOf(ActiveTab.CLEAN)
@@ -41,9 +43,33 @@ class AppViewModel : ViewModel() {
     var scannedAudioFiles by mutableStateOf<List<Audio>>(emptyList())
     var isScanning by mutableStateOf(false)
     var scanError by mutableStateOf<String?>(null)
-
+    
+    // Playback speeds
     val speeds = listOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
     var currentSpeedIndex by mutableStateOf(2)
+    
+    // Translation debug panel - shows step-by-step progress
+    var showTranslationDebug by mutableStateOf(false)
+    var translationSteps by mutableStateOf<List<TranslationStep>>(emptyList())
+    var translationLog by mutableStateOf<List<String>>(emptyList())
+
+    private fun logTranslation(message: String) {
+        val timestamp = SimpleDateFormat("HH:mm:ss.SSS").format(Date())
+        val logEntry = "[$timestamp] $message"
+        translationLog = translationLog + logEntry
+        android.util.Log.d("TranslationDebug", logEntry)
+    }
+
+    private fun addStep(step: TranslationStep) {
+        translationSteps = translationSteps + step
+    }
+
+    private fun updateLastStep(status: StepStatus, detail: String? = null) {
+        if (translationSteps.isNotEmpty()) {
+            val lastStep = translationSteps.last()
+            translationSteps = translationSteps.dropLast(1) + lastStep.copy(status = status, detail = detail)
+        }
+    }
 
     val filteredAudioFiles: List<Audio>
         get() {
@@ -97,6 +123,10 @@ class AppViewModel : ViewModel() {
         totalDuration = audio.durationSec
         currentPlaybackTime = 0.0
         activeTab = ActiveTab.CLEAN
+        // Clear previous translation state
+        translatedDialogues = emptyList()
+        translationSteps = emptyList()
+        translationLog = emptyList()
     }
 
     fun goHome() {
@@ -195,6 +225,19 @@ class AppViewModel : ViewModel() {
      * 3. Send to LLM for translation to Bangla
      */
     fun startTranslation(context: Context) {
+        // Initialize debug state
+        translationSteps = listOf(
+            TranslationStep(1, "Checking permissions", StepStatus.PENDING, icon = "🔐"),
+            TranslationStep(2, "Reading media file", StepStatus.PENDING, icon = "📁"),
+            TranslationStep(3, "Extracting audio track", StepStatus.PENDING, icon = "🎵"),
+            TranslationStep(4, "Sending to Whisper API", StepStatus.PENDING, icon = "🎤"),
+            TranslationStep(5, "Receiving transcript", StepStatus.PENDING, icon = "📝"),
+            TranslationStep(6, "Sending to LLM for translation", StepStatus.PENDING, icon = "🧠"),
+            TranslationStep(7, "Creating subtitle entries", StepStatus.PENDING, icon = "✅")
+        )
+        translationLog = emptyList()
+        showTranslationDebug = true
+        
         if (currentAudioFilePath.isBlank()) {
             // No file path - use mock data for demo
             useMockTranslation()
@@ -206,17 +249,38 @@ class AppViewModel : ViewModel() {
             translationProgress = "Starting..."
             
             try {
-                // Step 1: Get API key
+                // ===== STEP 1: Check API Key =====
+                updateLastStep(StepStatus.IN_PROGRESS, "Checking API key...")
+                logTranslation("STEP 1: Checking API key availability")
+                
                 val apiKey = ApiKeyStorage.getApiKey(context)
                 if (apiKey.isBlank()) {
+                    logTranslation("ERROR: No API key found in Settings")
+                    updateLastStep(StepStatus.FAILED, "No API key in Settings")
                     translationProgress = "Error: No API key in settings"
                     isTranslating = false
                     return@launch
                 }
+                logTranslation("✓ API key found: ${apiKey.take(10)}...")
+                updateLastStep(StepStatus.COMPLETED, "API key found")
                 
                 val authHeader = "Bearer $apiKey"
                 
-                // Step 2: Extract audio
+                // ===== STEP 2: Read Media File =====
+                addStep(TranslationStep(8, "Reading media metadata", StepStatus.IN_PROGRESS, icon = "📋"))
+                logTranslation("STEP 2: Reading media file information")
+                logTranslation("File path/URI: $currentAudioFilePath")
+                if (currentAudioFilePath.startsWith("content://")) {
+                    logTranslation("Using content URI (scoped storage mode)")
+                } else {
+                    logTranslation("Using direct file path")
+                }
+                updateLastStep(StepStatus.COMPLETED, "File: $currentAudioTitle")
+                
+                // ===== STEP 3: Extract Audio =====
+                updateLastStep(StepStatus.IN_PROGRESS, "Extracting audio from video...")
+                logTranslation("STEP 3: Starting audio extraction")
+                
                 translationProgress = "Extracting audio..."
                 val cacheDir = context.cacheDir
                 val audioPath = AudioExtractor.extractAudio(
@@ -224,42 +288,61 @@ class AppViewModel : ViewModel() {
                     videoPath = currentAudioFilePath,
                     outputDir = cacheDir,
                     onProgress = { progress ->
-                        translationProgress = "Extracting audio... ${(progress * 100).toInt()}%"
+                        val pct = "${(progress * 100).toInt()}%"
+                        translationProgress = "Extracting audio... $pct"
+                        updateLastStep(StepStatus.IN_PROGRESS, "Extracting... $pct")
                     }
                 )
                 
                 if (audioPath == null) {
+                    logTranslation("ERROR: Audio extraction failed - returned null")
+                    updateLastStep(StepStatus.FAILED, "Failed to extract audio")
                     translationProgress = "Error: Failed to extract audio"
                     isTranslating = false
                     return@launch
                 }
+                logTranslation("✓ Audio extracted successfully to: $audioPath")
+                updateLastStep(StepStatus.COMPLETED, "Audio saved to: ${File(audioPath).name}")
                 
-                // Step 3: Split if needed (25MB limit)
-                translationProgress = "Preparing audio..."
+                // ===== STEP 4: Prepare Audio =====
+                addStep(TranslationStep(9, "Preparing audio for upload", StepStatus.IN_PROGRESS, icon = "📦"))
+                logTranslation("STEP 4: Preparing audio for API upload")
                 val audioChunks = AudioExtractor.splitAudio(audioPath, cacheDir)
+                logTranslation("Audio chunks to process: ${audioChunks.size}")
+                updateLastStep(StepStatus.COMPLETED, "${audioChunks.size} chunk(s)")
                 
-                // Step 4: Transcribe with Whisper
-                translationProgress = "Transcribing with Whisper..."
+                // ===== STEP 5: Send to Whisper =====
+                updateLastStep(StepStatus.IN_PROGRESS, "Sending audio to Whisper API...")
+                logTranslation("STEP 5: Sending to Groq Whisper API")
+                logTranslation("Endpoint: https://api.groq.com/openai/v1/audio/transcriptions")
+                logTranslation("Model: whisper-1")
+                
                 val fullTranscript = StringBuilder()
                 
                 for ((index, chunkPath) in audioChunks.withIndex()) {
                     if (audioChunks.size > 1) {
-                        translationProgress = "Transcribing chunk ${index + 1}/${audioChunks.size}..."
+                        logTranslation("Processing chunk ${index + 1}/${audioChunks.size}")
                     }
                     
                     val chunkFile = File(chunkPath)
+                    logTranslation("Uploading: ${chunkFile.name} (${chunkFile.length() / 1024} KB)")
+                    
                     val mimeType = if (chunkPath.endsWith(".m4a")) "audio/mp4" else "audio/mpeg"
+                    logTranslation("MIME type: $mimeType")
+                    
                     val requestFile = chunkFile.asRequestBody(mimeType.toMediaTypeOrNull())
                     val body = MultipartBody.Part.createFormData("file", chunkFile.name, requestFile)
                     val modelBody = "whisper-1".toRequestBody("text/plain".toMediaTypeOrNull())
                     
+                    logTranslation("Sending POST request to Whisper API...")
                     val response = GroqClient.apiService.transcribeAudio(authHeader, body, modelBody)
                     
                     if (response.isSuccessful) {
                         val text = response.body()?.text ?: ""
+                        logTranslation("✓ Whisper response received: ${text.take(50)}...")
                         fullTranscript.append(text).append(" ")
                     } else {
-                        android.util.Log.e("Translation", "Whisper error: ${response.code()} - ${response.message()}")
+                        logTranslation("ERROR: Whisper API error: ${response.code()} - ${response.message()}")
                     }
                     
                     // Clean up chunk file
@@ -268,13 +351,27 @@ class AppViewModel : ViewModel() {
                 
                 val transcript = fullTranscript.toString().trim()
                 if (transcript.isBlank()) {
+                    logTranslation("ERROR: No transcript text received from Whisper")
+                    updateLastStep(StepStatus.FAILED, "Empty transcript")
                     translationProgress = "Error: No transcript generated"
                     isTranslating = false
                     return@launch
                 }
+                logTranslation("✓ Total transcript length: ${transcript.length} characters")
+                updateLastStep(StepStatus.COMPLETED, "${transcript.length} chars extracted")
                 
-                // Step 5: Translate with LLM
-                translationProgress = "Translating to Bangla..."
+                // ===== STEP 6: Receive Transcript =====
+                updateLastStep(StepStatus.IN_PROGRESS, "Processing transcript...")
+                logTranslation("STEP 6: Transcript received from Whisper")
+                logTranslation("Preview: \"${transcript.take(100)}...\"")
+                updateLastStep(StepStatus.COMPLETED, transcript.take(50) + "...")
+                
+                // ===== STEP 7: Send to LLM =====
+                updateLastStep(StepStatus.IN_PROGRESS, "Sending to LLM for Bangla translation...")
+                logTranslation("STEP 7: Sending transcript to Groq LLM for translation")
+                logTranslation("Endpoint: https://api.groq.com/openai/v1/chat/completions")
+                logTranslation("Model: llama-3.3-70b-versatile")
+                
                 val chatRequest = ChatRequest(
                     model = "llama-3.3-70b-versatile",
                     messages = listOf(
@@ -283,28 +380,43 @@ class AppViewModel : ViewModel() {
                     )
                 )
                 
+                logTranslation("Sending translation request...")
                 val translateResponse = GroqClient.apiService.translateText(authHeader, chatRequest)
                 
                 var banglaTranslation = ""
                 if (translateResponse.isSuccessful) {
                     banglaTranslation = translateResponse.body()?.choices?.firstOrNull()?.message?.content?.trim() ?: ""
+                    logTranslation("✓ LLM translation received: ${banglaTranslation.take(50)}...")
                 } else {
-                    android.util.Log.e("Translation", "LLM error: ${translateResponse.code()} - ${translateResponse.message()}")
+                    logTranslation("ERROR: LLM API error: ${translateResponse.code()} - ${translateResponse.message()}")
                 }
+                updateLastStep(StepStatus.COMPLETED, banglaTranslation.take(50) + "...")
                 
                 // Clean up extracted audio
                 File(audioPath).delete()
+                logTranslation("Cleaned up temp audio file")
                 
-                // Step 6: Create dialogues from transcript
-                translationProgress = "Creating subtitles..."
+                // ===== STEP 8: Create Subtitles =====
+                updateLastStep(StepStatus.IN_PROGRESS, "Creating subtitle entries...")
+                logTranslation("STEP 8: Creating dialogue entries from transcript")
                 val newDialogues = createDialoguesFromTranscript(transcript, banglaTranslation)
-                translatedDialogues = newDialogues
+                logTranslation("Created ${newDialogues.size} dialogue entries")
                 
-                translationProgress = "Done!"
+                translatedDialogues = newDialogues
+                updateLastStep(StepStatus.COMPLETED, "${newDialogues.size} entries created")
+                
+                translationProgress = "Done! ${newDialogues.size} subtitles created"
+                logTranslation("✓ TRANSLATION COMPLETE - ${newDialogues.size} subtitles ready")
+                
+                // Auto-hide debug panel after 5 seconds when successful
+                kotlinx.coroutines.delay(5000)
+                showTranslationDebug = false
                 
             } catch (e: Exception) {
-                android.util.Log.e("Translation", "Error: ${e.message}")
+                logTranslation("FATAL ERROR: ${e.message}")
+                logTranslation("Stack trace: ${e.stackTraceToString()}")
                 translationProgress = "Error: ${e.message}"
+                // Keep debug panel visible on error so user can see what happened
             }
             
             isTranslating = false
