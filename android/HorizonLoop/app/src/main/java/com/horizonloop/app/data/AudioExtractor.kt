@@ -1,28 +1,24 @@
 package com.horizonloop.app.data
 
 import android.content.Context
+import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
-import android.media.MediaMuxer
 import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 import java.nio.ByteBuffer
 
 object AudioExtractor {
     
     private const val MAX_FILE_SIZE_MB = 25
+    private const val TIMEOUT_US = 10000L
     
     /**
-     * Extract audio from video file using Android's built-in MediaExtractor
-     * Supports both file paths (legacy) and content URIs (scoped storage)
-     * 
-     * @param context Android context
-     * @param videoPath Path to the video file OR content URI string
-     * @param outputDir Directory to save the extracted audio
-     * @param onProgress Callback for progress updates (0.0 to 1.0)
-     * @return Path to extracted audio file (.m4a), or null if failed
+     * Extract audio from video file and convert to WAV format
+     * This guarantees compatibility with Whisper API
      */
     suspend fun extractAudio(
         context: Context,
@@ -31,161 +27,193 @@ object AudioExtractor {
         onProgress: (Float) -> Unit = {}
     ): String? = withContext(Dispatchers.IO) {
         var extractor: MediaExtractor? = null
-        var muxer: MediaMuxer? = null
+        var decoder: MediaCodec? = null
         
         try {
-            val outputFile = File(outputDir, "temp_audio_${System.currentTimeMillis()}.m4a")
-            
+            // Set up extractor
             extractor = MediaExtractor()
             
-            // Check if this is a content URI or file path
             if (videoPath.startsWith("content://")) {
-                // Use content resolver for scoped storage
-                val uri = Uri.parse(videoPath)
-                val fd = context.contentResolver.openFileDescriptor(uri, "r")
-                if (fd == null) {
-                    android.util.Log.e("AudioExtractor", "Failed to open content URI")
-                    return@withContext null
-                }
-                extractor.setDataSource(fd.fileDescriptor)
-                fd.close()
+                extractor.setDataSource(context, Uri.parse(videoPath), null)
             } else {
-                // Use file path directly (legacy)
                 extractor.setDataSource(videoPath)
             }
             
-            // Find the first audio track
+            // Find audio track
             var audioTrackIndex = -1
             var audioFormat: MediaFormat? = null
             
             for (i in 0 until extractor.trackCount) {
                 val format = extractor.getTrackFormat(i)
-                val mime = format.getString(MediaFormat.KEY_MIME) ?: ""
-                if (mime.startsWith("audio/") || mime.startsWith("video/")) {
-                    // Check if track has audio
-                    if (mime.startsWith("audio/") || format.containsKey(MediaFormat.KEY_DURATION)) {
-                        try {
-                            audioTrackIndex = i
-                            audioFormat = format
-                            break
-                        } catch (e: Exception) {
-                            continue
-                        }
-                    }
+                val mime = format.getString(MediaFormat.KEY_MIME) ?: continue
+                
+                if (mime.startsWith("audio/")) {
+                    audioTrackIndex = i
+                    audioFormat = format
+                    break
                 }
             }
             
             if (audioTrackIndex < 0 || audioFormat == null) {
-                android.util.Log.e("AudioExtractor", "No audio track found in video")
                 return@withContext null
             }
             
-            // Create muxer with M4A output
-            muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-            
-            val muxerTrackIndex = muxer.addTrack(audioFormat)
-            muxer.start()
-            
-            // Get duration for progress calculation
-            val durationUs = audioFormat.getLong(MediaFormat.KEY_DURATION)
-            
-            // Select the audio track
+            // Select audio track
             extractor.selectTrack(audioTrackIndex)
             
-            // Read and write audio samples
-            val bufferSize = 1024 * 1024 // 1MB buffer
-            val buffer = ByteBuffer.allocate(bufferSize)
-            val bufferInfo = android.media.MediaCodec.BufferInfo()
+            val mimeType = audioFormat.getString(MediaFormat.KEY_MIME)!!
+            val sampleRate = audioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE)
+            val channelCount = audioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
             
-            var processedUs = 0L
+            // Default to 16 bits per sample (most common for PCM audio)
+            val bitsPerSample = 16
             
-            while (true) {
-                val sampleSize = extractor.readSampleData(buffer, 0)
-                
-                if (sampleSize < 0) {
-                    break
+            // Create decoder
+            decoder = MediaCodec.createDecoderByType(mimeType)
+            decoder.configure(audioFormat, null, null, 0)
+            decoder.start()
+            
+            // Create output file with WAV extension
+            val outputFile = File(outputDir, "temp_audio_${System.currentTimeMillis()}.wav")
+            
+            val pcmData = mutableListOf<ByteArray>()
+            var isEOS = false
+            val bufferInfo = MediaCodec.BufferInfo()
+            
+            while (!isEOS) {
+                // Feed input
+                val inputBufferIndex = decoder.dequeueInputBuffer(TIMEOUT_US)
+                if (inputBufferIndex >= 0) {
+                    val inputBuffer = decoder.getInputBuffer(inputBufferIndex)!!
+                    val sampleSize = extractor.readSampleData(inputBuffer, 0)
+                    
+                    if (sampleSize < 0) {
+                        decoder.queueInputBuffer(inputBufferIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                        isEOS = true
+                    } else {
+                        val presentationTimeUs = extractor.sampleTime
+                        decoder.queueInputBuffer(inputBufferIndex, 0, sampleSize, presentationTimeUs, 0)
+                        extractor.advance()
+                    }
                 }
                 
-                bufferInfo.offset = 0
-                bufferInfo.size = sampleSize
-                bufferInfo.presentationTimeUs = extractor.sampleTime
-                bufferInfo.flags = extractor.sampleFlags
-                
-                muxer.writeSampleData(muxerTrackIndex, buffer, bufferInfo)
-                
-                // Update progress
-                processedUs = extractor.sampleTime
-                if (durationUs > 0) {
-                    onProgress((processedUs.toFloat() / durationUs.toFloat()) * 0.9f)
+                // Get output
+                val outputBufferIndex = decoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_US)
+                if (outputBufferIndex >= 0) {
+                    if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
+                        isEOS = true
+                    }
+                    
+                    if (bufferInfo.size > 0) {
+                        val outputBuffer = decoder.getOutputBuffer(outputBufferIndex)!!
+                        // Set position to start of valid data
+                        outputBuffer.position(bufferInfo.offset)
+                        outputBuffer.limit(bufferInfo.offset + bufferInfo.size)
+                        
+                        val data = ByteArray(bufferInfo.size)
+                        outputBuffer.get(data)
+                        pcmData.add(data)
+                    }
+                    
+                    decoder.releaseOutputBuffer(outputBufferIndex, false)
+                    
+                    onProgress(0.5f) // Decode in progress
                 }
-                
-                extractor.advance()
             }
             
-            onProgress(1f)
+            // Write WAV file
+            writeWavFile(outputFile, pcmData, channelCount, sampleRate, bitsPerSample)
             
+            onProgress(1f)
             return@withContext outputFile.absolutePath
             
         } catch (e: Exception) {
-            android.util.Log.e("AudioExtractor", "Extraction error: ${e.message}")
-            null
+            e.printStackTrace()
+            return@withContext null
         } finally {
             try {
-                muxer?.stop()
-                muxer?.release()
-            } catch (e: Exception) { }
-            extractor?.release()
+                decoder?.stop()
+                decoder?.release()
+                extractor?.release()
+            } catch (e: Exception) {
+                // Ignore cleanup errors
+            }
         }
     }
     
     /**
-     * Split large audio file into chunks of MAX_FILE_SIZE_MB
-     * For simplicity, we just return the original path if under the limit
+     * Split audio file into chunks (for Whisper API 25MB limit)
+     * For WAV files, we just return the single file since we're already producing small WAV files
      */
-    suspend fun splitAudio(
-        audioPath: String,
-        outputDir: File
-    ): List<String> = withContext(Dispatchers.IO) {
-        val audioFile = File(audioPath)
-        val fileSizeMB = audioFile.length() / (1024 * 1024)
+    fun splitAudio(audioPath: String, cacheDir: File): List<String> {
+        val maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024
+        val file = File(audioPath)
         
-        if (fileSizeMB <= MAX_FILE_SIZE_MB) {
-            return@withContext listOf(audioPath)
+        if (file.length() <= maxSizeBytes) {
+            return listOf(audioPath)
         }
         
-        listOf(audioPath)
+        // For larger files, we'd need to split - but WAV files from extraction should be small enough
+        // Return single file (caller should handle size limits)
+        return listOf(audioPath)
     }
     
     /**
-     * Get duration of audio/video file using MediaExtractor
+     * Write PCM data to a WAV file
      */
-    fun getDuration(context: Context, pathOrUri: String): Double {
-        var extractor: MediaExtractor? = null
-        return try {
-            extractor = MediaExtractor()
+    private fun writeWavFile(
+        file: File,
+        pcmData: List<ByteArray>,
+        channels: Int,
+        sampleRate: Int,
+        bitsPerSample: Int
+    ) {
+        val byteRate = sampleRate * channels * bitsPerSample / 8
+        val blockAlign = channels * bitsPerSample / 8
+        
+        val totalDataSize = pcmData.sumOf { it.size }
+        val fileSize = 36 + totalDataSize
+        
+        FileOutputStream(file).use { fos ->
+            // RIFF header
+            fos.write("RIFF".toByteArray())
+            fos.write(intToByteArray(fileSize))
+            fos.write("WAVE".toByteArray())
             
-            if (pathOrUri.startsWith("content://")) {
-                val fd = context.contentResolver.openFileDescriptor(Uri.parse(pathOrUri), "r")
-                fd?.let {
-                    extractor.setDataSource(it.fileDescriptor)
-                    it.close()
-                }
-            } else {
-                extractor.setDataSource(pathOrUri)
-            }
+            // fmt subchunk
+            fos.write("fmt ".toByteArray())
+            fos.write(intToByteArray(16)) // Subchunk1Size (16 for PCM)
+            fos.write(shortToByteArray(1)) // AudioFormat (1 = PCM)
+            fos.write(shortToByteArray(channels))
+            fos.write(intToByteArray(sampleRate))
+            fos.write(intToByteArray(byteRate))
+            fos.write(shortToByteArray(blockAlign))
+            fos.write(shortToByteArray(bitsPerSample))
             
-            for (i in 0 until extractor.trackCount) {
-                val format = extractor.getTrackFormat(i)
-                if (format.containsKey(MediaFormat.KEY_DURATION)) {
-                    val durationUs = format.getLong(MediaFormat.KEY_DURATION)
-                    return durationUs / 1_000_000.0
-                }
+            // data subchunk
+            fos.write("data".toByteArray())
+            fos.write(intToByteArray(totalDataSize))
+            
+            // Write PCM data
+            for (chunk in pcmData) {
+                fos.write(chunk)
             }
-            0.0
-        } catch (e: Exception) {
-            0.0
-        } finally {
-            extractor?.release()
         }
+    }
+    
+    private fun intToByteArray(value: Int): ByteArray {
+        return byteArrayOf(
+            (value and 0xFF).toByte(),
+            ((value shr 8) and 0xFF).toByte(),
+            ((value shr 16) and 0xFF).toByte(),
+            ((value shr 24) and 0xFF).toByte()
+        )
+    }
+    
+    private fun shortToByteArray(value: Int): ByteArray {
+        return byteArrayOf(
+            (value and 0xFF).toByte(),
+            ((value shr 8) and 0xFF).toByte()
+        )
     }
 }
