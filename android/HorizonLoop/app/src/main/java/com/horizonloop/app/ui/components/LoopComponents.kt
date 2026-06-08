@@ -111,6 +111,7 @@ fun LoopsTab(
     loops: List<Loop>,
     onAddLoop: (String, String, String, Int) -> Unit,
     onPlayLoop: (Loop) -> Unit,
+    onDeleteLoop: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDialog by remember { mutableStateOf(false) }
@@ -162,12 +163,24 @@ fun LoopsTab(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(
-                        text = selectedLoop!!.name,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Dark
-                    )
+                    // Header with title and delete in corner
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = selectedLoop!!.name,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Dark
+                        )
+                        Text(
+                            text = "🗑️",
+                            fontSize = 16.sp,
+                            modifier = Modifier.clickable { onDeleteLoop(selectedLoop!!.id); selectedLoop = null }
+                        )
+                    }
                     val startSec = parseTimeToSeconds(selectedLoop!!.start)
                     val endSec = parseTimeToSeconds(selectedLoop!!.end)
                     Text(
@@ -295,13 +308,12 @@ fun LoopsTab(
                         shape = RoundedCornerShape(12.dp)
                     )
 
+                    // Action buttons row: Preview | Cancel Save
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TextButton(onClick = { showDialog = false; name = ""; start = ""; end = ""; count = "1"; previewLoop = emptyMap(); showPreview = false }) {
-                            Text("Cancel", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                        }
                         TextButton(
                             onClick = {
                                 if (name.isNotBlank()) {
@@ -315,7 +327,10 @@ fun LoopsTab(
                                 }
                             }
                         ) {
-                            Text("Preview", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                            Text("Preview", color = Mid, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                        TextButton(onClick = { showDialog = false; name = ""; start = ""; end = ""; count = "1"; previewLoop = emptyMap(); showPreview = false }) {
+                            Text("Cancel", color = Mid, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                         }
                         Button(
                             onClick = {
@@ -330,7 +345,7 @@ fun LoopsTab(
                             colors = ButtonDefaults.buttonColors(containerColor = Mid, contentColor = Deep),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Save", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                            Text("Save", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }

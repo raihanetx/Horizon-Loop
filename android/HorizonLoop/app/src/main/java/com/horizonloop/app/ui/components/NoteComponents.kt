@@ -93,7 +93,7 @@ fun NoteCard(
 fun NotesTab(
     notes: List<Note>,
     onAddNote: (String) -> Unit,
-    onNoteClick: (Note) -> Unit,
+    onDeleteNote: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDialog by remember { mutableStateOf(false) }
@@ -143,12 +143,24 @@ fun NotesTab(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(
-                        text = "Note",
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Dark
-                    )
+                    // Header with title and delete in corner
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Note",
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Dark
+                        )
+                        Text(
+                            text = "🗑️",
+                            fontSize = 16.sp,
+                            modifier = Modifier.clickable { onDeleteNote(selectedNote!!.id); selectedNote = null }
+                        )
+                    }
                     Text(
                         text = selectedNote!!.text,
                         fontSize = 14.sp,
@@ -224,13 +236,34 @@ fun NotesTab(
                         minLines = 3
                     )
 
+                    // Preview and Save - full width side by side
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        TextButton(onClick = { showDialog = false; noteText = ""; previewNote = ""; showPreview = false }) {
-                            Text("Cancel", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                        }
+                        OutlinedTextField(
+                            value = noteText,
+                            onValueChange = { noteText = it },
+                            modifier = Modifier.weight(1f),
+                            placeholder = { Text("Type your note...", color = Mid) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = Dark,
+                                unfocusedTextColor = Dark,
+                                focusedBorderColor = Mid,
+                                unfocusedBorderColor = Muted,
+                                cursorColor = Dark
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            minLines = 3
+                        )
+                    }
+                    
+                    // Action buttons row: Preview | Cancel Save
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         TextButton(
                             onClick = {
                                 if (noteText.isNotBlank()) {
@@ -239,7 +272,10 @@ fun NotesTab(
                                 }
                             }
                         ) {
-                            Text("Preview", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                            Text("Preview", color = Mid, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                        TextButton(onClick = { showDialog = false; noteText = ""; previewNote = ""; showPreview = false }) {
+                            Text("Cancel", color = Mid, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                         }
                         Button(
                             onClick = {
@@ -254,7 +290,7 @@ fun NotesTab(
                             colors = ButtonDefaults.buttonColors(containerColor = Mid, contentColor = Deep),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Save", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                            Text("Save", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }

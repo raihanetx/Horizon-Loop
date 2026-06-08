@@ -73,7 +73,9 @@ fun PlayerScreen(
     onRewind: () -> Unit,
     onForward: () -> Unit,
     onAddNote: (String) -> Unit,
+    onDeleteNote: (Int) -> Unit,
     onAddLoop: (String, String, String, Int) -> Unit,
+    onDeleteLoop: (Int) -> Unit,
     onPlayLoop: (Loop) -> Unit,
     onSpeedChange: (Int) -> Unit,
     onDialogueSelect: (Dialogue) -> Unit,
@@ -96,7 +98,9 @@ fun PlayerScreen(
                 speeds = speeds,
                 selectedDialogueIds = selectedDialogueIds,
                 onAddNote = onAddNote,
+                onDeleteNote = onDeleteNote,
                 onAddLoop = onAddLoop,
+                onDeleteLoop = onDeleteLoop,
                 onPlayLoop = onPlayLoop,
                 onSpeedChange = onSpeedChange,
                 onDialogueSelect = onDialogueSelect,
@@ -112,6 +116,7 @@ fun PlayerScreen(
                     currentSpeed = currentSpeed,
                     activeTab = activeTab.value,
                     activeLoopId = activeLoopId,
+                    isCollapsed = activeTab == ActiveTab.SAVE,
                     onPlayPause = onPlayPause,
                     onRewind = onRewind,
                     onForward = onForward,
@@ -182,7 +187,9 @@ private fun TabContent(
     speeds: List<Float>,
     selectedDialogueIds: Set<Int>,
     onAddNote: (String) -> Unit,
+    onDeleteNote: (Int) -> Unit,
     onAddLoop: (String, String, String, Int) -> Unit,
+    onDeleteLoop: (Int) -> Unit,
     onPlayLoop: (Loop) -> Unit,
     onSpeedChange: (Int) -> Unit,
     onDialogueSelect: (Dialogue) -> Unit,
@@ -205,8 +212,8 @@ private fun TabContent(
                 onDialogueClick = onDialogueSelect
             )
             ActiveTab.SPEED -> SpeedTab(currentSpeed = currentSpeed, speeds = speeds, onSpeedChange = onSpeedChange)
-            ActiveTab.LOOP -> LoopsTab(loops = loops, onAddLoop = onAddLoop, onPlayLoop = onPlayLoop)
-            ActiveTab.NOTES -> NotesTab(notes = notes, onAddNote = onAddNote, onNoteClick = { })
+            ActiveTab.LOOP -> LoopsTab(loops = loops, onAddLoop = onAddLoop, onDeleteLoop = onDeleteLoop, onPlayLoop = onPlayLoop)
+            ActiveTab.NOTES -> NotesTab(notes = notes, onAddNote = onAddNote, onDeleteNote = onDeleteNote)
         }
     }
 }
