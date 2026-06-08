@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -32,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.horizonloop.app.data.ApiKeyStorage
 import com.horizonloop.app.ui.theme.Dark
 import com.horizonloop.app.ui.theme.Deep
 import com.horizonloop.app.ui.theme.Mid
@@ -40,19 +43,20 @@ import com.horizonloop.app.ui.theme.Surface
 
 @Composable
 fun SettingsDialog(
+    apiKey: String,
+    selectedSttModel: String,
+    selectedLlmModel: String,
+    onApiKeyChange: (String) -> Unit,
+    onSttModelChange: (String) -> Unit,
+    onLlmModelChange: (String) -> Unit,
     onDismiss: () -> Unit,
-    onSave: (String, String) -> Unit,
-    modifier: Modifier = Modifier
+    onSave: () -> Unit
 ) {
-    var apiKey by remember { mutableStateOf("") }
-    var engine by remember { mutableStateOf("gpt-4o") }
-    var expanded by remember { mutableStateOf(false) }
-    var engines by remember { mutableStateOf(listOf("gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo", "claude-3-opus", "claude-3-sonnet", "gemini-pro")) }
-    var isDetecting by remember { mutableStateOf(false) }
-    var detectionStatus by remember { mutableStateOf("") }
-
+    var sttExpanded by remember { mutableStateOf(false) }
+    var llmExpanded by remember { mutableStateOf(false) }
+    
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .background(Surface)
             .clip(RoundedCornerShape(16.dp))
@@ -70,12 +74,16 @@ fun SettingsDialog(
                 Text("Settings", fontWeight = FontWeight.SemiBold, color = Dark, fontSize = 16.sp)
                 TextButton(onClick = onDismiss) { Text("×", color = Mid, fontSize = 20.sp) }
             }
+            
+            // API Key Input
+            Text("Groq API Key", fontSize = 11.sp, color = Mid, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
             OutlinedTextField(
                 value = apiKey,
-                onValueChange = { apiKey = it },
+                onValueChange = onApiKeyChange,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("API Key", fontSize = 11.sp, color = Mid) },
-                placeholder = { Text("Enter your API key...", color = Mid) },
+                textStyle = TextStyle(fontSize = 14.sp, color = Dark),
+                placeholder = { Text("gsk_...", color = Mid, fontSize = 14.sp) },
+                singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Dark,
                     unfocusedTextColor = Dark,
@@ -84,51 +92,19 @@ fun SettingsDialog(
                     cursorColor = Dark
                 )
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    onClick = {
-                        if (apiKey.isNotBlank()) {
-                            isDetecting = true
-                            detectionStatus = ""
-                            // Simulate API detection - in production, this would call OpenAI API
-                            // For now, we detect based on API key pattern
-                            val detectedEngines = when {
-                                apiKey.startsWith("sk-ant") -> listOf("claude-3-5-sonnet-20240620", "claude-3-opus-20240229", "claude-3-sonnet-20240229")
-                                apiKey.startsWith("AIza") -> listOf("gemini-1.5-pro", "gemini-1.5-flash", "gemini-pro")
-                                else -> listOf("gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo")
-                            }
-                            engines = detectedEngines
-                            engine = detectedEngines.first()
-                            isDetecting = false
-                            detectionStatus = "${detectedEngines.size} models detected"
-                        } else {
-                            detectionStatus = "Enter API key first"
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Muted, contentColor = Dark),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    if (isDetecting) {
-                        CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = Dark)
-                    } else {
-                        Text("Detect Models", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-                if (detectionStatus.isNotBlank()) {
-                    Text(detectionStatus, fontSize = 10.sp, color = Mid, modifier = Modifier.weight(1f))
-                }
-            }
+            
+            // STT Model Selection (Audio to Text)
+            Text("Speech-to-Text Model (Audio → English)", fontSize = 11.sp, color = Mid, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
             Box {
                 OutlinedTextField(
-                    value = engine,
+                    value = selectedSttModel,
                     onValueChange = { },
                     modifier = Modifier.fillMaxWidth(),
                     readOnly = true,
-                    label = { Text("Engine", fontSize = 11.sp, color = Mid) },
+                    textStyle = TextStyle(fontSize = 14.sp, color = Dark),
+                    trailingIcon = {
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown", tint = Mid)
+                    },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Dark,
                         unfocusedTextColor = Dark,
@@ -139,21 +115,76 @@ fun SettingsDialog(
                 Box(
                     modifier = Modifier
                         .matchParentSize()
-                        .clickable { expanded = true }
+                        .clickable { sttExpanded = true }
                 )
                 DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
+                    expanded = sttExpanded,
+                    onDismissRequest = { sttExpanded = false },
                     modifier = Modifier.background(Surface)
                 ) {
-                    engines.forEach { e ->
+                    ApiKeyStorage.STT_MODELS.forEach { model ->
                         DropdownMenuItem(
-                            text = { Text(e, color = Dark, fontSize = 12.sp) },
-                            onClick = { engine = e; expanded = false }
+                            text = { 
+                                Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                                    Text(model, color = Dark, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                                }
+                            },
+                            onClick = { 
+                                onSttModelChange(model)
+                                sttExpanded = false 
+                            }
                         )
                     }
                 }
             }
+            
+            // LLM Model Selection (Translation to Bangla)
+            Text("Translation Model (English → Bangla)", fontSize = 11.sp, color = Mid, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+            Box {
+                OutlinedTextField(
+                    value = selectedLlmModel,
+                    onValueChange = { },
+                    modifier = Modifier.fillMaxWidth(),
+                    readOnly = true,
+                    textStyle = TextStyle(fontSize = 14.sp, color = Dark),
+                    trailingIcon = {
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown", tint = Mid)
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Dark,
+                        unfocusedTextColor = Dark,
+                        focusedBorderColor = Mid,
+                        unfocusedBorderColor = Muted
+                    )
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable { llmExpanded = true }
+                )
+                DropdownMenu(
+                    expanded = llmExpanded,
+                    onDismissRequest = { llmExpanded = false },
+                    modifier = Modifier.background(Surface)
+                ) {
+                    ApiKeyStorage.LLM_MODELS.forEach { model ->
+                        DropdownMenuItem(
+                            text = { 
+                                Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                                    Text(model, color = Dark, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                                }
+                            },
+                            onClick = { 
+                                onLlmModelChange(model)
+                                llmExpanded = false 
+                            }
+                        )
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 TextButton(
                     onClick = onDismiss,
@@ -162,7 +193,7 @@ fun SettingsDialog(
                     Text("Cancel", color = Mid, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                 }
                 Button(
-                    onClick = { onSave(apiKey, engine); onDismiss() },
+                    onClick = onSave,
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = Mid, contentColor = Deep)
                 ) {

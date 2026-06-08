@@ -87,6 +87,7 @@ class AppViewModel : ViewModel() {
             }
             return result
         }
+    }
     
     /**
      * Scan device for videos and audio files using MediaStore
@@ -225,6 +226,10 @@ class AppViewModel : ViewModel() {
      * 3. Send to LLM for translation to Bangla
      */
     fun startTranslation(context: Context) {
+        // Get the saved models from storage
+        val sttModel = ApiKeyStorage.getSttEngine(context)
+        val llmModel = ApiKeyStorage.getLlmEngine(context)
+        
         // Initialize debug state
         translationSteps = listOf(
             TranslationStep(1, "Checking permissions", StepStatus.PENDING, icon = "🔐"),
@@ -311,11 +316,11 @@ class AppViewModel : ViewModel() {
                 logTranslation("Audio chunks to process: ${audioChunks.size}")
                 updateLastStep(StepStatus.COMPLETED, "${audioChunks.size} chunk(s)")
                 
-                // ===== STEP 5: Send to Whisper =====
+                // ===== STEP 5: Send to Whisper (STT) =====
                 updateLastStep(StepStatus.IN_PROGRESS, "Sending audio to Whisper API...")
-                logTranslation("STEP 5: Sending to Groq Whisper API")
+                logTranslation("STEP 5: Sending to Groq Whisper API (STT)")
                 logTranslation("Endpoint: https://api.groq.com/openai/v1/audio/transcriptions")
-                logTranslation("Model: whisper-1")
+                logTranslation("STT Model: $sttModel")
                 
                 val fullTranscript = StringBuilder()
                 
@@ -332,7 +337,7 @@ class AppViewModel : ViewModel() {
                     
                     val requestFile = chunkFile.asRequestBody(mimeType.toMediaTypeOrNull())
                     val body = MultipartBody.Part.createFormData("file", chunkFile.name, requestFile)
-                    val modelBody = "whisper-1".toRequestBody("text/plain".toMediaTypeOrNull())
+                    val modelBody = sttModel.toRequestBody("text/plain".toMediaTypeOrNull())
                     
                     logTranslation("Sending POST request to Whisper API...")
                     val response = GroqClient.apiService.transcribeAudio(authHeader, body, modelBody)
@@ -366,14 +371,14 @@ class AppViewModel : ViewModel() {
                 logTranslation("Preview: \"${transcript.take(100)}...\"")
                 updateLastStep(StepStatus.COMPLETED, transcript.take(50) + "...")
                 
-                // ===== STEP 7: Send to LLM =====
+                // ===== STEP 7: Send to LLM for Translation =====
                 updateLastStep(StepStatus.IN_PROGRESS, "Sending to LLM for Bangla translation...")
                 logTranslation("STEP 7: Sending transcript to Groq LLM for translation")
                 logTranslation("Endpoint: https://api.groq.com/openai/v1/chat/completions")
-                logTranslation("Model: llama-3.3-70b-versatile")
+                logTranslation("LLM Translation Model: $llmModel")
                 
                 val chatRequest = ChatRequest(
-                    model = "llama-3.3-70b-versatile",
+                    model = llmModel,
                     messages = listOf(
                         ChatMessage("system", "You are a translator. Translate the following English text to Bangla (Bengali). Only output the translation, nothing else."),
                         ChatMessage("user", transcript)

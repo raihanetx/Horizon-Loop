@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.horizonloop.app.data.ApiKeyStorage
 import com.horizonloop.app.data.FilterType
 import com.horizonloop.app.ui.screens.HomeScreen
 import com.horizonloop.app.ui.screens.PlayerScreen
@@ -53,7 +54,32 @@ class MainActivity : ComponentActivity() {
             HorizonLoopTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = Deep) {
                     val viewModel: AppViewModel = viewModel()
+                    
+                    // Settings state
                     var showSettings by remember { mutableStateOf(false) }
+                    var settingsApiKey by remember { mutableStateOf("") }
+                    var settingsSttModel by remember { mutableStateOf("whisper-1") }
+                    var settingsLlmModel by remember { mutableStateOf("llama-3.3-70b-versatile") }
+                    
+                    // Original values to restore on cancel
+                    var originalApiKey by remember { mutableStateOf("") }
+                    var originalSttModel by remember { mutableStateOf("whisper-1") }
+                    var originalLlmModel by remember { mutableStateOf("llama-3.3-70b-versatile") }
+                    
+                    // Load saved settings when dialog opens
+                    LaunchedEffect(showSettings) {
+                        if (showSettings) {
+                            // Store original values for cancel restoration
+                            originalApiKey = ApiKeyStorage.getApiKey(this@MainActivity)
+                            originalSttModel = ApiKeyStorage.getSttEngine(this@MainActivity)
+                            originalLlmModel = ApiKeyStorage.getLlmEngine(this@MainActivity)
+                            
+                            // Load current values for editing
+                            settingsApiKey = originalApiKey
+                            settingsSttModel = originalSttModel
+                            settingsLlmModel = originalLlmModel
+                        }
+                    }
 
                     // Check permissions on first composition
                     LaunchedEffect(Unit) {
@@ -143,13 +169,29 @@ class MainActivity : ComponentActivity() {
                             onDismissTranslationDebug = { viewModel.showTranslationDebug = false }
                         )
                     }
+                    
                     if (showSettings) {
                         SettingsDialog(
-                            apiKey = "",
-                            selectedEngine = "gpt-4o-mini",
-                            onApiKeyChange = { },
-                            onEngineChange = { },
-                            onDismiss = { showSettings = false }
+                            apiKey = settingsApiKey,
+                            selectedSttModel = settingsSttModel,
+                            selectedLlmModel = settingsLlmModel,
+                            onApiKeyChange = { settingsApiKey = it },
+                            onSttModelChange = { settingsSttModel = it },
+                            onLlmModelChange = { settingsLlmModel = it },
+                            onDismiss = {
+                                // Cancel: restore original values (don't save)
+                                settingsApiKey = originalApiKey
+                                settingsSttModel = originalSttModel
+                                settingsLlmModel = originalLlmModel
+                                showSettings = false
+                            },
+                            onSave = {
+                                // Save settings to storage
+                                ApiKeyStorage.saveApiKey(this@MainActivity, settingsApiKey)
+                                ApiKeyStorage.saveSttEngine(this@MainActivity, settingsSttModel)
+                                ApiKeyStorage.saveLlmEngine(this@MainActivity, settingsLlmModel)
+                                showSettings = false
+                            }
                         )
                     }
                 }
