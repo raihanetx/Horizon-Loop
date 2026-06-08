@@ -20,17 +20,21 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
     
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+    
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('android/HorizonLoop/*.gradle*') }}
+        restore-keys: ${{ runner.os }}-gradle-
     
     - name: Grant execute permission for gradlew
       run: chmod +x android/HorizonLoop/gradlew
     
     - name: Build debug APK
       run: android/HorizonLoop/gradlew -p android/HorizonLoop assembleDebug
-      env:
-        ANDROID_HOME: /opt/android-sdk
-        ANDROID_SDK_ROOT: /opt/android-sdk
     
     - name: Upload APK to Release
       if: github.event_name == 'release'
@@ -41,6 +45,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Upload APK as Artifact
+      if: github.event_name != 'release'
       uses: actions/upload-artifact@v4
       with:
         name: app-debug-apk
