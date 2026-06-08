@@ -87,7 +87,6 @@ class AppViewModel : ViewModel() {
             }
             return result
         }
-    }
     
     /**
      * Scan device for videos and audio files using MediaStore
@@ -229,7 +228,7 @@ class AppViewModel : ViewModel() {
         // Get the saved models from storage
         val sttModel = ApiKeyStorage.getSttEngine(context)
         val llmModel = ApiKeyStorage.getLlmEngine(context)
-        
+
         // Initialize debug state
         translationSteps = listOf(
             TranslationStep(1, "Checking permissions", StepStatus.PENDING, icon = "🔐"),
@@ -316,11 +315,11 @@ class AppViewModel : ViewModel() {
                 logTranslation("Audio chunks to process: ${audioChunks.size}")
                 updateLastStep(StepStatus.COMPLETED, "${audioChunks.size} chunk(s)")
                 
-                // ===== STEP 5: Send to Whisper (STT) =====
+                // ===== STEP 5: Send to Whisper =====
                 updateLastStep(StepStatus.IN_PROGRESS, "Sending audio to Whisper API...")
-                logTranslation("STEP 5: Sending to Groq Whisper API (STT)")
+                logTranslation("STEP 5: Sending to Groq Whisper API")
                 logTranslation("Endpoint: https://api.groq.com/openai/v1/audio/transcriptions")
-                logTranslation("STT Model: $sttModel")
+                logTranslation("Model: whisper-1")
                 
                 val fullTranscript = StringBuilder()
                 
@@ -371,11 +370,11 @@ class AppViewModel : ViewModel() {
                 logTranslation("Preview: \"${transcript.take(100)}...\"")
                 updateLastStep(StepStatus.COMPLETED, transcript.take(50) + "...")
                 
-                // ===== STEP 7: Send to LLM for Translation =====
+                // ===== STEP 7: Send to LLM =====
                 updateLastStep(StepStatus.IN_PROGRESS, "Sending to LLM for Bangla translation...")
                 logTranslation("STEP 7: Sending transcript to Groq LLM for translation")
                 logTranslation("Endpoint: https://api.groq.com/openai/v1/chat/completions")
-                logTranslation("LLM Translation Model: $llmModel")
+                logTranslation("Model: llama-3.3-70b-versatile")
                 
                 val chatRequest = ChatRequest(
                     model = llmModel,

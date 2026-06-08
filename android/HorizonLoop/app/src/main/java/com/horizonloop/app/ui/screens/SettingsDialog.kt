@@ -31,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,12 +61,13 @@ fun SettingsDialog(
             .fillMaxWidth()
             .background(Surface)
             .clip(RoundedCornerShape(16.dp))
-            .padding(20.dp)
+            .padding(16.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -131,14 +133,14 @@ fun SettingsDialog(
                             },
                             onClick = { 
                                 onSttModelChange(model)
-                                sttExpanded = false 
+                                sttExpanded = false
                             }
                         )
                     }
                 }
             }
             
-            // LLM Model Selection (Translation to Bangla)
+            // LLM Model Selection (English to Bangla)
             Text("Translation Model (English → Bangla)", fontSize = 11.sp, color = Mid, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
             Box {
                 OutlinedTextField(
@@ -176,7 +178,7 @@ fun SettingsDialog(
                             },
                             onClick = { 
                                 onLlmModelChange(model)
-                                llmExpanded = false 
+                                llmExpanded = false
                             }
                         )
                     }
@@ -185,19 +187,24 @@ fun SettingsDialog(
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                TextButton(
+            // Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Button(
                     onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(containerColor = Muted, contentColor = Dark),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Cancel", color = Mid, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Cancel", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 }
                 Button(
                     onClick = onSave,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = Mid, contentColor = Deep)
+                    colors = ButtonDefaults.buttonColors(containerColor = Deep, contentColor = Surface),
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Text("Save", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Save", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
