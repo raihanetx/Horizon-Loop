@@ -36,6 +36,7 @@ import com.horizonloop.app.ui.theme.Dark
 import com.horizonloop.app.ui.theme.Mid
 import com.horizonloop.app.ui.theme.Muted
 import com.horizonloop.app.ui.theme.Surface
+import com.horizonloop.app.ui.theme.White20
 
 @Composable
 fun DialogueCard(
@@ -70,6 +71,7 @@ fun DialogueCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
+            .background(if (isSelected) White20 else Color.Transparent)
             .clickable(onClick = onClick)
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -115,7 +117,7 @@ fun DialogueTab(
         }
     } else {
         LazyColumn(
-            modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 20.dp),
+            modifier = modifier.fillMaxWidth().padding(horizontal = 30.dp).padding(bottom = 20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(top = 0.dp)
         ) {
