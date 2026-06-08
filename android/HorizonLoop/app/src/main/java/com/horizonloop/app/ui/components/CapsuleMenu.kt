@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.Context
 import com.horizonloop.app.ui.theme.Dark
 import com.horizonloop.app.ui.theme.Mid
 import com.horizonloop.app.ui.theme.Muted
@@ -42,8 +43,9 @@ fun CapsuleMenu(
     audioMode: Boolean,
     onTabClick: (String) -> Unit,
     onAudioModeToggle: () -> Unit,
-    onTranslate: () -> Unit,
+    onTranslate: (Context) -> Unit,
     onDismiss: () -> Unit,
+    context: Context,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -72,7 +74,7 @@ fun CapsuleMenu(
             CapsuleMenuItem("Save time frame", "Set start and end time markers", AppIcons.Loop, activeTab == "loop") { onTabClick("loop") },
             CapsuleMenuItem("Note", "Add and manage your personal notes", AppIcons.Note, activeTab == "notes") { onTabClick("notes") },
             CapsuleMenuItem("Audio", "Toggle audio only mode for listening", AppIcons.AudioMode, audioMode) { onAudioModeToggle() },
-            CapsuleMenuItem("Translate", "Generate English and Bangla subtitles", AppIcons.Translate) { onTranslate() }
+            CapsuleMenuItem("Translate", "Generate English and Bangla subtitles", AppIcons.Translate) { onTranslate(context) }
         )
         
         menuItems.forEachIndexed { index, item ->

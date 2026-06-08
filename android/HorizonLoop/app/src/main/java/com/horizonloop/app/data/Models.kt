@@ -8,7 +8,8 @@ data class Audio(
     val pin: Boolean,
     val bitrate: String,
     val duration: String,
-    val durationSec: Double
+    val durationSec: Double,
+    val filePath: String = ""  // Path to the actual audio/video file for extraction
 )
 
 data class Note(

@@ -48,6 +48,7 @@ fun CleanTab(
     isAudioMode: Boolean,
     isPlaying: Boolean,
     isTranslating: Boolean,
+    translationProgress: String = "",
     onSpeedDecrease: () -> Unit,
     onSpeedIncrease: () -> Unit,
     modifier: Modifier = Modifier
@@ -158,7 +159,7 @@ fun CleanTab(
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Generating translations...",
+                    text = if (translationProgress.isNotBlank()) translationProgress else "Generating translations...",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = Mid,

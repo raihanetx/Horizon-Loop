@@ -1,17 +1,20 @@
 package com.horizonloop.app.ui.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.horizonloop.app.data.ActiveTab
-import com.horizonloop.app.data.Audio
-import com.horizonloop.app.data.Dialogue
-import com.horizonloop.app.data.FilterType
-import com.horizonloop.app.data.Loop
-import com.horizonloop.app.data.Note
-import com.horizonloop.app.data.audioFiles
-import com.horizonloop.app.data.dialogues
+import androidx.lifecycle.viewModelScope
+import com.horizonloop.app.data.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 
 class AppViewModel : ViewModel() {
     var activeTab by mutableStateOf(ActiveTab.CLEAN)
@@ -24,12 +27,14 @@ class AppViewModel : ViewModel() {
     var audioMode by mutableStateOf(false)
     var previewEndTime by mutableStateOf<Double?>(null)
     var currentAudioTitle by mutableStateOf("")
+    var currentAudioFilePath by mutableStateOf("")
     var searchQuery by mutableStateOf("")
     var currentFilter by mutableStateOf<FilterType>(FilterType.ALL)
     var showHomeView by mutableStateOf(true)
     var showCapsuleMenu by mutableStateOf(false)
     var translatedDialogues by mutableStateOf<List<Dialogue>>(emptyList())
     var isTranslating by mutableStateOf(false)
+    var translationProgress by mutableStateOf("")
     var selectedDialogueIds by mutableStateOf<Set<Int>>(emptySet())
 
     val speeds = listOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
@@ -58,6 +63,7 @@ class AppViewModel : ViewModel() {
     fun openPlayer(audio: Audio) {
         showHomeView = false
         currentAudioTitle = audio.title
+        currentAudioFilePath = audio.filePath
         totalDuration = audio.durationSec
         currentPlaybackTime = 0.0
         activeTab = ActiveTab.CLEAN
@@ -152,13 +158,194 @@ class AppViewModel : ViewModel() {
         } catch (e: Exception) { Double.NaN }
     }
 
-    fun startTranslation() {
-        isTranslating = true
-        // Simulate async translation processing
-        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-            translatedDialogues = dialogues.take(10)
+    /**
+     * Start the full translation workflow:
+     * 1. Extract audio from video file
+     * 2. Send to Whisper for transcription
+     * 3. Send to LLM for translation to Bangla
+     */
+    fun startTranslation(context: Context) {
+        if (currentAudioFilePath.isBlank()) {
+            // No file path - use mock data for demo
+            useMockTranslation()
+            return
+        }
+        
+        viewModelScope.launch {
+            isTranslating = true
+            translationProgress = "Starting..."
+            
+            try {
+                // Step 1: Get API key
+                val apiKey = ApiKeyStorage.getApiKey(context)
+                if (apiKey.isBlank()) {
+                    translationProgress = "Error: No API key in settings"
+                    isTranslating = false
+                    return@launch
+                }
+                
+                val authHeader = "Bearer $apiKey"
+                
+                // Step 2: Extract audio
+                translationProgress = "Extracting audio..."
+                val cacheDir = context.cacheDir
+                val audioPath = AudioExtractor.extractAudio(
+                    context = context,
+                    videoPath = currentAudioFilePath,
+                    outputDir = cacheDir,
+                    onProgress = { progress ->
+                        translationProgress = "Extracting audio... ${(progress * 100).toInt()}%"
+                    }
+                )
+                
+                if (audioPath == null) {
+                    translationProgress = "Error: Failed to extract audio"
+                    isTranslating = false
+                    return@launch
+                }
+                
+                // Step 3: Split if needed (25MB limit)
+                translationProgress = "Preparing audio..."
+                val audioChunks = AudioExtractor.splitAudio(audioPath, cacheDir)
+                
+                // Step 4: Transcribe with Whisper
+                translationProgress = "Transcribing with Whisper..."
+                val fullTranscript = StringBuilder()
+                
+                for ((index, chunkPath) in audioChunks.withIndex()) {
+                    if (audioChunks.size > 1) {
+                        translationProgress = "Transcribing chunk ${index + 1}/${audioChunks.size}..."
+                    }
+                    
+                    val chunkFile = File(chunkPath)
+                    val requestFile = chunkFile.asRequestBody("audio/mpeg".toMediaTypeOrNull())
+                    val body = MultipartBody.Part.createFormData("file", chunkFile.name, requestFile)
+                    val modelBody = "whisper-1".toRequestBody("text/plain".toMediaTypeOrNull())
+                    
+                    val response = GroqClient.apiService.transcribeAudio(authHeader, body, modelBody)
+                    
+                    if (response.isSuccessful) {
+                        val text = response.body()?.text ?: ""
+                        fullTranscript.append(text).append(" ")
+                    } else {
+                        android.util.Log.e("Translation", "Whisper error: ${response.code()} - ${response.message()}")
+                    }
+                    
+                    // Clean up chunk file
+                    chunkFile.delete()
+                }
+                
+                val transcript = fullTranscript.toString().trim()
+                if (transcript.isBlank()) {
+                    translationProgress = "Error: No transcript generated"
+                    isTranslating = false
+                    return@launch
+                }
+                
+                // Step 5: Translate with LLM
+                translationProgress = "Translating to Bangla..."
+                val chatRequest = ChatRequest(
+                    model = "llama-3.3-70b-versatile",
+                    messages = listOf(
+                        ChatMessage("system", "You are a translator. Translate the following English text to Bangla (Bengali). Only output the translation, nothing else."),
+                        ChatMessage("user", transcript)
+                    )
+                )
+                
+                val translateResponse = GroqClient.apiService.translateText(authHeader, chatRequest)
+                
+                var banglaTranslation = ""
+                if (translateResponse.isSuccessful) {
+                    banglaTranslation = translateResponse.body()?.choices?.firstOrNull()?.message?.content?.trim() ?: ""
+                } else {
+                    android.util.Log.e("Translation", "LLM error: ${translateResponse.code()} - ${translateResponse.message()}")
+                }
+                
+                // Clean up extracted audio
+                File(audioPath).delete()
+                
+                // Step 6: Create dialogues from transcript
+                translationProgress = "Creating subtitles..."
+                val newDialogues = createDialoguesFromTranscript(transcript, banglaTranslation)
+                translatedDialogues = newDialogues
+                
+                translationProgress = "Done!"
+                
+            } catch (e: Exception) {
+                android.util.Log.e("Translation", "Error: ${e.message}")
+                translationProgress = "Error: ${e.message}"
+            }
+            
             isTranslating = false
-        }, 2000) // 2 second delay to show loading animation
+        }
+    }
+    
+    /**
+     * Create dialogue entries from transcript by splitting into sentences
+     */
+    private fun createDialoguesFromTranscript(english: String, bangla: String): List<Dialogue> {
+        // Split text by whitespace and filter for sentences with punctuation
+        val englishParts = english.split(" ").filter { it.isNotBlank() }
+        val englishSentences = mutableListOf<String>()
+        var currentSentence = StringBuilder()
+        
+        for (word in englishParts) {
+            currentSentence.append(word).append(" ")
+            if (word.endsWith(".") || word.endsWith("?") || word.endsWith("!")) {
+                englishSentences.add(currentSentence.toString().trim())
+                currentSentence = StringBuilder()
+            }
+        }
+        if (currentSentence.isNotBlank()) {
+            englishSentences.add(currentSentence.toString().trim())
+        }
+        
+        // Split bangla similarly
+        val banglaParts = bangla.split(" ").filter { it.isNotBlank() }
+        val banglaSentences = mutableListOf<String>()
+        var currentBangla = StringBuilder()
+        
+        for (word in banglaParts) {
+            currentBangla.append(word).append(" ")
+            if (word.endsWith(".") || word.endsWith("?") || word.endsWith("!") || word.contains("।")) {
+                banglaSentences.add(currentBangla.toString().trim())
+                currentBangla = StringBuilder()
+            }
+        }
+        if (currentBangla.isNotBlank()) {
+            banglaSentences.add(currentBangla.toString().trim())
+        }
+        
+        // Create dialogues with timestamps
+        var timeOffset = 0.0
+        return englishSentences.mapIndexed { index, eng ->
+            val time = formatTime(timeOffset)
+            val bang = if (index < banglaSentences.size) banglaSentences[index] else ""
+            timeOffset += 3.0
+            Dialogue(
+                id = index + 1,
+                time = time,
+                english = eng,
+                bangla = bang
+            )
+        }
+    }
+    
+    /**
+     * Use mock translation for demo purposes (when no file path available)
+     */
+    private fun useMockTranslation() {
+        viewModelScope.launch {
+            isTranslating = true
+            translationProgress = "Processing..."
+            
+            // Simulate processing time
+            kotlinx.coroutines.delay(2000)
+            
+            translatedDialogues = dialogues.take(10)
+            translationProgress = "Done!"
+            isTranslating = false
+        }
     }
 
     fun selectDialogue(dialogue: Dialogue) {

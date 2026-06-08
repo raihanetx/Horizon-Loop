@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.Context
 import com.horizonloop.app.data.ActiveTab
 import com.horizonloop.app.data.Dialogue
 import com.horizonloop.app.data.Loop
@@ -47,11 +48,13 @@ import com.horizonloop.app.ui.theme.Surface
 
 @Composable
 fun PlayerScreen(
+    context: Context,
     title: String,
     activeTab: ActiveTab,
     isPlaying: Boolean,
     isAudioMode: Boolean,
     isTranslating: Boolean,
+    translationProgress: String,
     currentTime: String,
     totalTime: String,
     progress: Float,
@@ -68,7 +71,7 @@ fun PlayerScreen(
     onMenuClick: () -> Unit,
     onTabClick: (ActiveTab) -> Unit,
     onAudioModeToggle: () -> Unit,
-    onTranslate: () -> Unit,
+    onTranslate: (Context) -> Unit,
     onPlayPause: () -> Unit,
     onRewind: () -> Unit,
     onForward: () -> Unit,
@@ -90,6 +93,7 @@ fun PlayerScreen(
                 isAudioMode = isAudioMode,
                 isPlaying = isPlaying,
                 isTranslating = isTranslating,
+                translationProgress = translationProgress,
                 currentDialogue = currentDialogue,
                 notes = notes,
                 loops = loops,
@@ -137,6 +141,7 @@ fun PlayerScreen(
                 onAudioModeToggle = onAudioModeToggle,
                 onTranslate = onTranslate,
                 onDismiss = onDismissCapsule,
+                context = context,
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
@@ -179,6 +184,7 @@ private fun TabContent(
     isAudioMode: Boolean,
     isPlaying: Boolean,
     isTranslating: Boolean,
+    translationProgress: String,
     currentDialogue: Dialogue?,
     notes: List<Note>,
     loops: List<Loop>,
@@ -202,6 +208,7 @@ private fun TabContent(
                 isAudioMode = isAudioMode,
                 isPlaying = isPlaying,
                 isTranslating = isTranslating,
+                translationProgress = translationProgress,
                 onSpeedDecrease = { onSpeedChange((speeds.indexOf(currentSpeed) - 1).coerceAtLeast(0)) },
                 onSpeedIncrease = { onSpeedChange((speeds.indexOf(currentSpeed) + 1).coerceAtMost(speeds.size - 1)) }
             )

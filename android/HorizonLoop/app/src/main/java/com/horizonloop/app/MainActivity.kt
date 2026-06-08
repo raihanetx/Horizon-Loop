@@ -49,11 +49,13 @@ class MainActivity : ComponentActivity() {
                         )
                     } else {
                         PlayerScreen(
+                            context = this@MainActivity,
                             title = viewModel.currentAudioTitle,
                             activeTab = viewModel.activeTab,
                             isPlaying = viewModel.isPlaying,
                             isAudioMode = viewModel.audioMode,
                             isTranslating = viewModel.isTranslating,
+                            translationProgress = viewModel.translationProgress,
                             currentTime = viewModel.formatTime(viewModel.currentPlaybackTime),
                             totalTime = viewModel.formatTime(viewModel.totalDuration),
                             progress = viewModel.getProgressPercent(),
@@ -70,7 +72,7 @@ class MainActivity : ComponentActivity() {
                             onMenuClick = { viewModel.toggleShowCapsuleMenu() },
                             onTabClick = { viewModel.activeTab = it },
                             onAudioModeToggle = { viewModel.toggleAudioMode() },
-                            onTranslate = { viewModel.startTranslation() },
+                            onTranslate = { ctx -> viewModel.startTranslation(ctx) },
                             onPlayPause = { viewModel.togglePlay() },
                             onRewind = { viewModel.rewind() },
                             onForward = { viewModel.forward() },
