@@ -81,12 +81,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     
-                    LaunchedEffect(Unit) {
-                        while (true) {
-                            delay(100)
-                            viewModel.updatePlayback()
-                        }
-                    }
+                    // AudioPlayer handles progress updates via callback - no need for simulation
 
                     if (viewModel.showHomeView) {
                         HomeScreen(
@@ -95,7 +90,7 @@ class MainActivity : ComponentActivity() {
                             currentFilter = viewModel.currentFilter,
                             onSearchChange = { viewModel.searchQuery = it },
                             onFilterChange = { viewModel.currentFilter = it },
-                            onAudioClick = { viewModel.openPlayer(it) },
+                            onAudioClick = { viewModel.openPlayer(this@MainActivity, it) },
                             onSettingsClick = { showSettings = true },
                             isScanning = viewModel.isScanning,
                             scanError = viewModel.scanError
@@ -137,7 +132,7 @@ class MainActivity : ComponentActivity() {
                             onDeleteNote = { viewModel.deleteNote(it) },
                             onAddLoop = { name, start, end, count -> viewModel.addLoop(name, start, end, count) },
                             onDeleteLoop = { viewModel.deleteLoop(it) },
-                            onPlayLoop = { viewModel.playLoop(it) },
+                            onPlayLoop = { viewModel.playLoop(this@MainActivity, it) },
                             onSpeedChange = { viewModel.setSpeed(it) },
                             onDialogueSelect = { viewModel.selectDialogue(it) },
                             onDismissCapsule = { viewModel.hideCapsuleMenu() },

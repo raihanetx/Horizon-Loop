@@ -25,6 +25,9 @@ class AppViewModel : ViewModel() {
     var isPlaying by mutableStateOf(false)
     var currentPlaybackTime by mutableStateOf(0.0)
     var totalDuration by mutableStateOf(0.0)
+    
+    // Real audio player
+    private var audioPlayer: AudioPlayer? = null
     var activeLoopId by mutableStateOf<Int?>(null)
     var audioMode by mutableStateOf(false)
     var previewEndTime by mutableStateOf<Double?>(null)
@@ -115,14 +118,33 @@ class AppViewModel : ViewModel() {
     fun toggleShowCapsuleMenu() { showCapsuleMenu = !showCapsuleMenu }
     fun hideCapsuleMenu() { showCapsuleMenu = false }
 
-    fun openPlayer(audio: Audio) {
+    fun openPlayer(context: Context, audio: Audio) {
         showHomeView = false
         currentAudioTitle = audio.title
         // Use contentUri for scoped storage compatibility (Android 10+)
         // Fall back to filePath for legacy access
         currentAudioFilePath = if (audio.contentUri.isNotBlank()) audio.contentUri else audio.filePath
-        totalDuration = audio.durationSec
-        currentPlaybackTime = 0.0
+        
+        // Initialize real audio player
+        audioPlayer?.release()
+        audioPlayer = AudioPlayer(context).apply {
+            onProgressUpdate = { currentMs, totalMs ->
+                currentPlaybackTime = currentMs / 1000.0
+                totalDuration = totalMs / 1000.0
+            }
+            onPlaybackStateChanged = { playing ->
+                isPlaying = playing
+            }
+            onCompletion = {
+                currentPlaybackTime = 0.0
+                isPlaying = false
+            }
+            onError = { error ->
+                android.util.Log.e("AppViewModel", "AudioPlayer error: $error")
+            }
+            load(currentAudioFilePath)
+        }
+        
         activeTab = ActiveTab.CLEAN
         // Clear previous translation state
         translatedDialogues = emptyList()
@@ -134,25 +156,26 @@ class AppViewModel : ViewModel() {
         showHomeView = true
         isPlaying = false
         previewEndTime = null
+        audioPlayer?.pause()
         if (audioMode) {
             audioMode = false
         }
     }
 
     fun togglePlay() {
-        isPlaying = !isPlaying
+        audioPlayer?.togglePlayPause()
     }
 
     fun rewind() {
-        currentPlaybackTime = (currentPlaybackTime - 5).coerceAtLeast(0.0)
+        audioPlayer?.rewind()
     }
 
     fun forward() {
-        currentPlaybackTime = (currentPlaybackTime + 5).coerceAtMost(totalDuration)
+        audioPlayer?.forward()
     }
 
     fun seekTo(percent: Float) {
-        currentPlaybackTime = (percent * totalDuration).coerceIn(0.0, totalDuration)
+        audioPlayer?.seekToPercent(percent)
     }
 
     fun cycleSpeed() {
@@ -161,6 +184,7 @@ class AppViewModel : ViewModel() {
 
     fun setSpeed(index: Int) {
         currentSpeedIndex = index.coerceIn(0, speeds.size - 1)
+        audioPlayer?.setSpeed(speeds[currentSpeedIndex])
     }
 
     fun toggleAudioMode() {
@@ -196,14 +220,14 @@ class AppViewModel : ViewModel() {
         loops = loops.filter { it.id != id }
     }
 
-    fun playLoop(loop: Loop) {
+    fun playLoop(context: Context, loop: Loop) {
         val startSec = parseTimeToSeconds(loop.start)
         val endSec = parseTimeToSeconds(loop.end)
         if (!startSec.isNaN() && !endSec.isNaN() && startSec < endSec) {
             activeLoopId = loop.id
             previewEndTime = endSec
-            currentPlaybackTime = startSec
-            isPlaying = true
+            audioPlayer?.seekTo((startSec * 1000).toLong())
+            audioPlayer?.play()
             activeTab = ActiveTab.CLEAN
         }
     }
@@ -519,17 +543,15 @@ class AppViewModel : ViewModel() {
         return "$m:${if (s < 10) "0" else ""}$s"
     }
 
-    fun updatePlayback() {
-        if (isPlaying) {
-            currentPlaybackTime += 0.1
-            val previewEnd = previewEndTime
-            if (previewEnd != null && currentPlaybackTime >= previewEnd) {
-                isPlaying = false
-                previewEndTime = null
-            }
-            if (currentPlaybackTime > totalDuration) {
-                currentPlaybackTime = 0.0
-            }
-        }
+    fun formatTimeFromMs(ms: Long): String {
+        val secs = ms / 1000
+        val m = (secs / 60).toInt()
+        val s = (secs % 60).toInt()
+        return "$m:${if (s < 10) "0" else ""}$s"
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer?.destroy()
     }
 }
