@@ -35,6 +35,7 @@ class AppViewModel : ViewModel() {
     var showHomeView by mutableStateOf(true)
     var showCapsuleMenu by mutableStateOf(false)
     var translatedDialogues by mutableStateOf<List<Dialogue>>(emptyList())
+    var translationError by mutableStateOf<String?>(null) // Show error instead of demo fallback
     var isTranslating by mutableStateOf(false)
     var translationProgress by mutableStateOf("")
     var selectedDialogueIds by mutableStateOf<Set<Int>>(emptySet())
@@ -225,6 +226,10 @@ class AppViewModel : ViewModel() {
      * 3. Send to LLM for translation to Bangla
      */
     fun startTranslation(context: Context) {
+        // Clear previous state - no demo fallback, only real data or error
+        translationError = null
+        translatedDialogues = emptyList()
+        
         // Initialize debug state
         translationSteps = listOf(
             TranslationStep(1, "Checking permissions", StepStatus.PENDING, icon = "🔐"),
@@ -239,8 +244,10 @@ class AppViewModel : ViewModel() {
         showTranslationDebug = true
         
         if (currentAudioFilePath.isBlank()) {
-            // No file path - use mock data for demo
-            useMockTranslation()
+            // No file path - show error, NO demo fallback
+            translationError = "No media file selected"
+            translationProgress = "Error: No media file"
+            showTranslationDebug = true
             return
         }
         
@@ -258,6 +265,7 @@ class AppViewModel : ViewModel() {
                     logTranslation("ERROR: No API key found in Settings")
                     updateLastStep(StepStatus.FAILED, "No API key in Settings")
                     translationProgress = "Error: No API key in settings"
+                    translationError = "No API key in Settings. Please add your Groq API key in Settings."
                     isTranslating = false
                     return@launch
                 }
@@ -298,6 +306,7 @@ class AppViewModel : ViewModel() {
                     logTranslation("ERROR: Audio extraction failed - returned null")
                     updateLastStep(StepStatus.FAILED, "Failed to extract audio")
                     translationProgress = "Error: Failed to extract audio"
+                    translationError = "Failed to extract audio from video. The video format may not be supported."
                     isTranslating = false
                     return@launch
                 }
@@ -349,11 +358,16 @@ class AppViewModel : ViewModel() {
                     chunkFile.delete()
                 }
                 
+                // Clean up extracted audio (AFTER all chunks processed)
+                File(audioPath).delete()
+                logTranslation("Cleaned up temp audio file")
+                
                 val transcript = fullTranscript.toString().trim()
                 if (transcript.isBlank()) {
                     logTranslation("ERROR: No transcript text received from Whisper")
                     updateLastStep(StepStatus.FAILED, "Empty transcript")
                     translationProgress = "Error: No transcript generated"
+                    translationError = "No transcript generated. The audio may be unclear or empty."
                     isTranslating = false
                     return@launch
                 }
@@ -392,10 +406,6 @@ class AppViewModel : ViewModel() {
                 }
                 updateLastStep(StepStatus.COMPLETED, banglaTranslation.take(50) + "...")
                 
-                // Clean up extracted audio
-                File(audioPath).delete()
-                logTranslation("Cleaned up temp audio file")
-                
                 // ===== STEP 8: Create Subtitles =====
                 updateLastStep(StepStatus.IN_PROGRESS, "Creating subtitle entries...")
                 logTranslation("STEP 8: Creating dialogue entries from transcript")
@@ -403,6 +413,7 @@ class AppViewModel : ViewModel() {
                 logTranslation("Created ${newDialogues.size} dialogue entries")
                 
                 translatedDialogues = newDialogues
+                translationError = null // Clear any previous error on success
                 updateLastStep(StepStatus.COMPLETED, "${newDialogues.size} entries created")
                 
                 translationProgress = "Done! ${newDialogues.size} subtitles created"
@@ -416,6 +427,7 @@ class AppViewModel : ViewModel() {
                 logTranslation("FATAL ERROR: ${e.message}")
                 logTranslation("Stack trace: ${e.stackTraceToString()}")
                 translationProgress = "Error: ${e.message}"
+                translationError = "Translation failed: ${e.message}"
                 // Keep debug panel visible on error so user can see what happened
             }
             
@@ -473,23 +485,6 @@ class AppViewModel : ViewModel() {
             )
         }
     }
-    
-    /**
-     * Use mock translation for demo purposes (when no file path available)
-     */
-    private fun useMockTranslation() {
-        viewModelScope.launch {
-            isTranslating = true
-            translationProgress = "Processing..."
-            
-            // Simulate processing time
-            kotlinx.coroutines.delay(2000)
-            
-            translatedDialogues = dialogues.take(10)
-            translationProgress = "Done!"
-            isTranslating = false
-        }
-    }
 
     fun selectDialogue(dialogue: Dialogue) {
         selectedDialogueIds = if (dialogue.id in selectedDialogueIds) {
@@ -500,8 +495,9 @@ class AppViewModel : ViewModel() {
     }
 
     fun getCurrentDialogue(): Dialogue? {
-        val activeList = if (translatedDialogues.isNotEmpty()) translatedDialogues else dialogues
-        if (activeList.isEmpty()) return null
+        // NEVER show demo dialogues - only show real translated content
+        val activeList = translatedDialogues
+        if (activeList.isEmpty()) return null // Return null if no real translation
         val firstSec = parseTimeToSeconds(activeList[0].time)
         if (currentPlaybackTime < firstSec) return activeList[0]
         var current: Dialogue? = null

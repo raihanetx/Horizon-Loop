@@ -71,6 +71,7 @@ fun PlayerScreen(
     showTranslationDebug: Boolean,
     translationSteps: List<com.horizonloop.app.data.TranslationStep>,
     translationLog: List<String>,
+    translationError: String?,
     onBack: () -> Unit,
     onMenuClick: () -> Unit,
     onTabClick: (ActiveTab) -> Unit,

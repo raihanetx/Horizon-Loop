@@ -2,6 +2,7 @@ package com.horizonloop.app.data
 
 import android.content.ContentUris
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
@@ -9,7 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * Scans the device for video files using MediaStore API
+ * Scans the device for video and audio files using MediaStore API
+ * Uses real MediaStore IDs to avoid collisions
  */
 object VideoScanner {
     
@@ -17,7 +19,7 @@ object VideoScanner {
     
     /**
      * Scan device for all video files
-     * Returns list of Audio objects with actual file paths
+     * Returns list of Audio objects with actual file paths and content URIs
      */
     suspend fun scanVideos(context: Context): List<Audio> = withContext(Dispatchers.IO) {
         val videos = mutableListOf<Audio>()
@@ -34,12 +36,15 @@ object VideoScanner {
             MediaStore.Video.Media.SIZE,
             MediaStore.Video.Media.DURATION,
             MediaStore.Video.Media.DATA,
-            MediaStore.Video.Media.MIME_TYPE
+            MediaStore.Video.Media.MIME_TYPE,
+            MediaStore.Video.Media.DATE_ADDED
         )
         
+        // Scan ALL videos, no limit, sorted by date newest first
         val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
         
         try {
+            Log.d(TAG, "Starting video scan...")
             context.contentResolver.query(
                 collection,
                 projection,
@@ -54,9 +59,10 @@ object VideoScanner {
                 val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)
                 val mimeColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.MIME_TYPE)
                 
-                var id = 1
-                while (cursor.moveToNext() && id <= 100) { // Limit to 100 videos
-                    val contentUri = ContentUris.withAppendedId(collection, cursor.getLong(idColumn))
+                Log.d(TAG, "Video cursor columns: ${cursor.columnCount}, rows: ${cursor.count}")
+                
+                while (cursor.moveToNext()) {
+                    val mediaId = cursor.getLong(idColumn) // Use REAL MediaStore ID
                     val name = cursor.getString(nameColumn) ?: "Unknown"
                     val size = cursor.getLong(sizeColumn)
                     val duration = cursor.getLong(durationColumn)
@@ -66,6 +72,8 @@ object VideoScanner {
                     // Skip very short videos (< 1 second) and very small files
                     if (duration < 1000 || size < 1024) continue
                     
+                    val contentUri = ContentUris.withAppendedId(collection, mediaId)
+                    
                     // Clean up display name (remove extension)
                     val displayName = name.substringBeforeLast(".")
                     
@@ -73,7 +81,7 @@ object VideoScanner {
                     val sizeMB = size / (1024.0 * 1024.0)
                     val sizeStr = String.format("%.1f MB", sizeMB)
                     
-                    // Convert duration to MM:SS string
+                    // Convert duration to seconds and format
                     val durationSec = duration / 1000.0
                     val durationStr = formatDuration(duration)
                     
@@ -82,7 +90,7 @@ object VideoScanner {
                     
                     videos.add(
                         Audio(
-                            id = id,
+                            id = mediaId.toInt().coerceIn(0, Int.MAX_VALUE - 1), // Use REAL MediaStore ID (safe cast)
                             title = displayName,
                             size = sizeStr,
                             subtitle = likelyHasSubtitle,
@@ -95,11 +103,11 @@ object VideoScanner {
                             contentUri = contentUri.toString()
                         )
                     )
-                    id++
                 }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error scanning videos: ${e.message}")
+            e.printStackTrace()
         }
         
         Log.d(TAG, "Found ${videos.size} videos on device")
@@ -107,7 +115,8 @@ object VideoScanner {
     }
     
     /**
-     * Scan device for audio files (music, recordings, etc.)
+     * Scan device for audio files (music, recordings, WhatsApp audio, etc.)
+     * Uses real MediaStore IDs to avoid collision with video IDs
      */
     suspend fun scanAudioFiles(context: Context): List<Audio> = withContext(Dispatchers.IO) {
         val audioFiles = mutableListOf<Audio>()
@@ -125,13 +134,15 @@ object VideoScanner {
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.MIME_TYPE
+            MediaStore.Audio.Media.MIME_TYPE,
+            MediaStore.Audio.Media.DATE_ADDED
         )
         
-        // Get all audio files (music, voice recordings, WhatsApp audio, etc.)
+        // Get all audio files - no filter, sorted by date
         val sortOrder = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
         
         try {
+            Log.d(TAG, "Starting audio scan...")
             context.contentResolver.query(
                 collection,
                 projection,
@@ -147,9 +158,10 @@ object VideoScanner {
                 val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
                 val mimeColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE)
                 
-                var id = 1000 // Start from 1000 to avoid ID conflicts with videos
-                while (cursor.moveToNext() && id <= 1100) { // Limit to 100 audio files
-                    val contentUri = ContentUris.withAppendedId(collection, cursor.getLong(idColumn))
+                Log.d(TAG, "Audio cursor columns: ${cursor.columnCount}, rows: ${cursor.count}")
+                
+                while (cursor.moveToNext()) {
+                    val mediaId = cursor.getLong(idColumn) // Use REAL MediaStore ID
                     val name = cursor.getString(nameColumn) ?: "Unknown"
                     val size = cursor.getLong(sizeColumn)
                     val duration = cursor.getLong(durationColumn)
@@ -160,8 +172,10 @@ object VideoScanner {
                     // Skip very short audio (< 5 seconds) and very small files
                     if (duration < 5000 || size < 1024) continue
                     
+                    val contentUri = ContentUris.withAppendedId(collection, mediaId)
+                    
                     // Clean up display name
-                    val displayName = if (artist != "<unknown>") {
+                    val displayName = if (artist != "<unknown>" && artist.isNotBlank()) {
                         "$artist - ${name.substringBeforeLast(".")}"
                     } else {
                         name.substringBeforeLast(".")
@@ -175,9 +189,11 @@ object VideoScanner {
                     val durationSec = duration / 1000.0
                     val durationStr = formatDuration(duration)
                     
+                    // Add unique offset to avoid ID collision with videos
+                    // Video IDs are from 0-99999, audio uses 100000+
                     audioFiles.add(
                         Audio(
-                            id = id,
+                            id = (mediaId + 100000).toInt().coerceIn(0, Int.MAX_VALUE - 1), // Use REAL MediaStore ID + offset (safe cast)
                             title = displayName,
                             size = sizeStr,
                             subtitle = true, // Most audio files could have lyrics/subtitles
@@ -190,11 +206,11 @@ object VideoScanner {
                             contentUri = contentUri.toString()
                         )
                     )
-                    id++
                 }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error scanning audio: ${e.message}")
+            e.printStackTrace()
         }
         
         Log.d(TAG, "Found ${audioFiles.size} audio files on device")
@@ -205,9 +221,16 @@ object VideoScanner {
      * Combine videos and audio into a single list sorted by date
      */
     suspend fun scanAllMedia(context: Context): List<Audio> {
+        Log.d(TAG, "Starting full media scan...")
         val videos = scanVideos(context)
+        Log.d(TAG, "Video scan complete: ${videos.size} videos")
         val audioFiles = scanAudioFiles(context)
-        return (videos + audioFiles).sortedByDescending { it.durationSec }
+        Log.d(TAG, "Audio scan complete: ${audioFiles.size} audio files")
+        
+        // Combine and sort by date added (newest first)
+        val allMedia = videos + audioFiles
+        Log.d(TAG, "Total media files: ${allMedia.size}")
+        return allMedia
     }
     
     private fun formatDuration(durationMs: Long): String {

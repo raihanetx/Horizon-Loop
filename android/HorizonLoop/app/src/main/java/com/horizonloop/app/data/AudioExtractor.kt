@@ -5,103 +5,96 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.net.Uri
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import android.util.Log
 import java.io.File
-import java.nio.ByteBuffer
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
+/**
+ * Extracts audio track from video files using MediaMuxer
+ * Produces proper M4A/AAC output that Groq API can process
+ */
 object AudioExtractor {
     
-    private const val MAX_FILE_SIZE_MB = 25
+    private const val TAG = "AudioExtractor"
     
     /**
-     * Extract audio from video file using Android's built-in MediaExtractor
-     * Supports both file paths (legacy) and content URIs (scoped storage)
-     * 
-     * @param context Android context
-     * @param videoPath Path to the video file OR content URI string
-     * @param outputDir Directory to save the extracted audio
-     * @param onProgress Callback for progress updates (0.0 to 1.0)
-     * @return Path to extracted audio file (.m4a), or null if failed
+     * Extract audio from video file using MediaMuxer
+     * Supports both content:// URIs (scoped storage) and file paths
      */
-    suspend fun extractAudio(
+    fun extractAudio(
         context: Context,
         videoPath: String,
         outputDir: File,
-        onProgress: (Float) -> Unit = {}
-    ): String? = withContext(Dispatchers.IO) {
-        var extractor: MediaExtractor? = null
-        var muxer: MediaMuxer? = null
+        onProgress: (Double) -> Unit
+    ): String? {
+        val extractor = MediaExtractor()
         
         try {
-            val outputFile = File(outputDir, "temp_audio_${System.currentTimeMillis()}.m4a")
+            val tag = "AudioExtractor"
+            Log.d(tag, "extractAudio: $videoPath")
             
-            extractor = MediaExtractor()
-            
-            // Check if this is a content URI or file path
+            // Set up data source
             if (videoPath.startsWith("content://")) {
-                // Use content resolver for scoped storage
                 val uri = Uri.parse(videoPath)
-                val fd = context.contentResolver.openFileDescriptor(uri, "r")
-                if (fd == null) {
-                    android.util.Log.e("AudioExtractor", "Failed to open content URI")
-                    return@withContext null
+                val pfd = context.contentResolver.openFileDescriptor(uri, "r")
+                if (pfd == null) {
+                    Log.e(tag, "Failed to open content URI")
+                    return null
                 }
-                extractor.setDataSource(fd.fileDescriptor)
-                fd.close()
+                extractor.setDataSource(pfd.fileDescriptor)
+                pfd.close()
             } else {
-                // Use file path directly (legacy)
                 extractor.setDataSource(videoPath)
             }
             
-            // Find the first audio track
+            // Find audio track
             var audioTrackIndex = -1
             var audioFormat: MediaFormat? = null
             
             for (i in 0 until extractor.trackCount) {
                 val format = extractor.getTrackFormat(i)
                 val mime = format.getString(MediaFormat.KEY_MIME) ?: ""
-                if (mime.startsWith("audio/") || mime.startsWith("video/")) {
-                    // Check if track has audio
-                    if (mime.startsWith("audio/") || format.containsKey(MediaFormat.KEY_DURATION)) {
-                        try {
-                            audioTrackIndex = i
-                            audioFormat = format
-                            break
-                        } catch (e: Exception) {
-                            continue
-                        }
-                    }
+                if (mime.startsWith("audio/")) {
+                    audioTrackIndex = i
+                    audioFormat = format
+                    Log.d(tag, "Found audio track at index $i")
+                    break
                 }
             }
             
             if (audioTrackIndex < 0 || audioFormat == null) {
-                android.util.Log.e("AudioExtractor", "No audio track found in video")
-                return@withContext null
+                Log.e(tag, "No audio track found")
+                return null
             }
             
-            // Create muxer with M4A output
-            muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            val durationUs = if (audioFormat.containsKey(MediaFormat.KEY_DURATION)) {
+                audioFormat.getLong(MediaFormat.KEY_DURATION)
+            } else {
+                0L
+            }
             
+            extractor.selectTrack(audioTrackIndex)
+            
+            // Create output file
+            val outputFile = File(outputDir, "audio_${System.currentTimeMillis()}.m4a")
+            Log.d(tag, "Output: ${outputFile.absolutePath}")
+            
+            // Use MediaMuxer to write audio track
+            val muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
             val muxerTrackIndex = muxer.addTrack(audioFormat)
             muxer.start()
             
-            // Get duration for progress calculation
-            val durationUs = audioFormat.getLong(MediaFormat.KEY_DURATION)
-            
-            // Select the audio track
-            extractor.selectTrack(audioTrackIndex)
-            
-            // Read and write audio samples
-            val bufferSize = 1024 * 1024 // 1MB buffer
-            val buffer = ByteBuffer.allocate(bufferSize)
+            val bufferSize = 1024 * 1024
+            val buffer = java.nio.ByteBuffer.allocate(bufferSize)
             val bufferInfo = android.media.MediaCodec.BufferInfo()
             
-            var processedUs = 0L
+            var totalBytesWritten = 0L
+            var samplesWritten = 0L
             
             while (true) {
+                buffer.clear()  // Reset buffer position before each read
                 val sampleSize = extractor.readSampleData(buffer, 0)
-                
                 if (sampleSize < 0) {
                     break
                 }
@@ -109,83 +102,132 @@ object AudioExtractor {
                 bufferInfo.offset = 0
                 bufferInfo.size = sampleSize
                 bufferInfo.presentationTimeUs = extractor.sampleTime
-                bufferInfo.flags = extractor.sampleFlags
+                bufferInfo.flags = 0
                 
                 muxer.writeSampleData(muxerTrackIndex, buffer, bufferInfo)
+                totalBytesWritten += sampleSize
+                samplesWritten++
                 
                 // Update progress
-                processedUs = extractor.sampleTime
                 if (durationUs > 0) {
-                    onProgress((processedUs.toFloat() / durationUs.toFloat()) * 0.9f)
+                    val progress = extractor.sampleTime.toDouble() / durationUs.toDouble()
+                    onProgress(progress.coerceIn(0.0, 1.0))
                 }
                 
                 extractor.advance()
             }
             
-            onProgress(1f)
+            onProgress(1.0)
             
-            return@withContext outputFile.absolutePath
+            muxer.stop()
+            muxer.release()
+            extractor.release()
+            
+            Log.d(tag, "Extracted $totalBytesWritten bytes, $samplesWritten samples")
+            
+            return if (outputFile.exists() && outputFile.length() > 0) {
+                outputFile.absolutePath
+            } else {
+                null
+            }
             
         } catch (e: Exception) {
-            android.util.Log.e("AudioExtractor", "Extraction error: ${e.message}")
-            null
-        } finally {
-            try {
-                muxer?.stop()
-                muxer?.release()
-            } catch (e: Exception) { }
-            extractor?.release()
+            Log.e(TAG, "Error: ${e.message}")
+            extractor.release()
+            return null
         }
     }
     
     /**
-     * Split large audio file into chunks of MAX_FILE_SIZE_MB
-     * For simplicity, we just return the original path if under the limit
+     * Split audio file into chunks for API upload
      */
-    suspend fun splitAudio(
-        audioPath: String,
-        outputDir: File
-    ): List<String> = withContext(Dispatchers.IO) {
-        val audioFile = File(audioPath)
-        val fileSizeMB = audioFile.length() / (1024 * 1024)
+    fun splitAudio(audioPath: String, outputDir: File): List<String> {
+        val chunks = mutableListOf<String>()
         
-        if (fileSizeMB <= MAX_FILE_SIZE_MB) {
-            return@withContext listOf(audioPath)
-        }
-        
-        listOf(audioPath)
-    }
-    
-    /**
-     * Get duration of audio/video file using MediaExtractor
-     */
-    fun getDuration(context: Context, pathOrUri: String): Double {
-        var extractor: MediaExtractor? = null
-        return try {
-            extractor = MediaExtractor()
+        try {
+            val file = File(audioPath)
+            if (!file.exists()) {
+                Log.e(TAG, "File not found: $audioPath")
+                return chunks
+            }
             
-            if (pathOrUri.startsWith("content://")) {
-                val fd = context.contentResolver.openFileDescriptor(Uri.parse(pathOrUri), "r")
-                fd?.let {
-                    extractor.setDataSource(it.fileDescriptor)
-                    it.close()
+            val fileSize = file.length()
+            val maxChunkSize = 20L * 1024 * 1024 // 20MB
+            
+            if (fileSize <= maxChunkSize) {
+                // No split needed
+                chunks.add(audioPath)
+                return chunks
+            }
+            
+            // Split into chunks
+            val inputStream = FileInputStream(file)
+            var chunkIndex = 0
+            var bytesRead = 0L
+            
+            while (bytesRead < fileSize) {
+                val remaining = fileSize - bytesRead
+                val chunkSize = minOf(remaining, maxChunkSize)
+                
+                val chunkName = "chunk_" + chunkIndex + "_" + System.currentTimeMillis() + ".m4a"
+                val chunkFile = File(outputDir, chunkName)
+                val outputStream = FileOutputStream(chunkFile)
+                
+                val buffer = ByteArray(chunkSize.toInt())
+                val read = inputStream.read(buffer)
+                if (read > 0) {
+                    outputStream.write(buffer, 0, read)
+                    chunks.add(chunkFile.absolutePath)
+                    chunkIndex++
+                    bytesRead += read
+                }
+                
+                outputStream.close()
+            }
+            
+            inputStream.close()
+            Log.d(TAG, "Split into ${chunks.size} chunks")
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Split error: ${e.message}")
+        }
+        
+        return chunks
+    }
+    
+    /**
+     * Get duration of audio file
+     */
+    fun getDuration(context: Context, audioPath: String): Double {
+        val extractor = MediaExtractor()
+        
+        try {
+            if (audioPath.startsWith("content://")) {
+                val uri = Uri.parse(audioPath)
+                val pfd = context.contentResolver.openFileDescriptor(uri, "r")
+                if (pfd != null) {
+                    extractor.setDataSource(pfd.fileDescriptor)
+                    pfd.close()
                 }
             } else {
-                extractor.setDataSource(pathOrUri)
+                extractor.setDataSource(audioPath)
             }
             
             for (i in 0 until extractor.trackCount) {
                 val format = extractor.getTrackFormat(i)
-                if (format.containsKey(MediaFormat.KEY_DURATION)) {
-                    val durationUs = format.getLong(MediaFormat.KEY_DURATION)
-                    return durationUs / 1_000_000.0
+                val mime = format.getString(MediaFormat.KEY_MIME) ?: ""
+                if (mime.startsWith("audio/")) {
+                    if (format.containsKey(MediaFormat.KEY_DURATION)) {
+                        return format.getLong(MediaFormat.KEY_DURATION) / 1000000.0
+                    }
                 }
             }
-            0.0
         } catch (e: Exception) {
-            0.0
+            Log.e(TAG, "getDuration error: ${e.message}")
         } finally {
-            extractor?.release()
+            extractor.release()
         }
+        
+        return 0.0
     }
 }
