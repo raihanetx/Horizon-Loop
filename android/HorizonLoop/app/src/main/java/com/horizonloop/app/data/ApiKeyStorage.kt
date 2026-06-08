@@ -12,15 +12,12 @@ object ApiKeyStorage {
     
     // Groq Whisper/STT model options for audio transcription
     val STT_MODELS = listOf(
-        "whisper-1"
+        "whisper-large-v3"
     )
     
     // Groq LLM model options for translation
     val LLM_MODELS = listOf(
-        "llama-3.3-70b-versatile",
-        "llama-3.1-8b-instant",
-        "mixtral-8x7b-32768",
-        "gemma-9b-it"
+        "openai/gpt-oss-120b"
     )
     
     private fun getPrefs(context: Context): SharedPreferences {
@@ -40,7 +37,7 @@ object ApiKeyStorage {
     }
     
     fun getSttEngine(context: Context): String {
-        return getPrefs(context).getString(KEY_STT_ENGINE, "whisper-1") ?: "whisper-1"
+        return getPrefs(context).getString(KEY_STT_ENGINE, "whisper-large-v3") ?: "whisper-large-v3"
     }
     
     fun saveLlmEngine(context: Context, engine: String) {
@@ -48,7 +45,7 @@ object ApiKeyStorage {
     }
     
     fun getLlmEngine(context: Context): String {
-        return getPrefs(context).getString(KEY_LLM_ENGINE, "llama-3.3-70b-versatile") ?: "llama-3.3-70b-versatile"
+        return getPrefs(context).getString(KEY_LLM_ENGINE, "openai/gpt-oss-120b") ?: "openai/gpt-oss-120b"
     }
     
     fun hasApiKey(context: Context): Boolean {
