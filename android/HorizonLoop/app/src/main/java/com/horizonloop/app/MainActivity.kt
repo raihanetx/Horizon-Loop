@@ -134,6 +134,7 @@ class MainActivity : ComponentActivity() {
                             isPlaying = viewModel.isPlaying,
                             isAudioMode = viewModel.audioMode,
                             isTranslating = viewModel.isTranslating,
+                            isPlaybackEnded = viewModel.isPlaybackEnded,
                             translationProgress = viewModel.translationProgress,
                             currentTime = viewModel.formatTime(viewModel.currentPlaybackTime),
                             totalTime = viewModel.formatTime(viewModel.totalDuration),

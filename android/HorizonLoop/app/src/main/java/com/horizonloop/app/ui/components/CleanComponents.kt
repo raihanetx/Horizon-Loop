@@ -48,6 +48,7 @@ fun CleanTab(
     isAudioMode: Boolean,
     isPlaying: Boolean,
     isTranslating: Boolean,
+    isPlaybackEnded: Boolean = false,
     translationProgress: String = "",
     onSpeedDecrease: () -> Unit,
     onSpeedIncrease: () -> Unit,
@@ -139,7 +140,7 @@ fun CleanTab(
             // - Audio mode is OFF (normal mode with subtitles), AND
             // - Dialogue is available
             // Note: Shows even when paused - user can see the last subtitle
-            val showSubtitle = !isAudioMode && dialogue != null
+            val showSubtitle = !isAudioMode && dialogue != null && !isPlaybackEnded
             
             // Show translation loading animation
             if (isTranslating) {

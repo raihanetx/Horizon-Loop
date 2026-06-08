@@ -36,6 +36,7 @@ class AppViewModel : ViewModel() {
     var showCapsuleMenu by mutableStateOf(false)
     var translatedDialogues by mutableStateOf<List<Dialogue>>(emptyList())
     var isTranslating by mutableStateOf(false)
+    var isPlaybackEnded by mutableStateOf(false)
     var translationProgress by mutableStateOf("")
     var selectedDialogueIds by mutableStateOf<Set<Int>>(emptySet())
     
@@ -115,6 +116,7 @@ class AppViewModel : ViewModel() {
         translatedDialogues = emptyList()
         translationSteps = emptyList()
         translationLog = emptyList()
+        isPlaybackEnded = false
         
         MediaPlaybackManager.prepare(
             context = context,
@@ -125,6 +127,9 @@ class AppViewModel : ViewModel() {
             },
             onStateChanged = { playing ->
                 isPlaying = playing
+                if (!playing && currentPlaybackTime >= totalDuration - 1.0) {
+                    isPlaybackEnded = true
+                }
             },
             onPlaybackError = { error ->
                 android.util.Log.e("AppViewModel", "Playback error: $error")
@@ -140,11 +145,15 @@ class AppViewModel : ViewModel() {
         if (audioMode) {
             audioMode = false
         }
+        isPlaybackEnded = false
     }
 
     fun togglePlay() {
         MediaPlaybackManager.togglePlayPause()
         isPlaying = MediaPlaybackManager.isPlaying
+        if (isPlaying) {
+            isPlaybackEnded = false
+        }
     }
 
     fun rewind() {
@@ -460,6 +469,7 @@ class AppViewModel : ViewModel() {
     }
 
     fun getCurrentDialogue(): Dialogue? {
+        if (isPlaybackEnded) return null
         if (translatedDialogues.isEmpty()) return null
         val activeList = translatedDialogues
         if (activeList.isEmpty()) return null
