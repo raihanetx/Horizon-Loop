@@ -1,5 +1,9 @@
 package com.horizonloop.app.ui.components
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -50,6 +55,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TranslationDebugPanel(
+    context: Context,
     steps: List<TranslationStep>,
     log: List<String>,
     isVisible: Boolean,
@@ -108,6 +114,22 @@ fun TranslationDebugPanel(
                         contentDescription = if (isExpanded) "Collapse" else "Expand",
                         tint = Mid,
                         modifier = Modifier.size(20.dp)
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        val clip = ClipData.newPlainText("Translation Log", log.joinToString("\n"))
+                        clipboard.setPrimaryClip(clip)
+                        Toast.makeText(context, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ContentCopy,
+                        contentDescription = "Copy Log",
+                        tint = Mid,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
                 IconButton(

@@ -153,6 +153,7 @@ fun PlayerScreen(
         
         // Translation Debug Panel - shows step-by-step progress
         TranslationDebugPanel(
+            context = context,
             steps = translationSteps,
             log = translationLog,
             isVisible = showTranslationDebug,
