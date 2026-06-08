@@ -1,0 +1,64 @@
+Subject: Inquiry Regarding Linux Workspace Space on Hugging Face Spaces
+
+To: legal@huggingface.co
+
+---
+
+Dear Hugging Face Team,
+
+I hope this email finds you well. I am writing to discuss my usage of Hugging Face Spaces and to seek clarification regarding the acceptable use of the platform.
+
+## My Project
+
+I currently host a Space called "Linux Workspace" at:
+https://raihan1234-app.hf.space
+
+This is a Docker-based container that provides:
+- A browser-based Linux terminal (using xterm.js + node-pty)
+- A web-based file manager for managing files in the workspace
+- tmux integration for session persistence
+- The ability to install packages via npm, pip, or apt-get
+- Automatic periodic backup to a Hugging Face Dataset (workspace-backup)
+
+## Purpose
+
+The workspace serves as a lightweight development environment that can be useful for:
+- Developing and testing ML models (running Python scripts, training models)
+- Processing datasets for ML workflows
+- Quick coding tasks without local environment setup
+- Learning and experimentation with Linux tools
+
+## Current Status
+
+The Space has been running successfully on the cpu-basic tier since May 22, 2026 without any issues. I have implemented the following resource-conscious measures:
+- Runs on the free cpu-basic hardware tier
+- Backup operations are lightweight (Git commit/push to a Dataset)
+- No cryptomining, heavy compute workloads, or malicious activities
+- All data is backed up to my own HF Dataset for persistence
+
+## Inquiry
+
+I understand that Hugging Face Spaces is primarily designed for ML prototypes and demos. While my project is not a traditional ML demo, it serves as a development environment that can be used for ML workflows (model training, data processing, etc.).
+
+I wanted to reach out to:
+1. Confirm whether this type of usage is acceptable within Hugging Face's acceptable use policy
+2. Understand if there are any specific guidelines or restrictions I should be aware of
+3. Ensure that I am not violating any terms of service
+
+I appreciate your time and guidance. If this type of project is not aligned with Hugging Face's vision for Spaces, I am happy to explore alternatives.
+
+Thank you for your consideration.
+
+Best regards,
+Raihan1234
+Email: usefor2bzx@gmail.com
+Space URL: https://raihan1234-app.hf.space
+
+---
+
+## Notes for Sending:
+
+1. **Review before sending** - Make sure everything looks correct
+2. **Subject line** - Can be adjusted if you prefer something different
+3. **Alternative** - You could also post this on the Hugging Face Forums (discuss@huggingface.co) for a more public discussion, which might get community feedback as well
+4. **Response time** - HF legal team may take a few days to respond, if at all

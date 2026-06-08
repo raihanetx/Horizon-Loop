@@ -120,6 +120,7 @@ fun LoopsTab(
     var count by remember { mutableStateOf("1") }
     var previewLoop by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var showPreview by remember { mutableStateOf(false) }
+    var selectedLoop by remember { mutableStateOf<Loop?>(null) }
 
     Box(modifier = modifier.fillMaxSize()) {
         if (loops.isEmpty()) {
@@ -132,13 +133,13 @@ fun LoopsTab(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 loops.forEach { loop ->
-                    LoopCard(loop = loop, onClick = { }, onPlay = { onPlayLoop(loop) })
+                    LoopCard(loop = loop, onClick = { selectedLoop = loop }, onPlay = { onPlayLoop(loop) })
                 }
             }
         }
         FloatingActionButton(
             onClick = { showDialog = true },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 14.dp, end = 16.dp).size(48.dp),
+            modifier = Modifier.align(Alignment.TopEnd).padding(top = 60.dp, end = 16.dp).size(48.dp),
             shape = androidx.compose.foundation.shape.CircleShape,
             containerColor = Muted,
             contentColor = Dark
@@ -146,6 +147,61 @@ fun LoopsTab(
             Icon(AppIcons.Add, contentDescription = "Add Loop", modifier = Modifier.size(20.dp))
         }
     }
+    
+    // Loop detail dialog
+    if (selectedLoop != null) {
+        Dialog(onDismissRequest = { selectedLoop = null }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Surface)
+                    .padding(20.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = selectedLoop!!.name,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Dark
+                    )
+                    val startSec = parseTimeToSeconds(selectedLoop!!.start)
+                    val endSec = parseTimeToSeconds(selectedLoop!!.end)
+                    Text(
+                        text = "Time: ${formatTimestamp(startSec)} - ${formatTimestamp(endSec)}",
+                        fontSize = 14.sp,
+                        color = Mid
+                    )
+                    Text(
+                        text = "Loop: ${selectedLoop!!.count} time(s)",
+                        fontSize = 14.sp,
+                        color = Mid
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End)
+                    ) {
+                        TextButton(onClick = { selectedLoop = null }) {
+                            Text("Close", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                        Button(
+                            onClick = { onPlayLoop(selectedLoop!!); selectedLoop = null },
+                            colors = ButtonDefaults.buttonColors(containerColor = Mid, contentColor = Deep),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(AppIcons.Play, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Play", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     if (showDialog) {
         Dialog(onDismissRequest = { showDialog = false; name = ""; start = ""; end = ""; count = "1"; previewLoop = emptyMap(); showPreview = false }) {
             Box(
