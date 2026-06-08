@@ -71,10 +71,10 @@ fun DialogueCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(if (isSelected) White20 else Color.Transparent)
+            .background(Surface)
             .clickable(onClick = onClick)
             .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -112,12 +112,12 @@ fun DialogueTab(
     modifier: Modifier = Modifier
 ) {
     if (dialogues.isEmpty()) {
-        Box(modifier = modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+        Box(modifier = modifier.fillMaxWidth().background(Surface).padding(32.dp), contentAlignment = Alignment.Center) {
             Text("No dialogues available", fontSize = 12.sp, color = Mid)
         }
     } else {
         LazyColumn(
-            modifier = modifier.fillMaxWidth().padding(horizontal = 30.dp).padding(bottom = 20.dp),
+            modifier = modifier.fillMaxWidth().background(Surface).padding(horizontal = 30.dp).padding(bottom = 20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(top = 0.dp)
         ) {
