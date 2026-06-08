@@ -61,7 +61,7 @@ fun AudioControls(
     // isCollapsed from parent (e.g., when on list page) takes priority
     // Otherwise use local toggle state
     var localExpanded by remember { mutableStateOf(true) }
-    val isExpanded = isCollapsed.not() && localExpanded
+    val isExpanded = true // Always expanded, no collapse option
     
     Column(
         modifier = modifier
@@ -71,7 +71,7 @@ fun AudioControls(
             .padding(top = 8.dp, bottom = if (isExpanded) 16.dp else 8.dp)
     ) {
         
-        // Title with expand/collapse toggle
+        // Title with expand/collapse toggle - always visible, no collapse option
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -88,14 +88,6 @@ fun AudioControls(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center
-                )
-            }
-            if (!isCollapsed) {
-                Text(
-                    text = if (localExpanded) "▲" else "▼",
-                    fontSize = 12.sp,
-                    color = Mid,
-                    modifier = Modifier.clickable { localExpanded = !localExpanded }.padding(start = 8.dp)
                 )
             }
         }

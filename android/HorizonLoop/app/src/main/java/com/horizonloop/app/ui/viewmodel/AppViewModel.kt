@@ -231,11 +231,27 @@ class AppViewModel : ViewModel() {
 
     private fun parseTimeToSeconds(timeStr: String): Double {
         return try {
-            val parts = timeStr.split(":")
-            if (parts.size == 2) {
-                parts[0].toDouble() * 60 + parts[1].toDouble()
-            } else {
-                timeStr.toDoubleOrNull() ?: Double.NaN
+            // Handle SRT format: HH:MM:SS,mmm or HH:MM:SS
+            // Also handle simple MM:SS or SS format
+            val cleanTime = timeStr.replace(",", ".")  // Replace comma decimal with dot
+            val parts = cleanTime.split(":")
+            when (parts.size) {
+                3 -> {
+                    // HH:MM:SS.mmm format - correctly calculate total seconds
+                    val hours = parts[0].toDouble()
+                    val minutes = parts[1].toDouble()
+                    val seconds = parts[2].toDouble()
+                    hours * 3600 + minutes * 60 + seconds
+                }
+                2 -> {
+                    // MM:SS format
+                    parts[0].toDouble() * 60 + parts[1].toDouble()
+                }
+                1 -> {
+                    // Just seconds
+                    parts[0].toDouble()
+                }
+                else -> Double.NaN
             }
         } catch (e: Exception) { Double.NaN }
     }

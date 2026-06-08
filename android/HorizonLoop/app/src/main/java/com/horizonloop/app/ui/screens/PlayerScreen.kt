@@ -127,7 +127,7 @@ fun PlayerScreen(
                     currentSpeed = currentSpeed,
                     activeTab = activeTab.value,
                     activeLoopId = activeLoopId,
-                    isCollapsed = activeTab == ActiveTab.SAVE,
+                    isCollapsed = false,
                     onPlayPause = onPlayPause,
                     onRewind = onRewind,
                     onForward = onForward,
