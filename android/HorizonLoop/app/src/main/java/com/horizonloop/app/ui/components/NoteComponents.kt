@@ -120,7 +120,7 @@ fun NotesTab(
         }
         FloatingActionButton(
             onClick = { showDialog = true },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 14.dp, end = 16.dp).size(48.dp),
+            modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 34.dp, end = 16.dp).size(48.dp),
             shape = androidx.compose.foundation.shape.CircleShape,
             containerColor = Muted,
             contentColor = Dark

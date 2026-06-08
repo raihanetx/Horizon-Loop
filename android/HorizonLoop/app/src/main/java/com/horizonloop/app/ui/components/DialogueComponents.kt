@@ -72,6 +72,10 @@ fun DialogueCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(Surface)
+            .then(
+                if (isSelected) Modifier.border(1.dp, Color.White, RoundedCornerShape(12.dp))
+                else Modifier
+            )
             .clickable(onClick = onClick)
             .padding(12.dp),
         verticalArrangement = Arrangement.Center
@@ -117,8 +121,8 @@ fun DialogueTab(
         }
     } else {
         LazyColumn(
-            modifier = modifier.fillMaxWidth().background(Surface).padding(horizontal = 30.dp).padding(bottom = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = modifier.fillMaxWidth().background(Surface).padding(horizontal = 16.dp).padding(bottom = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(top = 0.dp)
         ) {
             items(dialogues, key = { it.id }) { dialogue ->
