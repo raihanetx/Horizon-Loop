@@ -20,14 +20,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import com.horizonloop.app.ui.theme.AppIcons
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +46,7 @@ import com.horizonloop.app.ui.theme.Mid
 import com.horizonloop.app.ui.theme.Muted
 import com.horizonloop.app.ui.theme.Surface
 import com.horizonloop.app.ui.theme.White12
+import com.horizonloop.app.ui.screens.SettingsDialog
 
 @Composable
 fun HomeScreen(
@@ -72,39 +69,17 @@ fun HomeScreen(
             .background(Deep)
             .padding(12.dp)
     ) {
-        // Show error message if scan failed
-        scanError?.let { error ->
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = error,
-                fontSize = 12.sp,
-                color = Surface,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Mid.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
-                    .padding(12.dp)
-            )
-        }
-        
-        // Show scanning indicator
         if (isScanning) {
             Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = Mid,
-                    strokeWidth = 2.dp
-                )
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Mid, strokeWidth = 2.dp)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Scanning device for media...",
-                    fontSize = 12.sp,
-                    color = Mid
-                )
+                Text("Scanning device for media...", fontSize = 12.sp, color = Mid)
             }
+        }
+        scanError?.let { error ->
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = error, fontSize = 12.sp, color = Surface, modifier = Modifier.fillMaxWidth().background(Mid.copy(alpha = 0.2f), RoundedCornerShape(8.dp)).padding(12.dp))
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -112,21 +87,9 @@ fun HomeScreen(
             verticalAlignment = Alignment.Top
         ) {
             Column {
-                Text(
-                    "Horizon Loop",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Dark,
-                    letterSpacing = (-0.5).sp
-                )
+                Text("Horizon Loop", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Dark, letterSpacing = (-0.5).sp)
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    "Master English by Listening",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Mid,
-                    letterSpacing = 1.sp
-                )
+                Text("Master English by Listening", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, letterSpacing = 1.sp)
             }
             Row {
                 IconButton(
@@ -217,59 +180,4 @@ private fun FilterChip(label: String, isActive: Boolean, onClick: () -> Unit) {
             color = if (isActive) Deep else Mid
         )
     }
-}
-
-@Composable
-fun SettingsDialog(
-    apiKey: String,
-    selectedEngine: String,
-    onApiKeyChange: (String) -> Unit,
-    onEngineChange: (String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Settings", color = Dark, fontWeight = FontWeight.SemiBold) },
-        text = {
-            Column {
-                Text("OpenAI API Key", fontSize = 11.sp, color = Mid, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp, modifier = Modifier.padding(bottom = 4.dp))
-                OutlinedTextField(
-                    value = apiKey,
-                    onValueChange = onApiKeyChange,
-                    modifier = Modifier.fillMaxWidth(),
-                    textStyle = TextStyle(fontSize = 14.sp),
-                    placeholder = { Text("sk-...", color = Mid) },
-                    singleLine = true
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Translation Engine", fontSize = 11.sp, color = Mid, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp, modifier = Modifier.padding(bottom = 4.dp))
-                Row {
-                    Button(
-                        onClick = { onEngineChange("gpt-4o-mini") },
-                        colors = if (selectedEngine == "gpt-4o-mini") androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Dark) else androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Muted)
-                    ) {
-                        Text("GPT-4o Mini", fontSize = 12.sp)
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        onClick = { onEngineChange("gpt-4o") },
-                        colors = if (selectedEngine == "gpt-4o") androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Dark) else androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Muted)
-                    ) {
-                        Text("GPT-4o", fontSize = 12.sp)
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Save", color = Deep, fontWeight = FontWeight.SemiBold)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel", color = Mid)
-            }
-        },
-        containerColor = Surface
-    )
 }

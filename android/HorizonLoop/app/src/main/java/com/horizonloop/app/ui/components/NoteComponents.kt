@@ -41,6 +41,8 @@ import com.horizonloop.app.ui.theme.Deep
 import com.horizonloop.app.ui.theme.Mid
 import com.horizonloop.app.ui.theme.Muted
 import com.horizonloop.app.ui.theme.Surface
+import com.horizonloop.app.ui.components.NoteDetailDialog
+import com.horizonloop.app.ui.components.NoteAddDialog
 
 @Composable
 fun NoteCard(
@@ -97,24 +99,15 @@ fun NotesTab(
     modifier: Modifier = Modifier
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    var noteText by remember { mutableStateOf("") }
-    var previewNote by remember { mutableStateOf("") }
-    var showPreview by remember { mutableStateOf(false) }
     var selectedNote by remember { mutableStateOf<Note?>(null) }
 
     Box(modifier = modifier.fillMaxSize()) {
         if (notes.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxWidth().padding(32.dp),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                 Text("No notes yet.", fontSize = 12.sp, color = Mid)
             }
         } else {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 notes.forEach { note -> NoteCard(note = note, onClick = { selectedNote = note }) }
             }
         }
@@ -124,177 +117,13 @@ fun NotesTab(
             shape = androidx.compose.foundation.shape.CircleShape,
             containerColor = Muted,
             contentColor = Dark
-        ) {
-            Icon(AppIcons.Add, contentDescription = "Add Note", modifier = Modifier.size(20.dp))
-        }
+        ) { Icon(AppIcons.Add, contentDescription = "Add Note", modifier = Modifier.size(20.dp)) }
     }
 
-    // Note detail dialog
     if (selectedNote != null) {
-        Dialog(onDismissRequest = { selectedNote = null }) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Surface)
-                    .padding(20.dp)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Header with title and delete in corner
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Note",
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Dark
-                        )
-                        Text(
-                            text = "🗑️",
-                            fontSize = 16.sp,
-                            modifier = Modifier.clickable { onDeleteNote(selectedNote!!.id); selectedNote = null }
-                        )
-                    }
-                    Text(
-                        text = selectedNote!!.text,
-                        fontSize = 14.sp,
-                        color = Dark,
-                        fontWeight = FontWeight.Normal,
-                        lineHeight = 20.sp
-                    )
-                    Text(
-                        text = "${selectedNote!!.date} | ${selectedNote!!.text.split("\\s+".toRegex()).filter { it.isNotBlank() }.size} words",
-                        fontSize = 11.sp,
-                        color = Mid
-                    )
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-                        TextButton(onClick = { selectedNote = null }) {
-                            Text("Close", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                        }
-                    }
-                }
-            }
-        }
+        NoteDetailDialog(note = selectedNote!!, onDelete = { onDeleteNote(selectedNote!!.id); selectedNote = null }, onDismiss = { selectedNote = null })
     }
-
     if (showDialog) {
-        Dialog(onDismissRequest = { showDialog = false; noteText = ""; previewNote = ""; showPreview = false }) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Surface)
-                    .padding(20.dp)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Text(
-                        text = "Add Note",
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Dark
-                    )
-
-                    if (showPreview && previewNote.isNotBlank()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Muted.copy(alpha = 0.15f))
-                                .padding(16.dp)
-                        ) {
-                            Text(
-                                text = previewNote,
-                                fontSize = 13.sp,
-                                color = Dark.copy(alpha = 0.7f),
-                                fontWeight = FontWeight.Normal
-                            )
-                        }
-                    }
-
-                    OutlinedTextField(
-                        value = noteText,
-                        onValueChange = { noteText = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Type your note...", color = Mid) },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Dark,
-                            unfocusedTextColor = Dark,
-                            focusedBorderColor = Mid,
-                            unfocusedBorderColor = Muted,
-                            cursorColor = Dark
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        minLines = 3
-                    )
-
-                    // Preview and Save - full width side by side
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        OutlinedTextField(
-                            value = noteText,
-                            onValueChange = { noteText = it },
-                            modifier = Modifier.weight(1f),
-                            placeholder = { Text("Type your note...", color = Mid) },
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = Dark,
-                                unfocusedTextColor = Dark,
-                                focusedBorderColor = Mid,
-                                unfocusedBorderColor = Muted,
-                                cursorColor = Dark
-                            ),
-                            shape = RoundedCornerShape(12.dp),
-                            minLines = 3
-                        )
-                    }
-                    
-                    // Action buttons row: Preview | Cancel Save
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextButton(
-                            onClick = {
-                                if (noteText.isNotBlank()) {
-                                    previewNote = noteText
-                                    showPreview = true
-                                }
-                            }
-                        ) {
-                            Text("Preview", color = Mid, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                        }
-                        TextButton(onClick = { showDialog = false; noteText = ""; previewNote = ""; showPreview = false }) {
-                            Text("Cancel", color = Mid, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                        }
-                        Button(
-                            onClick = {
-                                if (noteText.isNotBlank()) {
-                                    onAddNote(noteText.trim())
-                                    noteText = ""
-                                    previewNote = ""
-                                    showPreview = false
-                                    showDialog = false
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Mid, contentColor = Deep),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text("Save", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                        }
-                    }
-                }
-            }
-        }
+        NoteAddDialog(onAdd = { onAddNote(it); showDialog = false }, onDismiss = { showDialog = false })
     }
 }

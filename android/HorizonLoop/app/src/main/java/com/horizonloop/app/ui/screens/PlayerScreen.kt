@@ -41,6 +41,8 @@ import com.horizonloop.app.ui.components.DialogueTab
 import com.horizonloop.app.ui.components.LoopsTab
 import com.horizonloop.app.ui.components.NotesTab
 import com.horizonloop.app.ui.components.SpeedTab
+import com.horizonloop.app.ui.screens.PlayerHeader
+import com.horizonloop.app.ui.screens.TabContent
 import com.horizonloop.app.ui.theme.Dark
 import com.horizonloop.app.ui.theme.Deep
 import com.horizonloop.app.ui.theme.Mid
@@ -163,79 +165,3 @@ fun PlayerScreen(
     }
 }
 
-@Composable
-private fun PlayerHeader(title: String, onBack: () -> Unit, onMenuClick: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxWidth().background(Muted).padding(horizontal = 4.dp, vertical = 4.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Mid)
-            }
-            Text(
-                text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = Dark,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f)
-            )
-            IconButton(onClick = onMenuClick) {
-                Icon(Icons.Default.MoreVert, contentDescription = "Menu", tint = Mid)
-            }
-        }
-    }
-}
-
-@Composable
-private fun TabContent(
-    activeTab: ActiveTab,
-    isAudioMode: Boolean,
-    isPlaying: Boolean,
-    isTranslating: Boolean,
-    translationProgress: String,
-    currentDialogue: Dialogue?,
-    notes: List<Note>,
-    loops: List<Loop>,
-    dialogues: List<Dialogue>,
-    currentSpeed: Float,
-    speeds: List<Float>,
-    selectedDialogueIds: Set<Int>,
-    onAddNote: (String) -> Unit,
-    onDeleteNote: (Int) -> Unit,
-    onAddLoop: (String, String, String, Int) -> Unit,
-    onDeleteLoop: (Int) -> Unit,
-    onPlayLoop: (Loop) -> Unit,
-    onSpeedChange: (Int) -> Unit,
-    onDialogueSelect: (Dialogue) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(modifier = modifier.fillMaxSize()) {
-        when (activeTab) {
-            ActiveTab.CLEAN -> CleanTab(
-                dialogue = currentDialogue,
-                isAudioMode = isAudioMode,
-                isPlaying = isPlaying,
-                isTranslating = isTranslating,
-                translationProgress = translationProgress,
-                onSpeedDecrease = { onSpeedChange((speeds.indexOf(currentSpeed) - 1).coerceAtLeast(0)) },
-                onSpeedIncrease = { onSpeedChange((speeds.indexOf(currentSpeed) + 1).coerceAtMost(speeds.size - 1)) }
-            )
-            ActiveTab.SAVE -> DialogueTab(
-                dialogues = dialogues,
-                playingDialogueId = currentDialogue?.id,
-                selectedDialogueIds = selectedDialogueIds,
-                onDialogueClick = onDialogueSelect
-            )
-            ActiveTab.SPEED -> SpeedTab(currentSpeed = currentSpeed, speeds = speeds, onSpeedChange = onSpeedChange)
-            ActiveTab.LOOP -> LoopsTab(loops = loops, onAddLoop = onAddLoop, onDeleteLoop = onDeleteLoop, onPlayLoop = onPlayLoop)
-            ActiveTab.NOTES -> NotesTab(notes = notes, onAddNote = onAddNote, onDeleteNote = onDeleteNote)
-        }
-    }
-}

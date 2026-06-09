@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.horizonloop.app.data.FilterType
+import com.horizonloop.app.data.formatTime
 import com.horizonloop.app.ui.screens.HomeScreen
 import com.horizonloop.app.ui.screens.PlayerScreen
 import com.horizonloop.app.ui.screens.SettingsDialog
@@ -104,8 +105,8 @@ class MainActivity : ComponentActivity() {
                             isAudioMode = viewModel.audioMode,
                             isTranslating = viewModel.isTranslating,
                             translationProgress = viewModel.translationProgress,
-                            currentTime = viewModel.formatTime(viewModel.currentPlaybackTime),
-                            totalTime = viewModel.formatTime(viewModel.totalDuration),
+                            currentTime = formatTime(viewModel.currentPlaybackTime),
+                            totalTime = formatTime(viewModel.totalDuration),
                             progress = viewModel.getProgressPercent(),
                             currentSpeed = viewModel.speeds[viewModel.currentSpeedIndex],
                             speeds = viewModel.speeds,
@@ -141,11 +142,10 @@ class MainActivity : ComponentActivity() {
                     }
                     if (showSettings) {
                         SettingsDialog(
-                            apiKey = "",
-                            selectedEngine = "gpt-4o-mini",
-                            onApiKeyChange = { },
-                            onEngineChange = { },
-                            onDismiss = { showSettings = false }
+                            onDismiss = { showSettings = false },
+                            onSave = { apiKey, engine ->
+                                // TODO: wire up API key storage with the new engine
+                            }
                         )
                     }
                 }

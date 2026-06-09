@@ -25,8 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -35,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horizonloop.app.ui.theme.Dark
 import com.horizonloop.app.ui.theme.Deep
+import com.horizonloop.app.ui.components.ProgressBar
 
 import com.horizonloop.app.ui.theme.Mid
 import com.horizonloop.app.ui.theme.Muted
@@ -129,9 +128,9 @@ fun AudioControls(
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(totalTime, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             // Playback buttons - all same height (rounded rectangle)
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -183,33 +182,5 @@ fun AudioControls(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun ProgressBar(progress: Float, onSeek: (Float) -> Unit, modifier: Modifier = Modifier) {
-    var barWidth by remember { mutableStateOf(0f) }
-    Box(
-        modifier = modifier
-            .height(12.dp)
-            .clip(RoundedCornerShape(6.dp))
-            .background(Muted)
-            .onSizeChanged { barWidth = it.width.toFloat() }
-            .pointerInput(Unit) {
-                detectTapGestures { offset ->
-                    if (barWidth > 0) {
-                        val newProgress = (offset.x / barWidth).coerceIn(0f, 1f)
-                        onSeek(newProgress)
-                    }
-                }
-            }
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(progress)
-                .height(12.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(Dark)
-        )
     }
 }
