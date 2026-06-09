@@ -15,7 +15,7 @@ object ApiKeyStorage {
         "whisper-large-v3"
     )
     
-    // Groq LLM model options for translation
+    // Groq LLM model options for translation - user's preferred model
     val LLM_MODELS = listOf(
         "openai/gpt-oss-120b"
     )
