@@ -17,18 +17,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.horizonloop.app.data.FilterType
-import com.horizonloop.app.data.formatTime
-import com.horizonloop.app.ui.screens.HomeScreen
-import com.horizonloop.app.ui.screens.PlayerScreen
-import com.horizonloop.app.ui.screens.SettingsDialog
-import com.horizonloop.app.ui.theme.Deep
-import com.horizonloop.app.ui.theme.HorizonLoopTheme
-import com.horizonloop.app.ui.viewmodel.AppViewModel
+import com.horizonloop.app.core.domain.model.FilterType
+import com.horizonloop.app.core.data.ApiKeyStorage
+import com.horizonloop.app.core.data.formatTime
+import com.horizonloop.app.core.ui.viewmodel.AppViewModel
+import com.horizonloop.app.features.player.ui.screens.HomeScreen
+import com.horizonloop.app.features.player.ui.screens.PlayerScreen
+import com.horizonloop.app.features.player.ui.screens.SettingsDialog
+import com.horizonloop.app.core.ui.theme.Deep
+import com.horizonloop.app.core.ui.theme.HorizonLoopTheme
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
-    
+
     private val requiredPermissions: Array<String>
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arrayOf(
@@ -38,16 +39,15 @@ class MainActivity : ComponentActivity() {
         } else {
             arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
-    
+
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         permissionResult = permissions
     }
-    
-    // Use state to communicate permission result to composables
+
     private var permissionResult by mutableStateOf<Map<String, Boolean>?>(null)
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -56,21 +56,17 @@ class MainActivity : ComponentActivity() {
                     val viewModel: AppViewModel = viewModel()
                     var showSettings by remember { mutableStateOf(false) }
 
-                    // Check permissions on first composition
                     LaunchedEffect(Unit) {
                         val missingPermissions = requiredPermissions.filter {
                             ContextCompat.checkSelfPermission(this@MainActivity, it) != PackageManager.PERMISSION_GRANTED
                         }
                         if (missingPermissions.isEmpty()) {
-                            // All permissions granted, scan immediately
                             viewModel.scanDeviceMedia(this@MainActivity)
                         } else {
-                            // Request permissions
                             permissionLauncher.launch(missingPermissions.toTypedArray())
                         }
                     }
-                    
-                    // Handle permission result
+
                     LaunchedEffect(permissionResult) {
                         permissionResult?.let { results ->
                             val allGranted = results.values.all { it }
@@ -81,8 +77,6 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                    
-                    // AudioPlayer handles progress updates via callback - no need for simulation
 
                     if (viewModel.showHomeView) {
                         HomeScreen(
@@ -113,7 +107,7 @@ class MainActivity : ComponentActivity() {
                             activeLoopId = viewModel.activeLoopId,
                             notes = viewModel.notes,
                             loops = viewModel.loops,
-                            dialogues = viewModel.translatedDialogues, // Never show demo - real data or empty
+                            dialogues = viewModel.translatedDialogues,
                             currentDialogue = viewModel.getCurrentDialogue(),
                             showCapsuleMenu = viewModel.showCapsuleMenu,
                             selectedDialogueIds = viewModel.selectedDialogueIds,
@@ -129,13 +123,14 @@ class MainActivity : ComponentActivity() {
                             onPlayPause = { viewModel.togglePlay() },
                             onRewind = { viewModel.rewind() },
                             onForward = { viewModel.forward() },
+                            onSeek = { viewModel.seekTo(it) },
                             onAddNote = { viewModel.addNote(it) },
                             onDeleteNote = { viewModel.deleteNote(it) },
                             onAddLoop = { name, start, end, count -> viewModel.addLoop(name, start, end, count) },
                             onDeleteLoop = { viewModel.deleteLoop(it) },
                             onPlayLoop = { viewModel.playLoop(this@MainActivity, it) },
                             onSpeedChange = { viewModel.setSpeed(it) },
-                            onDialogueSelect = { viewModel.selectDialogue(it) },
+                            onDialogueSelect = { ctx, dialogue -> viewModel.selectDialogue(ctx, dialogue) },
                             onDismissCapsule = { viewModel.hideCapsuleMenu() },
                             onDismissTranslationDebug = { viewModel.showTranslationDebug = false }
                         )
@@ -143,9 +138,15 @@ class MainActivity : ComponentActivity() {
                     if (showSettings) {
                         SettingsDialog(
                             onDismiss = { showSettings = false },
-                            onSave = { apiKey, engine ->
-                                // TODO: wire up API key storage with the new engine
-                            }
+                            onSave = { apiKey, translationModel, transcriptionModel ->
+                                ApiKeyStorage.saveApiKey(this@MainActivity, apiKey)
+                                ApiKeyStorage.saveEngine(this@MainActivity, translationModel)
+                                ApiKeyStorage.saveTranscriptionModel(this@MainActivity, transcriptionModel)
+                                viewModel.updateApiKey(this@MainActivity)
+                            },
+                            initialApiKey = ApiKeyStorage.getApiKey(this@MainActivity),
+                            initialTranscriptionModel = ApiKeyStorage.getTranscriptionModel(this@MainActivity),
+                            initialTranslationModel = ApiKeyStorage.getEngine(this@MainActivity)
                         )
                     }
                 }

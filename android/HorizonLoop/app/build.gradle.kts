@@ -72,4 +72,14 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
+
+    // Test dependencies
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.20")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:5.8.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.20")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.10.1")
+    testImplementation("org.robolectric:robolectric:4.11.1")
 }
