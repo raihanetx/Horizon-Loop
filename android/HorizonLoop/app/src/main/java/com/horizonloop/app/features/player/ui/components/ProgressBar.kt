@@ -28,52 +28,35 @@ fun ProgressBar(
     modifier: Modifier = Modifier
 ) {
     var barWidth by remember { mutableStateOf(0f) }
-    // Static colors — no green flash. The bar position itself is the feedback.
     val trackColor = Mid.copy(alpha = 0.25f)
     val progressColor = Dark
 
-    // Outer box = 52dp touch target for comfortable tapping per Material Design.
-    // Inner box = 8dp visual bar.
     Box(
         modifier = modifier
-            .height(52.dp)
+            .height(48.dp)
             .clip(RoundedCornerShape(4.dp))
             .onSizeChanged { barWidth = it.width.toFloat() }
             .pointerInput(Unit) {
-                // Standard Compose pattern: awaitFirstDown + awaitPointerEvent.
-                // The ProgressBar and Play button are SEPARATE composables, so the
-                // ProgressBar's pointerInput only receives events that hit ITS bounds.
-                // It does NOT interfere with the Play button's .clickable.
-                // We seek on DOWN (tap-to-seek works immediately).
                 awaitEachGesture {
                     val down = awaitFirstDown()
                     val startX = down.position.x
-
-                    // Seek on DOWN (tap-to-seek) — works in both playing and paused states
                     if (barWidth > 0f) {
                         val tapProgress = (startX / barWidth).coerceIn(0f, 1f)
                         onSeek(tapProgress)
                     }
-
                     var dragStarted = false
                     var lastSeekTime = 0L
-
-                    // Process MOVE and UP events — throttle drag seeks to 50ms
-                    // so the MediaPlayer isn't flooded with 60 calls/sec.
                     while (true) {
                         val event = awaitPointerEvent()
                         val change = event.changes.find { it.id == down.id } ?: break
-
                         if (!change.pressed) {
-                            // UP — finger lifted
                             break
                         }
-
                         val dx = change.position.x - startX
                         if (kotlin.math.abs(dx) >= 10f) {
                             if (!dragStarted) {
                                 dragStarted = true
-                                change.consume() // Claim the gesture for drag
+                                change.consume()
                             }
                             val now = System.currentTimeMillis()
                             if (now - lastSeekTime > 50 && barWidth > 0f) {
@@ -86,24 +69,23 @@ fun ProgressBar(
                 }
             }
     ) {
-        // Center the 6dp visual bar vertically inside the 48dp touch area
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
+                .height(48.dp),
             contentAlignment = androidx.compose.ui.Alignment.Center
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(8.dp)
+                    .height(6.dp)
                     .clip(RoundedCornerShape(4.dp))
                     .background(trackColor)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(progress.coerceIn(0f, 1f))
-                        .height(8.dp)
+                        .height(6.dp)
                         .clip(RoundedCornerShape(4.dp))
                         .background(progressColor)
                 )

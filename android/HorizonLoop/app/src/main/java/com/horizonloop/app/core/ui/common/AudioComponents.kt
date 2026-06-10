@@ -38,14 +38,14 @@ fun AudioListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(92.dp)
             .clip(RoundedCornerShape(18.dp))
             .background(Surface)
             .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 18.dp),
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(modifier = Modifier.size(64.dp).clip(RoundedCornerShape(14.dp)).background(Muted.copy(alpha = 0.5f)), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.size(56.dp).clip(RoundedCornerShape(14.dp)).background(Muted.copy(alpha = 0.5f)), contentAlignment = Alignment.Center) {
             Icon(imageVector = AppIcons.MusicNote, contentDescription = null, tint = Mid, modifier = Modifier.size(36.dp))
         }
         Spacer(modifier = Modifier.width(16.dp))
@@ -53,9 +53,9 @@ fun AudioListItem(
             Text(text = audio.title, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = Dark, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(modifier = Modifier.height(6.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = audio.duration, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Mid)
+                Text(text = audio.duration, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = Mid)
                 Spacer(modifier = Modifier.width(10.dp))
-                Text(text = audio.size, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Mid)
+                Text(text = audio.size, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = Mid)
             }
         }
         Icon(imageVector = AppIcons.ChevronRight, contentDescription = null, tint = Mid, modifier = Modifier.size(18.dp))

@@ -49,30 +49,30 @@ fun LoopCard(
             .clip(RoundedCornerShape(14.dp))
             .background(Muted.copy(alpha = 0.04f))
             .clickable(onClick = onClick)
-            .padding(24.dp),
+            .padding(20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(imageVector = AppIcons.Play, contentDescription = null, tint = Mid, modifier = Modifier.size(28.dp))
+        Icon(imageVector = AppIcons.Play, contentDescription = null, tint = Mid, modifier = Modifier.size(24.dp))
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(loop.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Dark)
+            Text(loop.name, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Dark)
             Spacer(modifier = Modifier.height(6.dp))
             val startSec = parseTimeToSeconds(loop.start)
             val endSec = parseTimeToSeconds(loop.end)
             val duration = if (!startSec.isNaN() && !endSec.isNaN()) kotlin.math.abs(endSec - startSec) else null
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (loop.start.isNotBlank() && loop.end.isNotBlank()) {
-                    Text("[${formatTimestamp(startSec)} to ${formatTimestamp(endSec)}]", fontSize = 14.sp, color = Mid)
+                    Text("[${formatTimestamp(startSec)} to ${formatTimestamp(endSec)}]", fontSize = 12.sp, color = Mid)
                     Spacer(modifier = Modifier.width(10.dp))
                     Box(modifier = Modifier.width(1.dp).height(12.dp).background(Dark.copy(alpha = 0.3f)))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text("Total:${duration?.let { String.format("%.1f", it / 60) } ?: "—"} min", fontSize = 14.sp, color = Mid)
+                    Text("Total:${duration?.let { String.format("%.1f", it / 60) } ?: "—"} min", fontSize = 12.sp, color = Mid)
                     Spacer(modifier = Modifier.width(10.dp))
                     Box(modifier = Modifier.width(1.dp).height(12.dp).background(Dark.copy(alpha = 0.3f)))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text("Loop:${loop.count} time", fontSize = 14.sp, color = Mid)
+                    Text("Loop:${loop.count} time", fontSize = 12.sp, color = Mid)
                 } else {
-                    Text("No time set", fontSize = 14.sp, color = Mid)
+                    Text("No time set", fontSize = 12.sp, color = Mid)
                 }
             }
         }

@@ -64,7 +64,7 @@ fun SettingsDialog(
             .fillMaxWidth()
             .background(Surface)
             .clip(RoundedCornerShape(20.dp))
-            .padding(24.dp)
+            .padding(22.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
@@ -74,7 +74,7 @@ fun SettingsDialog(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Settings", fontWeight = FontWeight.SemiBold, color = Dark, fontSize = 20.sp)
+                Text("Settings", fontWeight = FontWeight.SemiBold, color = Dark, fontSize = 18.sp)
                 TextButton(onClick = onDismiss) { Text("×", color = Mid, fontSize = 24.sp) }
             }
 
@@ -82,7 +82,7 @@ fun SettingsDialog(
             OutlinedTextField(
                 value = apiKey, onValueChange = { apiKey = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("API Key", fontSize = 13.sp, color = Mid) },
+                label = { Text("API Key", fontSize = 12.sp, color = Mid) },
                 placeholder = { Text("Enter your API key...", color = Mid) },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Dark, unfocusedTextColor = Dark,
@@ -129,13 +129,13 @@ fun SettingsDialog(
                 if (isDetecting) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.5.dp, color = Dark)
                 } else {
-                    Text("Fetch Available Models", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Fetch Available Models", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
 
             // Status message
             if (detectionStatus.isNotBlank()) {
-                Text(detectionStatus, fontSize = 12.sp, color = Mid)
+                Text(detectionStatus, fontSize = 11.sp, color = Mid)
             }
 
             // Voice-to-Text model selector
@@ -165,14 +165,14 @@ fun SettingsDialog(
             // Action buttons
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 TextButton(onClick = onDismiss, modifier = Modifier.weight(1f)) {
-                    Text("Cancel", color = Mid, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Cancel", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 }
                 Button(
                     onClick = { onSave(apiKey, translationModel, transcriptionModel); onDismiss() },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = Mid, contentColor = Deep)
                 ) {
-                    Text("Save", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Save", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         }

@@ -68,20 +68,20 @@ fun TranslationDebugPanel(
         }
     }
 
-    Column(modifier = modifier.fillMaxWidth().padding(16.dp)) {
+    Column(modifier = modifier.fillMaxWidth().padding(14.dp)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
                 .background(Muted)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Translation Debug", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Dark)
+                Text(text = "Translation Debug", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Dark)
                 Spacer(modifier = Modifier.width(10.dp))
-                Text(text = "[${steps.count { it.status == StepStatus.COMPLETED }}/${steps.size}]", fontSize = 12.sp, color = Mid)
+                Text(text = "[${steps.count { it.status == StepStatus.COMPLETED }}/${steps.size}]", fontSize = 11.sp, color = Mid)
             }
             Row {
                 IconButton(onClick = { isExpanded = !isExpanded }, modifier = Modifier.size(36.dp)) {
@@ -105,8 +105,8 @@ fun TranslationDebugPanel(
                     .background(Deep)
                     .border(1.dp, Muted.copy(alpha = 0.3f), RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "PROGRESS:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Mid)
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Text(text = "PROGRESS:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Mid)
                     Spacer(modifier = Modifier.height(12.dp))
                     steps.forEach { step ->
                         StepRow(step = step)
@@ -114,14 +114,14 @@ fun TranslationDebugPanel(
                     }
                 }
                 Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Muted.copy(alpha = 0.2f)))
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "LOG:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Mid)
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Text(text = "LOG:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Mid)
                     Spacer(modifier = Modifier.height(12.dp))
                     LazyColumn(
                         state = listState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 240.dp)
+                            .heightIn(max = 200.dp)
                             .clip(RoundedCornerShape(10.dp))
                             .background(Dark.copy(alpha = 0.5f))
                             .padding(10.dp)
@@ -129,7 +129,7 @@ fun TranslationDebugPanel(
                         items(log) { entry ->
                             Text(
                                 text = entry,
-                                fontSize = 11.sp,
+                                fontSize = 10.sp,
                                 fontFamily = FontFamily.Monospace,
                                 color = when {
                                     entry.contains("ERROR") -> Surface

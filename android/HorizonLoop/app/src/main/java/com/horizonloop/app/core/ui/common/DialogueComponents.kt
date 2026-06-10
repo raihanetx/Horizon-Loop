@@ -75,14 +75,14 @@ fun DialogueCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 20.dp),
+            .padding(vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Left accent divider bar
         Box(
             modifier = Modifier
-                .width(4.dp)
-                .height(48.dp)
+                .width(3.dp)
+                .height(40.dp)
                 .clip(RoundedCornerShape(2.dp))
                 .background(dividerColor)
                 .then(if (isPlaying) Modifier.alpha(pulseAlpha) else Modifier)
@@ -108,7 +108,7 @@ fun DialogueCard(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = dialogue.english,
-                    fontSize = 16.sp,
+                    fontSize = 15.sp,
                     fontWeight = if (isPlaying) FontWeight.Bold else FontWeight.Normal,
                     color = textColor,
                     maxLines = 2,
@@ -120,7 +120,7 @@ fun DialogueCard(
             // Bangla text on next line
             Text(
                 text = dialogue.bangla,
-                fontSize = 15.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Normal,
                 color = textColor.copy(alpha = if (isPlaying) 0.8f else 0.45f),
                 maxLines = 2,

@@ -53,25 +53,25 @@ fun AudioControls(
         modifier = modifier
             .fillMaxWidth()
             .background(Muted)
-            .padding(horizontal = 20.dp)
-            .padding(top = 12.dp, bottom = 20.dp)
+            .padding(horizontal = 16.dp)
+            .padding(top = 10.dp, bottom = 16.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Dark, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+                Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = Dark, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
             }
         }
         Spacer(modifier = Modifier.height(6.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            Text("Mode:${activeTab.replaceFirstChar { it.uppercase() }}", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Mid)
+            Text("Mode:${activeTab.replaceFirstChar { it.uppercase() }}", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid)
             Text(" | ", fontSize = 11.sp, color = Muted)
-            Text("Loop:${activeLoopId ?: "None"}", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Mid)
+            Text("Loop:${activeLoopId ?: "None"}", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid)
             Text(" | ", fontSize = 11.sp, color = Muted)
-            Text("Speed: ${currentSpeed}x", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Mid)
+            Text("Speed: ${currentSpeed}x", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid)
         }
         Spacer(modifier = Modifier.height(20.dp))
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(currentTime, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
+            Text(currentTime, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
             Spacer(modifier = Modifier.width(14.dp))
             ProgressBar(
                 progress = progress,
@@ -79,7 +79,7 @@ fun AudioControls(
                 modifier = Modifier.weight(1f)
             )
             Spacer(modifier = Modifier.width(14.dp))
-            Text(totalTime, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
+            Text(totalTime, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
         }
         Spacer(modifier = Modifier.height(20.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
@@ -92,8 +92,7 @@ fun AudioControls(
                     .padding(horizontal = 20.dp, vertical = 12.dp)
                     .clickable { onRewind() },
                 contentAlignment = Alignment.Center
-            ) {
-                Text("-5s", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = Mid)
+            ) {                    Text("-5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Mid)
             }
             Spacer(modifier = Modifier.width(16.dp))
             // Play/Pause button — single tap toggles play/pause.
@@ -109,7 +108,7 @@ fun AudioControls(
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                     Icon(imageVector = if (isPlaying) AppIcons.Pause else AppIcons.Play, contentDescription = if (isPlaying) "Pause" else "Play", tint = Deep, modifier = Modifier.size(22.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = if (isPlaying) "Pause" else "Play", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Deep)
+                    Text(text = if (isPlaying) "Pause" else "Play", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Deep)
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -122,8 +121,7 @@ fun AudioControls(
                     .padding(horizontal = 20.dp, vertical = 12.dp)
                     .clickable { onForward() },
                 contentAlignment = Alignment.Center
-            ) {
-                Text("+5s", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = Mid)
+            ) {                    Text("+5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Mid)
             }
         }
     }

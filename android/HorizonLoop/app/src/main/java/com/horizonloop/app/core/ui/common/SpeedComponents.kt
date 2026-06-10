@@ -44,8 +44,8 @@ fun SpeedTab(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             speeds.forEachIndexed { index, speed ->
                 val isActive = speed == currentSpeed
-                Box(modifier = Modifier.padding(horizontal = 10.dp).size(56.dp).clip(CircleShape).background(if (isActive) Dark else Muted).clickable { onSpeedChange(index) }, contentAlignment = Alignment.Center) {
-                    Icon(imageVector = AppIcons.PlayTriangle, contentDescription = null, tint = if (isActive) Dark else Mid, modifier = Modifier.size(28.dp))
+                Box(modifier = Modifier.padding(horizontal = 8.dp).size(52.dp).clip(CircleShape).background(if (isActive) Dark else Muted).clickable { onSpeedChange(index) }, contentAlignment = Alignment.Center) {
+                    Icon(imageVector = AppIcons.PlayTriangle, contentDescription = null, tint = if (isActive) Dark else Mid, modifier = Modifier.size(24.dp))
                 }
             }
         }

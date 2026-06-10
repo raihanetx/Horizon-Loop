@@ -28,14 +28,14 @@ fun StepRow(step: TranslationStep) {
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(if (step.status == StepStatus.IN_PROGRESS) Muted.copy(alpha = 0.3f) else Deep)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(horizontal = 10.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = step.icon, fontSize = 14.sp, modifier = Modifier.width(28.dp))
         Text(text = "${step.stepNumber}.", fontSize = 12.sp, color = Mid, modifier = Modifier.width(24.dp))
         Text(
             text = step.title,
-            fontSize = 13.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = when (step.status) {
                 StepStatus.PENDING -> Mid.copy(alpha = 0.7f)
@@ -52,7 +52,7 @@ fun StepRow(step: TranslationStep) {
                 StepStatus.COMPLETED -> "OK"
                 StepStatus.FAILED -> "X"
             },
-            fontSize = 12.sp,
+            fontSize = 11.sp,
             color = when (step.status) {
                 StepStatus.COMPLETED -> Muted
                 StepStatus.FAILED -> Deep

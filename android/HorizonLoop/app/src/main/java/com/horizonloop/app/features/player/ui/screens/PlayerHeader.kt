@@ -30,13 +30,13 @@ fun PlayerHeader(title: String, onBack: () -> Unit, onMenuClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .background(Muted)
-            .padding(horizontal = 12.dp, vertical = 12.dp),
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Mid, modifier = Modifier.size(24.dp)) }
-            Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Dark, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.weight(1f))
-            IconButton(onClick = onMenuClick) { Icon(Icons.Default.MoreVert, contentDescription = "Menu", tint = Mid, modifier = Modifier.size(24.dp)) }
+            IconButton(onClick = onBack) {            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Mid, modifier = Modifier.size(22.dp)) }
+            Text(text = title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Dark, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.weight(1f))
+            IconButton(onClick = onMenuClick) {            Icon(Icons.Default.MoreVert, contentDescription = "Menu", tint = Mid, modifier = Modifier.size(22.dp)) }
         }
     }
 }

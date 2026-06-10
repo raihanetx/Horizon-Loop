@@ -53,11 +53,11 @@ fun CapsuleMenu(
             .fillMaxWidth()
             .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
             .background(Surface)
-            .padding(20.dp)
-            .padding(bottom = 28.dp)
+            .padding(18.dp)
+            .padding(bottom = 24.dp)
     ) {
         Box(modifier = Modifier.width(44.dp).height(5.dp).clip(RoundedCornerShape(3.dp)).background(Muted).align(Alignment.CenterHorizontally))
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         val menuItems = listOf(
             CapsuleMenuItem("Subtitle", "Enable or disable subtitles display", AppIcons.Subtitles, activeTab == "clean") { onTabClick("clean") },
             CapsuleMenuItem("List", "View full dialogue and transcript list", AppIcons.List, activeTab == "save") { onTabClick("save") },
@@ -82,17 +82,17 @@ private fun CapsuleMenuRow(item: CapsuleMenuItem, isLast: Boolean) {
                 .clip(RoundedCornerShape(10.dp))
                 .clickable(onClick = item.onClick)
                 .background(if (item.isActive) Muted.copy(alpha = 0.1f) else androidx.compose.ui.graphics.Color.Transparent)
-                .padding(18.dp),
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(modifier = Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(Muted), contentAlignment = Alignment.Center) {
-                Icon(imageVector = item.icon, contentDescription = null, tint = if (item.isActive) Dark else Mid, modifier = Modifier.size(24.dp))
+            Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(Muted), contentAlignment = Alignment.Center) {
+                Icon(imageVector = item.icon, contentDescription = null, tint = if (item.isActive) Dark else Mid, modifier = Modifier.size(20.dp))
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(item.title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Dark)
+                Text(item.title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Dark)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(item.subtitle, fontSize = 13.sp, fontWeight = FontWeight.Normal, color = Mid.copy(alpha = 0.8f))
+                Text(item.subtitle, fontSize = 12.sp, fontWeight = FontWeight.Normal, color = Mid.copy(alpha = 0.8f))
             }
             Icon(imageVector = AppIcons.ChevronRight, contentDescription = null, tint = Mid, modifier = Modifier.size(18.dp))
         }

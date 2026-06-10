@@ -59,9 +59,9 @@ fun LoopAddDialog(onAdd: (String, String, String, Int) -> Unit, onDismiss: () ->
         previewLoop = emptyMap()
         showPreview = false
     }) {
-        Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Surface).padding(24.dp)) {
+        Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Surface).padding(22.dp)) {
             Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text("Add Loop", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Dark)
+                Text("Add Loop", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Dark)
 
                 if (showPreview && previewLoop.isNotEmpty()) {
                     Box(
@@ -72,7 +72,7 @@ fun LoopAddDialog(onAdd: (String, String, String, Int) -> Unit, onDismiss: () ->
                             .padding(20.dp)
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(previewLoop["name"] ?: "", fontSize = 15.sp, color = Dark, fontWeight = FontWeight.SemiBold)
+                            Text(previewLoop["name"] ?: "", fontSize = 14.sp, color = Dark, fontWeight = FontWeight.SemiBold)
                             Text(
                                 "[${previewLoop["start"] ?: "—"} to ${previewLoop["end"] ?: "—"}] | Loop: ${previewLoop["count"] ?: "1"} time(s)",
                                 fontSize = 13.sp,
@@ -146,7 +146,7 @@ fun LoopAddDialog(onAdd: (String, String, String, Int) -> Unit, onDismiss: () ->
                             )
                             showPreview = true
                         }
-                    }) { Text("Preview", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold) }
+                    }) {                    Text("Preview", color = Mid, fontSize = 12.sp, fontWeight = FontWeight.SemiBold) }
 
                     TextButton(onClick = {
                         onDismiss()
@@ -156,7 +156,7 @@ fun LoopAddDialog(onAdd: (String, String, String, Int) -> Unit, onDismiss: () ->
                         count = "1"
                         previewLoop = emptyMap()
                         showPreview = false
-                    }) { Text("Cancel", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold) }
+                    }) {                    Text("Cancel", color = Mid, fontSize = 12.sp, fontWeight = FontWeight.SemiBold) }
 
                     Button(
                         onClick = {
@@ -173,7 +173,7 @@ fun LoopAddDialog(onAdd: (String, String, String, Int) -> Unit, onDismiss: () ->
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Mid, contentColor = Deep),
                         shape = RoundedCornerShape(14.dp)
-                    ) { Text("Save", fontSize = 13.sp, fontWeight = FontWeight.SemiBold) }
+                    ) { Text("Save", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) }
                 }
             }
         }

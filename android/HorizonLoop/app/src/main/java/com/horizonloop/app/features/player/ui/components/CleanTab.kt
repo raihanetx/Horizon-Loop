@@ -52,7 +52,7 @@ fun CleanTab(
     )
     Box(modifier = modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(32.dp),
+            modifier = Modifier.fillMaxSize().padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -60,8 +60,8 @@ fun CleanTab(
             val showAudioIcon = isAudioMode
             val showSubtitle = !isAudioMode && dialogue != null
             if (isTranslating) {
-                Box(modifier = Modifier.size(72.dp), contentAlignment = Alignment.Center) {
-                    Icon(AppIcons.Translate, contentDescription = null, tint = Mid, modifier = Modifier.size(56.dp).alpha(alpha))
+                Box(modifier = Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+                    Icon(AppIcons.Translate, contentDescription = null, tint = Mid, modifier = Modifier.size(48.dp).alpha(alpha))
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(if (translationProgress.isNotBlank()) translationProgress else "Generating translations...", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Mid, textAlign = TextAlign.Center)
@@ -78,16 +78,16 @@ fun CleanTab(
                 }
             }
             if (showAudioIcon && !isTranslating) {
-                Box(modifier = Modifier.size(72.dp), contentAlignment = Alignment.Center) {
-                    Icon(AppIcons.AudioMode, contentDescription = null, tint = White15, modifier = Modifier.size(72.dp).alpha(if (isPlaying) alpha else 1f))
+                Box(modifier = Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+                    Icon(AppIcons.AudioMode, contentDescription = null, tint = White15, modifier = Modifier.size(56.dp).alpha(if (isPlaying) alpha else 1f))
                 }
                 Spacer(modifier = Modifier.height(20.dp))
             }
             if (showSubtitle && !isTranslating) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-                    Text("[${dialogue!!.time}]  ${dialogue.english}", fontSize = 24.sp, fontWeight = FontWeight.Medium, color = Dark, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp))
+                    Text("[${dialogue!!.time}]  ${dialogue.english}", fontSize = 20.sp, fontWeight = FontWeight.Medium, color = Dark, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp))
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text(dialogue.bangla, fontSize = 18.sp, fontWeight = FontWeight.Normal, color = Mid, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp))
+                    Text(dialogue.bangla, fontSize = 16.sp, fontWeight = FontWeight.Normal, color = Mid, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp))
                 }
             }
             Spacer(modifier = Modifier.weight(1f))

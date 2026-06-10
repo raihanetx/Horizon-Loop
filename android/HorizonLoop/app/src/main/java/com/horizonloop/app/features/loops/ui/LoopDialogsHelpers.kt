@@ -44,18 +44,18 @@ import com.horizonloop.app.core.ui.theme.Surface
 @Composable
 fun LoopDetailDialog(loop: Loop, onPlay: (Loop) -> Unit, onDelete: (Int) -> Unit, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
-        Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Surface).padding(24.dp)) {
+        Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Surface).padding(22.dp)) {
             Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(loop.name, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Dark)
-                Text("🗑️", fontSize = 20.sp, modifier = Modifier.clickable { onDelete(loop.id); onDismiss() })
+                Text(loop.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Dark)
+                Text("🗑️", fontSize = 18.sp, modifier = Modifier.clickable { onDelete(loop.id); onDismiss() })
                 }
                 val startSec = parseTimeToSeconds(loop.start)
                 val endSec = parseTimeToSeconds(loop.end)
-                Text("[${formatTimestamp(startSec)} to ${formatTimestamp(endSec)}]", fontSize = 16.sp, color = Mid)
-                Text("Loop: ${loop.count} time(s)", fontSize = 16.sp, color = Mid)
+                Text("[${formatTimestamp(startSec)} to ${formatTimestamp(endSec)}]", fontSize = 15.sp, color = Mid)
+                Text("Loop: ${loop.count} time(s)", fontSize = 15.sp, color = Mid)
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End)) {
-                    TextButton(onClick = onDismiss) { Text("Close", color = Mid, fontSize = 14.sp, fontWeight = FontWeight.SemiBold) }
+                    TextButton(onClick = onDismiss) { Text("Close", color = Mid, fontSize = 13.sp, fontWeight = FontWeight.SemiBold) }
                     Button(
                         onClick = { onPlay(loop); onDismiss() },
                         colors = ButtonDefaults.buttonColors(containerColor = Mid, contentColor = Deep),
@@ -63,7 +63,7 @@ fun LoopDetailDialog(loop: Loop, onPlay: (Loop) -> Unit, onDelete: (Int) -> Unit
                     ) {
                         Icon(AppIcons.Play, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Play", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Text("Play", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }

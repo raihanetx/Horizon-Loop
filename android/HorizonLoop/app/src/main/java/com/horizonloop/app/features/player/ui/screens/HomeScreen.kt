@@ -65,7 +65,7 @@ fun HomeScreen(
         modifier = modifier
             .fillMaxSize()
             .background(Deep)
-            .padding(16.dp)
+            .padding(14.dp)
     ) {
         if (isScanning) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -151,8 +151,8 @@ private fun FilterChip(label: String, isActive: Boolean, onClick: () -> Unit) {
             .clip(RoundedCornerShape(50.dp))
             .then(if (isActive) Modifier.background(Dark) else Modifier.border(1.dp, Mid.copy(alpha = 0.4f), RoundedCornerShape(50.dp)))
             .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 10.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Text(text = label, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = if (isActive) Deep else Mid)
+        Text(text = label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = if (isActive) Deep else Mid)
     }
 }

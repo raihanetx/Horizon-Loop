@@ -74,8 +74,7 @@ internal fun ModelSelector(
             value = selectedModel,
             onValueChange = { },
             modifier = Modifier.fillMaxWidth(),
-            readOnly = true,
-            label = { Text(label, fontSize = 12.sp, color = Mid) },
+            readOnly = true,                    label = { Text(label, fontSize = 11.sp, color = Mid) },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Dark, unfocusedTextColor = Dark,
                 focusedBorderColor = Mid, unfocusedBorderColor = Muted
