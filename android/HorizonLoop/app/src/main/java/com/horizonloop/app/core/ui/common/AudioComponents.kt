@@ -47,7 +47,7 @@ fun AudioListItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(modifier = Modifier.size(56.dp).clip(RoundedCornerShape(14.dp)).background(Muted.copy(alpha = 0.5f)), contentAlignment = Alignment.Center) {
-            Icon(imageVector = AppIcons.MusicNote, contentDescription = null, tint = Accent, modifier = Modifier.size(36.dp))
+            Icon(imageVector = AppIcons.AudioFile, contentDescription = null, tint = Accent, modifier = Modifier.size(34.dp))
         }
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {

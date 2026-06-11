@@ -25,6 +25,7 @@ object AppIcons {
     val Play: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_play)
     val Pause: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_pause)
     val MusicNote: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_music_note)
+    val AudioFile: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_audio_file)
     val Translate: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_translate)
     val VolumeUp: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_volume_up)
     val List: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_list)

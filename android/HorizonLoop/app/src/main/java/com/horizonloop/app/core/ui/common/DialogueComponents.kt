@@ -10,20 +10,23 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -38,7 +41,6 @@ import com.horizonloop.app.core.ui.theme.Accent
 import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
-import com.horizonloop.app.core.ui.theme.Surface
 
 @Composable
 fun DialogueCard(
@@ -56,7 +58,7 @@ fun DialogueCard(
         label = "pulseAnim"
     )
 
-    // Card-based design: Surface card with rounded corners, left-aligned text
+    // Card-less design: just text on the dark background, with left-aligned text
     val textColor = if (isPlaying || isSelected) Accent else Dark
     val timeColor = if (isPlaying || isSelected) Accent.copy(alpha = pulseAlpha) else Mid
 
@@ -85,15 +87,28 @@ fun DialogueCard(
         }
     }
 
-    Column(
+    // Card-less design with a 3dp left accent bar that lights up emerald
+    // when this dialogue is playing or selected. The bar's space is always
+    // reserved (transparent when inactive) so layout doesn't shift.
+    Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .background(Surface)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 16.dp),
-        horizontalAlignment = Alignment.Start
+            .height(IntrinsicSize.Max)
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        Box(
+            modifier = Modifier
+                .width(3.dp)
+                .fillMaxHeight()
+                .background(if (isPlaying || isSelected) Accent else Color.Transparent)
+        )
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 17.dp, end = 20.dp, top = 12.dp, bottom = 12.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
         // First line: [time] English — left-aligned
         Text(
             text = firstLine,
@@ -112,6 +127,7 @@ fun DialogueCard(
             maxLines = 3,
             overflow = TextOverflow.Ellipsis
         )
+        }
     }
 }
 
@@ -145,8 +161,8 @@ fun DialogueTab(
                 .fillMaxWidth()
                 .background(Deep)
                 .padding(bottom = 32.dp),
-            contentPadding = PaddingValues(top = 6.dp, start = 14.dp, end = 14.dp),
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(10.dp)
+            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 4.dp),
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(18.dp)
         ) {
             items(dialogues.size) { index ->
                 val dialogue = dialogues[index]
