@@ -39,26 +39,26 @@ fun AudioListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(68.dp)
-            .clip(RoundedCornerShape(14.dp))
+            .height(76.dp)
+            .clip(RoundedCornerShape(15.dp))
             .background(Surface)
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(horizontal = 12.dp, vertical = 11.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(modifier = Modifier.size(44.dp).clip(RoundedCornerShape(10.dp)).background(Muted.copy(alpha = 0.5f)), contentAlignment = Alignment.Center) {
-            Icon(imageVector = AppIcons.AudioFile, contentDescription = null, tint = Accent, modifier = Modifier.size(26.dp))
+        Box(modifier = Modifier.size(48.dp).clip(RoundedCornerShape(11.dp)).background(Muted.copy(alpha = 0.5f)), contentAlignment = Alignment.Center) {
+            Icon(imageVector = AppIcons.AudioFile, contentDescription = null, tint = Accent, modifier = Modifier.size(28.dp))
         }
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(13.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = audio.title, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = Dark, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Spacer(modifier = Modifier.height(3.dp))
+            Text(text = audio.title, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = Dark, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(modifier = Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = audio.duration, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Mid)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = audio.size, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Mid)
             }
         }
-        Icon(imageVector = AppIcons.ChevronRight, contentDescription = null, tint = Mid, modifier = Modifier.size(16.dp))
+        Icon(imageVector = AppIcons.ChevronRight, contentDescription = null, tint = Mid, modifier = Modifier.size(17.dp))
     }
 }
