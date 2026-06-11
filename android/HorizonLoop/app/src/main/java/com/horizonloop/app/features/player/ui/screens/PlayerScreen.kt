@@ -96,8 +96,9 @@ fun PlayerScreen(
                 onDialogueSelect = onDialogueSelect,
                 modifier = Modifier.weight(1f)
             )
-            val showAudioControls = activeTab != ActiveTab.NOTES && activeTab != ActiveTab.LOOP &&
-                    !(activeTab == ActiveTab.SAVE && selectedDialogueIds.isEmpty())
+            // Audio controls are always visible on CLEAN, SAVE, and SPEED tabs
+            // (only hidden on NOTES and LOOP tabs where they don't apply).
+            val showAudioControls = activeTab != ActiveTab.NOTES && activeTab != ActiveTab.LOOP
             if (showAudioControls) {
                 AudioControls(
                     title = title,

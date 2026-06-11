@@ -36,7 +36,6 @@ import com.horizonloop.app.core.ui.theme.Accent
 import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
-import com.horizonloop.app.core.ui.theme.Surface
 
 @Composable
 fun DialogueCard(
@@ -87,9 +86,8 @@ fun DialogueCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(Surface)
             .clickable(onClick = onClick)
-            .padding(vertical = 20.dp, horizontal = 18.dp),
+            .padding(vertical = 18.dp, horizontal = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // First line: [time] English

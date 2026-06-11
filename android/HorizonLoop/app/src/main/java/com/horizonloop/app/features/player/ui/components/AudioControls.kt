@@ -55,14 +55,14 @@ fun AudioControls(
             .fillMaxWidth()
             .background(Muted)
             .padding(horizontal = 16.dp)
-            .padding(top = 10.dp, bottom = 16.dp)
+            .padding(top = 6.dp, bottom = 12.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = Dark, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+                Text(text = title, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = Dark, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
             }
         }
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             Text("Mode:${activeTab.replaceFirstChar { it.uppercase() }}", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid)
             Text(" | ", fontSize = 11.sp, color = Muted)
@@ -70,19 +70,19 @@ fun AudioControls(
             Text(" | ", fontSize = 11.sp, color = Muted)
             Text("Speed: ${currentSpeed}x", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid)
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(currentTime, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             ProgressBar(
                 progress = progress,
                 onSeek = onSeek,
                 modifier = Modifier.weight(1f)
             )
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             Text(totalTime, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             // Subtitle icon button (left side, outside -5s)
             // CRITICAL: .clickable must be AFTER .padding so the padded area is clickable.
@@ -91,14 +91,14 @@ fun AudioControls(
                     .clip(RoundedCornerShape(28.dp))
                     .background(Muted)
                     .clickable { onSubtitleClick() }
-                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                    .padding(horizontal = 12.dp, vertical = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = AppIcons.Subtitles,
                     contentDescription = "Subtitles",
                     tint = Dark,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(22.dp)
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))
@@ -109,7 +109,7 @@ fun AudioControls(
                     .clip(RoundedCornerShape(28.dp))
                     .background(Muted)
                     .clickable { onRewind() }
-                    .padding(horizontal = 18.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text("-5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Dark)
@@ -122,14 +122,14 @@ fun AudioControls(
                 modifier = Modifier
                     .clip(RoundedCornerShape(28.dp))
                     .background(Dark)
-                    .padding(horizontal = 20.dp, vertical = 12.dp)
+                    .padding(horizontal = 18.dp, vertical = 10.dp)
                     .clickable { onPlayPause() },
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                    Icon(imageVector = if (isPlaying) AppIcons.Pause else AppIcons.Play, contentDescription = if (isPlaying) "Pause" else "Play", tint = Deep, modifier = Modifier.size(22.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = if (isPlaying) "Pause" else "Play", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Deep)
+                    Icon(imageVector = if (isPlaying) AppIcons.Pause else AppIcons.Play, contentDescription = if (isPlaying) "Pause" else "Play", tint = Deep, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(text = if (isPlaying) "Pause" else "Play", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Deep)
                 }
             }
             Spacer(modifier = Modifier.width(12.dp))
@@ -140,7 +140,7 @@ fun AudioControls(
                     .clip(RoundedCornerShape(28.dp))
                     .background(Muted)
                     .clickable { onForward() }
-                    .padding(horizontal = 18.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text("+5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Dark)
@@ -154,14 +154,14 @@ fun AudioControls(
                     .clip(RoundedCornerShape(28.dp))
                     .background(Muted)
                     .clickable { onListClick() }
-                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                    .padding(horizontal = 12.dp, vertical = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = AppIcons.List,
                     contentDescription = "List",
                     tint = Dark,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(22.dp)
                 )
             }
         }
