@@ -20,12 +20,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -41,6 +42,7 @@ import com.horizonloop.app.core.ui.theme.Accent
 import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
+import com.horizonloop.app.core.ui.theme.Surface
 
 @Composable
 fun DialogueCard(
@@ -58,10 +60,8 @@ fun DialogueCard(
         label = "pulseAnim"
     )
 
-    // Card-less design: just text on the dark background, with left-aligned text
     val textColor = if (isPlaying || isSelected) Accent else Dark
     val timeColor = if (isPlaying || isSelected) Accent.copy(alpha = pulseAlpha) else Mid
-
     val englishWeight = if (isPlaying || isSelected) FontWeight.SemiBold else FontWeight.Medium
 
     // First line: "[0:45-56] how are you? are you good ?"
@@ -87,9 +87,10 @@ fun DialogueCard(
         }
     }
 
-    // Card-less design with a 3dp left accent bar that lights up emerald
-    // when this dialogue is playing or selected. The bar's space is always
-    // reserved (transparent when inactive) so layout doesn't shift.
+    // Card-based design: Surface background with 14dp rounded corners,
+    // with a 3dp left accent bar OUTSIDE the card clip so the bar keeps
+    // clean square edges. The bar's space is always reserved (transparent
+    // when inactive) so the layout doesn't shift between items.
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -103,30 +104,38 @@ fun DialogueCard(
                 .fillMaxHeight()
                 .background(if (isPlaying || isSelected) Accent else Color.Transparent)
         )
-        Column(
+        Box(
             modifier = Modifier
                 .weight(1f)
-                .padding(start = 17.dp, end = 20.dp, top = 12.dp, bottom = 12.dp),
-            horizontalAlignment = Alignment.Start
+                .height(IntrinsicSize.Max)
+                .clip(RoundedCornerShape(14.dp))
+                .background(Surface)
         ) {
-        // First line: [time] English — left-aligned
-        Text(
-            text = firstLine,
-            textAlign = TextAlign.Start,
-            maxLines = 4,
-            overflow = TextOverflow.Ellipsis
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-        // Second line: Bangla — left-aligned
-        Text(
-            text = dialogue.bangla,
-            fontSize = 16.sp,
-            fontWeight = if (isPlaying || isSelected) FontWeight.SemiBold else FontWeight.Normal,
-            color = textColor.copy(alpha = if (isPlaying || isSelected) 1f else 0.75f),
-            textAlign = TextAlign.Start,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis
-        )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                // First line: [time] English — left-aligned
+                Text(
+                    text = firstLine,
+                    textAlign = TextAlign.Start,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                // Second line: Bangla — left-aligned
+                Text(
+                    text = dialogue.bangla,
+                    fontSize = 16.sp,
+                    fontWeight = if (isPlaying || isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                    color = textColor.copy(alpha = if (isPlaying || isSelected) 1f else 0.75f),
+                    textAlign = TextAlign.Start,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
@@ -162,7 +171,7 @@ fun DialogueTab(
                 .background(Deep)
                 .padding(bottom = 32.dp),
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 4.dp),
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(18.dp)
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(10.dp)
         ) {
             items(dialogues.size) { index ->
                 val dialogue = dialogues[index]
