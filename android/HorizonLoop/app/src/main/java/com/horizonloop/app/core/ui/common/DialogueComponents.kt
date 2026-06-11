@@ -11,7 +11,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,12 +21,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.horizonloop.app.core.data.formatTimestamp
+import com.horizonloop.app.core.data.formatTimeRange
 import com.horizonloop.app.core.domain.model.Dialogue
 import com.horizonloop.app.core.ui.theme.Accent
 import com.horizonloop.app.core.ui.theme.DarkDivider
@@ -44,7 +46,7 @@ fun DialogueCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Subtle pulse for the time line when playing
+    // Subtle pulse for the time prefix when playing
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseAlpha by infiniteTransition.animateFloat(
         initialValue = 1f, targetValue = 0.55f,
@@ -55,37 +57,48 @@ fun DialogueCard(
     // White color combination: dark text on white card, accent on click/select
     val textColor = if (isPlaying || isSelected) Accent else DarkText
     val timeColor = if (isPlaying || isSelected) Accent.copy(alpha = pulseAlpha) else DarkMuted
-    val separatorColor = if (isPlaying || isSelected) Accent.copy(alpha = 0.4f) else DarkDivider
+
+    val englishWeight = if (isPlaying || isSelected) FontWeight.SemiBold else FontWeight.Medium
+
+    // First line: "[0:45-56] how are you? are you good ?"
+    val timeText = formatTimeRange(dialogue.startTime, dialogue.endTime)
+    val firstLine = buildAnnotatedString {
+        withStyle(
+            SpanStyle(
+                color = timeColor,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        ) {
+            append("[$timeText] ")
+        }
+        withStyle(
+            SpanStyle(
+                color = textColor,
+                fontSize = 15.sp,
+                fontWeight = englishWeight
+            )
+        ) {
+            append(dialogue.english)
+        }
+    }
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(White)
             .clickable(onClick = onClick)
-            .padding(vertical = 18.dp, horizontal = 18.dp),
+            .padding(vertical = 16.dp, horizontal = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Time as a small header
+        // First line: [time] English
         Text(
-            text = "${formatTimestamp(dialogue.startTime)} → ${formatTimestamp(dialogue.endTime)}",
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = timeColor,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        // English on the first line
-        Text(
-            text = dialogue.english,
-            fontSize = 15.sp,
-            fontWeight = if (isPlaying || isSelected) FontWeight.SemiBold else FontWeight.Medium,
-            color = textColor,
+            text = firstLine,
             textAlign = TextAlign.Center,
-            maxLines = 3,
+            maxLines = 4,
             overflow = TextOverflow.Ellipsis
         )
-        Spacer(modifier = Modifier.height(5.dp))
-        // Bangla on the second line — same size as English
+        // Second line: Bangla — same size as English
         Text(
             text = dialogue.bangla,
             fontSize = 15.sp,
@@ -143,7 +156,7 @@ fun DialogueTab(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(1.dp)
-                            .background(DarkDivider)
+                            .background(separatorColorOf(index, dialogues, playingDialogueId, selectedDialogueIds))
                     )
                 }
             }
@@ -151,3 +164,15 @@ fun DialogueTab(
     }
 }
 
+private fun separatorColorOf(
+    index: Int,
+    dialogues: List<Dialogue>,
+    playingId: Int?,
+    selected: Set<Int>
+): androidx.compose.ui.graphics.Color {
+    val current = dialogues[index]
+    val next = dialogues.getOrNull(index + 1) ?: return DarkDivider
+    val active = current.id == playingId || current.id in selected ||
+        next.id == playingId || next.id in selected
+    return if (active) Accent.copy(alpha = 0.4f) else DarkDivider
+}

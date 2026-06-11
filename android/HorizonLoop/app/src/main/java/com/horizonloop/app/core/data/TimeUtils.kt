@@ -44,3 +44,31 @@ fun formatTimeFromMs(ms: Long): String {
     val s = (secs % 60).toInt()
     return "$m:${if (s < 10) "0" else ""}$s"
 }
+
+/**
+ * Formats a time range as a compact "M:SS-SS" or "M:SS-M:SS" string.
+ * When the end time is in the same minute as the start, the end is shown
+ * as bare seconds (no leading zero, no minutes), producing a tidy
+ * "[0:45-56]" style. When the end crosses a minute boundary, the full
+ * "M:SS" form is used for the end.
+ *
+ * Returns "—" for NaN inputs.
+ */
+fun formatTimeRange(startSec: Double, endSec: Double): String {
+    if (startSec.isNaN() || endSec.isNaN()) return "—"
+    val startM = (startSec / 60).toInt()
+    val startS = (startSec % 60).toInt()
+    val startStr = "$startM:${if (startS < 10) "0" else ""}$startS"
+
+    val endM = (endSec / 60).toInt()
+    val endS = (endSec % 60).toInt()
+
+    val endStr = if (endM == startM) {
+        // Same minute — just bare seconds, no leading zero
+        "$endS"
+    } else {
+        // Crosses a minute boundary — full M:SS
+        "$endM:${if (endS < 10) "0" else ""}$endS"
+    }
+    return "$startStr-$endStr"
+}
