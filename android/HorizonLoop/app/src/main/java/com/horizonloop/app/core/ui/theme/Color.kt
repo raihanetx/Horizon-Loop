@@ -2,20 +2,28 @@ package com.horizonloop.app.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Deep = Color(0xFF18181b)
-val Surface = Color(0xFF202023)
-val Muted = Color(0xFF27272a)
-val Mid = Color(0xFF71717a)
-val Dark = Color(0xFFE4E4E7)
-val Accent = Color(0xFF10B981)
+// ── Twilight Amber palette ────────────────────────────────────────────────────
+// Dark indigo background with a warm amber accent. Cozy, inviting, warm.
 
-// White color combination — for light/white surfaces
+// Primary surfaces
+val Deep = Color(0xFF0F0F1A)      // near-black indigo — main background
+val Surface = Color(0xFF1A1A2E)   // dark indigo — cards, elevated surfaces
+val Muted = Color(0xFF252542)     // slightly lighter indigo — subtle backgrounds
+val Mid = Color(0xFF8B8BA0)       // cool gray-violet — muted text & icons
+val Dark = Color(0xFFF5F5FA)      // off-white — primary text
+
+// Warm amber accent
+val Accent = Color(0xFFF59E0B)    // amber-500 — primary highlight
+val AccentSoft = Color(0xFFFBBF24) // amber-400 — secondary highlight
+
+// White color combination — for light/white surfaces (dialogue list)
 val White = Color(0xFFFFFFFF)
-val WhiteSurface = Color(0xFFF4F4F5)
-val DarkText = Color(0xFF18181b)
-val DarkMuted = Color(0xFF52525b)
+val WhiteSurface = Color(0xFFFAFAFA)
+val DarkText = Color(0xFF0F0F1A)  // matches new Deep
+val DarkMuted = Color(0xFF6B6B80) // cool gray for muted text on white
 val DarkDivider = Color(0xFFE4E4E7)
 
+// Translucent white overlays (for tints, search bar, etc.)
 val White15 = Color(0x26FFFFFF)
 val White6 = Color(0x0FFFFFFF)
 val White8 = Color(0x14FFFFFF)
