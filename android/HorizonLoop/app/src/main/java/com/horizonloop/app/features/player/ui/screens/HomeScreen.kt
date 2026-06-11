@@ -65,7 +65,7 @@ fun HomeScreen(
         modifier = modifier
             .fillMaxSize()
             .background(Deep)
-            .padding(14.dp)
+            .padding(10.dp)
     ) {
         if (isScanning) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -85,30 +85,30 @@ fun HomeScreen(
             verticalAlignment = Alignment.Top
         ) {
             Column {
-                Text("Horizon Loop", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Dark, letterSpacing = (-0.5).sp)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Master English by Listening", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Mid, letterSpacing = 1.sp)
+                Text("Horizon Loop", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Dark, letterSpacing = (-0.5).sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Master English by Listening", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, letterSpacing = 1.sp)
             }
             Row {
                 IconButton(onClick = { showFilters = !showFilters }) {
-                    Icon(AppIcons.Filter, contentDescription = "Filter", tint = Dark, modifier = Modifier.size(22.dp))
+                    Icon(AppIcons.Filter, contentDescription = "Filter", tint = Dark, modifier = Modifier.size(20.dp))
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 IconButton(onClick = onSettingsClick) {
-                    Icon(AppIcons.Settings, contentDescription = "Settings", tint = Dark, modifier = Modifier.size(22.dp))
+                    Icon(AppIcons.Settings, contentDescription = "Settings", tint = Dark, modifier = Modifier.size(20.dp))
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(50.dp))
                 .background(White12)
-                .padding(horizontal = 18.dp, vertical = 12.dp)
+                .padding(horizontal = 14.dp, vertical = 9.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(AppIcons.Search, contentDescription = null, tint = Mid, modifier = Modifier.size(16.dp))
+                Icon(AppIcons.Search, contentDescription = null, tint = Mid, modifier = Modifier.size(15.dp))
                 BasicTextField(
                     value = searchQuery,
                     onValueChange = onSearchChange,
@@ -120,8 +120,8 @@ fun HomeScreen(
             }
         }
         if (showFilters) {
-            Spacer(modifier = Modifier.height(16.dp))
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Spacer(modifier = Modifier.height(10.dp))
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 val filters = listOf(
                     FilterType.ALL to "All",
                     FilterType.SIZE_DESC to "Size: High to Low",
@@ -135,8 +135,8 @@ fun HomeScreen(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        LazyColumn(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Spacer(modifier = Modifier.height(10.dp))
+        LazyColumn(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             items(audioFiles, key = { it.id }) { audio ->
                 AudioListItem(audio = audio, onClick = { onAudioClick(audio) })
             }
@@ -151,8 +151,8 @@ private fun FilterChip(label: String, isActive: Boolean, onClick: () -> Unit) {
             .clip(RoundedCornerShape(50.dp))
             .then(if (isActive) Modifier.background(Dark) else Modifier.border(1.dp, Mid.copy(alpha = 0.4f), RoundedCornerShape(50.dp)))
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
-        Text(text = label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = if (isActive) Deep else Mid)
+        Text(text = label, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = if (isActive) Deep else Mid)
     }
 }
