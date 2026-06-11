@@ -17,11 +17,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +38,7 @@ import com.horizonloop.app.core.ui.theme.Accent
 import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
+import com.horizonloop.app.core.ui.theme.Surface
 
 @Composable
 fun DialogueCard(
@@ -53,8 +56,7 @@ fun DialogueCard(
         label = "pulseAnim"
     )
 
-    // Mono (white + black): Surface card on Deep background, near-black text,
-    // pure black on click/select.
+    // Card-based design: Surface card with rounded corners, left-aligned text
     val textColor = if (isPlaying || isSelected) Accent else Dark
     val timeColor = if (isPlaying || isSelected) Accent.copy(alpha = pulseAlpha) else Mid
 
@@ -66,7 +68,7 @@ fun DialogueCard(
         withStyle(
             SpanStyle(
                 color = timeColor,
-                fontSize = 15.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold
             )
         ) {
@@ -75,7 +77,7 @@ fun DialogueCard(
         withStyle(
             SpanStyle(
                 color = textColor,
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 fontWeight = englishWeight
             )
         ) {
@@ -86,25 +88,27 @@ fun DialogueCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(Surface)
             .clickable(onClick = onClick)
-            .padding(vertical = 18.dp, horizontal = 18.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.Start
     ) {
-        // First line: [time] English
+        // First line: [time] English — left-aligned
         Text(
             text = firstLine,
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             maxLines = 4,
             overflow = TextOverflow.Ellipsis
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        // Second line: Bangla — same size as English
+        Spacer(modifier = Modifier.height(6.dp))
+        // Second line: Bangla — left-aligned
         Text(
             text = dialogue.bangla,
-            fontSize = 18.sp,
+            fontSize = 16.sp,
             fontWeight = if (isPlaying || isSelected) FontWeight.SemiBold else FontWeight.Normal,
             color = textColor.copy(alpha = if (isPlaying || isSelected) 1f else 0.75f),
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis
         )
@@ -141,7 +145,8 @@ fun DialogueTab(
                 .fillMaxWidth()
                 .background(Deep)
                 .padding(bottom = 32.dp),
-            contentPadding = PaddingValues(top = 6.dp)
+            contentPadding = PaddingValues(top = 6.dp, start = 14.dp, end = 14.dp),
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(10.dp)
         ) {
             items(dialogues.size) { index ->
                 val dialogue = dialogues[index]
@@ -151,10 +156,6 @@ fun DialogueTab(
                     isSelected = dialogue.id in selectedDialogueIds,
                     onClick = { onDialogueClick(context, dialogue) }
                 )
-                // No divider lines — just spacing between cards
-                if (index < dialogues.lastIndex) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
             }
         }
     }
