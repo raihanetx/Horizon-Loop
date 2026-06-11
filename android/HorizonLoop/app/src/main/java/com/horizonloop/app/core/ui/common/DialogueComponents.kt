@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -54,8 +54,8 @@ fun DialogueCard(
         label = "pulseAnim"
     )
 
-    // Same color combination as the rest of the app:
-    // Surface card on Deep background, off-white text, amber on click/select
+    // Mono (white + black): Surface card on Deep background, near-black text,
+    // pure black on click/select.
     val textColor = if (isPlaying || isSelected) Accent else Dark
     val timeColor = if (isPlaying || isSelected) Accent.copy(alpha = pulseAlpha) else Mid
 
@@ -67,7 +67,7 @@ fun DialogueCard(
         withStyle(
             SpanStyle(
                 color = timeColor,
-                fontSize = 13.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.SemiBold
             )
         ) {
@@ -76,7 +76,7 @@ fun DialogueCard(
         withStyle(
             SpanStyle(
                 color = textColor,
-                fontSize = 15.sp,
+                fontSize = 18.sp,
                 fontWeight = englishWeight
             )
         ) {
@@ -89,7 +89,7 @@ fun DialogueCard(
             .fillMaxWidth()
             .background(Surface)
             .clickable(onClick = onClick)
-            .padding(vertical = 16.dp, horizontal = 18.dp),
+            .padding(vertical = 20.dp, horizontal = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // First line: [time] English
@@ -99,10 +99,11 @@ fun DialogueCard(
             maxLines = 4,
             overflow = TextOverflow.Ellipsis
         )
+        Spacer(modifier = Modifier.height(8.dp))
         // Second line: Bangla — same size as English
         Text(
             text = dialogue.bangla,
-            fontSize = 15.sp,
+            fontSize = 18.sp,
             fontWeight = if (isPlaying || isSelected) FontWeight.SemiBold else FontWeight.Normal,
             color = textColor.copy(alpha = if (isPlaying || isSelected) 1f else 0.75f),
             textAlign = TextAlign.Center,
@@ -131,7 +132,7 @@ fun DialogueTab(
         ) {
             Text(
                 "No dialogues yet — tap Translate to generate",
-                fontSize = 13.sp,
+                fontSize = 14.sp,
                 color = Mid.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
             )
@@ -152,28 +153,11 @@ fun DialogueTab(
                     isSelected = dialogue.id in selectedDialogueIds,
                     onClick = { onDialogueClick(context, dialogue) }
                 )
+                // No divider lines — just spacing between cards
                 if (index < dialogues.lastIndex) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(separatorColorOf(index, dialogues, playingDialogueId, selectedDialogueIds))
-                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
     }
-}
-
-private fun separatorColorOf(
-    index: Int,
-    dialogues: List<Dialogue>,
-    playingId: Int?,
-    selected: Set<Int>
-): Color {
-    val current = dialogues[index]
-    val next = dialogues.getOrNull(index + 1) ?: return Mid.copy(alpha = 0.3f)
-    val active = current.id == playingId || current.id in selected ||
-        next.id == playingId || next.id in selected
-    return if (active) Accent.copy(alpha = 0.4f) else Mid.copy(alpha = 0.3f)
 }

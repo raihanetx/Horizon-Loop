@@ -30,7 +30,6 @@ import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
 import com.horizonloop.app.core.ui.theme.Muted
-import com.horizonloop.app.features.player.ui.components.ProgressBar
 
 @Composable
 fun AudioControls(
@@ -46,6 +45,8 @@ fun AudioControls(
     onRewind: () -> Unit,
     onForward: () -> Unit,
     onSeek: (Float) -> Unit,
+    onSubtitleClick: () -> Unit = {},
+    onListClick: () -> Unit = {},
 
     modifier: Modifier = Modifier
 ) {
@@ -83,6 +84,24 @@ fun AudioControls(
         }
         Spacer(modifier = Modifier.height(20.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+            // Subtitle icon button (left side, outside -5s)
+            // CRITICAL: .clickable must be AFTER .padding so the padded area is clickable.
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(Muted)
+                    .clickable { onSubtitleClick() }
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = AppIcons.Subtitles,
+                    contentDescription = "Subtitles",
+                    tint = Dark,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
             // Rewind button — tap calls onRewind() once.
             // CRITICAL: .clickable must be AFTER .padding so the padded area is clickable.
             Column(
@@ -93,10 +112,10 @@ fun AudioControls(
                     .padding(horizontal = 18.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("-5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Mid)
-                Text("Backward", fontSize = 9.sp, fontWeight = FontWeight.Medium, color = Mid.copy(alpha = 0.75f))
+                Text("-5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Dark)
+                Text("Backward", fontSize = 9.sp, fontWeight = FontWeight.Medium, color = Dark.copy(alpha = 0.65f))
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             // Play/Pause button — single tap toggles play/pause.
             // CRITICAL: .clickable must be AFTER .padding so the entire padded area is clickable.
             Box(
@@ -113,7 +132,7 @@ fun AudioControls(
                     Text(text = if (isPlaying) "Pause" else "Play", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Deep)
                 }
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             // Forward button — tap calls onForward() once.
             // CRITICAL: .clickable must be AFTER .padding so the padded area is clickable.
             Column(
@@ -124,8 +143,26 @@ fun AudioControls(
                     .padding(horizontal = 18.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("+5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Mid)
-                Text("Forward", fontSize = 9.sp, fontWeight = FontWeight.Medium, color = Mid.copy(alpha = 0.75f))
+                Text("+5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Dark)
+                Text("Forward", fontSize = 9.sp, fontWeight = FontWeight.Medium, color = Dark.copy(alpha = 0.65f))
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            // List icon button (right side, outside +5s)
+            // CRITICAL: .clickable must be AFTER .padding so the padded area is clickable.
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(Muted)
+                    .clickable { onListClick() }
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = AppIcons.List,
+                    contentDescription = "List",
+                    tint = Dark,
+                    modifier = Modifier.size(24.dp)
+                )
             }
         }
     }
