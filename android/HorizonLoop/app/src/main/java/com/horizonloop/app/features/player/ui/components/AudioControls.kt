@@ -85,14 +85,16 @@ fun AudioControls(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             // Rewind button — tap calls onRewind() once.
             // CRITICAL: .clickable must be AFTER .padding so the padded area is clickable.
-            Box(
+            Column(
                 modifier = Modifier
                     .clip(RoundedCornerShape(28.dp))
                     .background(Muted)
-                    .padding(horizontal = 20.dp, vertical = 12.dp)
-                    .clickable { onRewind() },
-                contentAlignment = Alignment.Center
-            ) {                    Text("-5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Mid)
+                    .clickable { onRewind() }
+                    .padding(horizontal = 18.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("-5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Mid)
+                Text("Backward", fontSize = 9.sp, fontWeight = FontWeight.Medium, color = Mid.copy(alpha = 0.75f))
             }
             Spacer(modifier = Modifier.width(16.dp))
             // Play/Pause button — single tap toggles play/pause.
@@ -114,14 +116,16 @@ fun AudioControls(
             Spacer(modifier = Modifier.width(16.dp))
             // Forward button — tap calls onForward() once.
             // CRITICAL: .clickable must be AFTER .padding so the padded area is clickable.
-            Box(
+            Column(
                 modifier = Modifier
                     .clip(RoundedCornerShape(28.dp))
                     .background(Muted)
-                    .padding(horizontal = 20.dp, vertical = 12.dp)
-                    .clickable { onForward() },
-                contentAlignment = Alignment.Center
-            ) {                    Text("+5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Mid)
+                    .clickable { onForward() }
+                    .padding(horizontal = 18.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("+5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Mid)
+                Text("Forward", fontSize = 9.sp, fontWeight = FontWeight.Medium, color = Mid.copy(alpha = 0.75f))
             }
         }
     }
