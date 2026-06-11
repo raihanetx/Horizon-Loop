@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horizonloop.app.core.domain.model.Audio
+import com.horizonloop.app.core.ui.theme.Accent
 import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Mid
 import com.horizonloop.app.core.ui.theme.Muted
@@ -46,7 +47,7 @@ fun AudioListItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(modifier = Modifier.size(56.dp).clip(RoundedCornerShape(14.dp)).background(Muted.copy(alpha = 0.5f)), contentAlignment = Alignment.Center) {
-            Icon(imageVector = AppIcons.MusicNote, contentDescription = null, tint = Dark, modifier = Modifier.size(36.dp))
+            Icon(imageVector = AppIcons.MusicNote, contentDescription = null, tint = Accent, modifier = Modifier.size(36.dp))
         }
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {

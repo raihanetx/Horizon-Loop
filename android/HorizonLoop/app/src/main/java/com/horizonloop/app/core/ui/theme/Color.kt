@@ -2,33 +2,24 @@ package com.horizonloop.app.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── Mono (white + black) palette ──────────────────────────────────────────────
-// Clean, minimal, high-contrast monochrome. ONE color combination used across
-// the entire app — no tints, no hue accents. Just white, black, and a few
-// shades of gray for hierarchy.
+// ── Dark + Emerald (60-30-10) palette ────────────────────────────────────────
+// 60% primary (background), 30% secondary (cards), 10% accent (brand).
+// Easy on the eyes, professional, dark mode by default.
 
 // Primary surfaces
-val Deep = Color(0xFFFFFFFF)      // pure white — main background
-val Surface = Color(0xFFF9F9F9)   // very light gray — cards (subtle separation)
-val Muted = Color(0xFFF4F4F5)     // light gray — buttons, icon backgrounds
-val Mid = Color(0xFF71717A)       // medium gray — muted text & icons
-val Dark = Color(0xFF0A0A0A)      // near-black — primary text & icons
+val Deep = Color(0xFF0F0F0F)      // near-black — 60% main background
+val Surface = Color(0xFF1E1E1E)   // dark gray — 30% cards
+val Muted = Color(0xFF2A2A2A)     // slightly lighter dark — subtle backgrounds & buttons
+val Mid = Color(0xFF8A8A8A)       // cool gray — muted text & icons
+val Dark = Color(0xFFF5F5F5)      // off-white — primary text
 
-// Black accent (no color, just deeper black for active/selected states)
-val Accent = Color(0xFF000000)    // pure black — active highlight
-val AccentSoft = Color(0xFF27272A) // very dark gray — secondary highlight
+// Emerald green — 10% brand accent
+val Accent = Color(0xFF10B981)    // emerald-500 — primary brand highlight
+val AccentSoft = Color(0xFF34D399) // emerald-400 — secondary brand highlight
 
-// Translucent black overlays (for tints on the white debug panel, search bar, etc.)
-val Black15 = Color(0x26000000)
-val Black6 = Color(0x0F000000)
-val Black8 = Color(0x14000000)
-val Black12 = Color(0x1F000000)
-val Black20 = Color(0x33000000)
-
-// Backwards-compat aliases (these used to be white overlays before the mono
-// palette switch; the names are kept so existing call sites still compile).
-val White15 = Black15
-val White6 = Black6
-val White8 = Black8
-val White12 = Black12
-val White20 = Black20
+// Translucent white overlays (for tints on the dark search bar, debug panel, etc.)
+val White6 = Color(0x0FFFFFFF)
+val White8 = Color(0x14FFFFFF)
+val White12 = Color(0x1FFFFFFF)
+val White15 = Color(0x26FFFFFF)
+val White20 = Color(0x33FFFFFF)

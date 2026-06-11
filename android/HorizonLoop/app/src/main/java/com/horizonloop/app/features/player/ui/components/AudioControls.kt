@@ -30,6 +30,7 @@ import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
 import com.horizonloop.app.core.ui.theme.Muted
+import com.horizonloop.app.core.ui.theme.Surface
 
 @Composable
 fun AudioControls(
@@ -53,7 +54,7 @@ fun AudioControls(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(Muted)
+            .background(Surface)
             .padding(horizontal = 16.dp)
             .padding(top = 6.dp, bottom = 12.dp)
     ) {

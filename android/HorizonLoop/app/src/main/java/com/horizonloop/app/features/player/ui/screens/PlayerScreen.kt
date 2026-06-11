@@ -130,6 +130,7 @@ fun PlayerScreen(
                 onTranslate = onTranslate,
                 onDismiss = onDismissCapsule,
                 context = context,
+                hasTranslation = dialogues.isNotEmpty(),
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
