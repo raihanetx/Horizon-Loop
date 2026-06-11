@@ -139,7 +139,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(10.dp))
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 20.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             items(audioFiles, key = { it.id }) { audio ->
