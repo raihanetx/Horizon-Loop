@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -32,11 +33,10 @@ import androidx.compose.ui.unit.sp
 import com.horizonloop.app.core.data.formatTimeRange
 import com.horizonloop.app.core.domain.model.Dialogue
 import com.horizonloop.app.core.ui.theme.Accent
-import com.horizonloop.app.core.ui.theme.DarkDivider
-import com.horizonloop.app.core.ui.theme.DarkMuted
-import com.horizonloop.app.core.ui.theme.DarkText
-import com.horizonloop.app.core.ui.theme.White
-import com.horizonloop.app.core.ui.theme.WhiteSurface
+import com.horizonloop.app.core.ui.theme.Dark
+import com.horizonloop.app.core.ui.theme.Deep
+import com.horizonloop.app.core.ui.theme.Mid
+import com.horizonloop.app.core.ui.theme.Surface
 
 @Composable
 fun DialogueCard(
@@ -54,9 +54,10 @@ fun DialogueCard(
         label = "pulseAnim"
     )
 
-    // White color combination: dark text on white card, accent on click/select
-    val textColor = if (isPlaying || isSelected) Accent else DarkText
-    val timeColor = if (isPlaying || isSelected) Accent.copy(alpha = pulseAlpha) else DarkMuted
+    // Same color combination as the rest of the app:
+    // Surface card on Deep background, off-white text, amber on click/select
+    val textColor = if (isPlaying || isSelected) Accent else Dark
+    val timeColor = if (isPlaying || isSelected) Accent.copy(alpha = pulseAlpha) else Mid
 
     val englishWeight = if (isPlaying || isSelected) FontWeight.SemiBold else FontWeight.Medium
 
@@ -86,7 +87,7 @@ fun DialogueCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(White)
+            .background(Surface)
             .clickable(onClick = onClick)
             .padding(vertical = 16.dp, horizontal = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -103,7 +104,7 @@ fun DialogueCard(
             text = dialogue.bangla,
             fontSize = 15.sp,
             fontWeight = if (isPlaying || isSelected) FontWeight.SemiBold else FontWeight.Normal,
-            color = textColor.copy(alpha = if (isPlaying || isSelected) 1f else 0.85f),
+            color = textColor.copy(alpha = if (isPlaying || isSelected) 1f else 0.75f),
             textAlign = TextAlign.Center,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis
@@ -124,14 +125,14 @@ fun DialogueTab(
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(WhiteSurface)
+                .background(Deep)
                 .padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 "No dialogues yet — tap Translate to generate",
                 fontSize = 13.sp,
-                color = DarkMuted.copy(alpha = 0.6f),
+                color = Mid.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
             )
         }
@@ -139,7 +140,7 @@ fun DialogueTab(
         LazyColumn(
             modifier = modifier
                 .fillMaxWidth()
-                .background(WhiteSurface)
+                .background(Deep)
                 .padding(bottom = 32.dp),
             contentPadding = PaddingValues(top = 6.dp)
         ) {
@@ -169,10 +170,10 @@ private fun separatorColorOf(
     dialogues: List<Dialogue>,
     playingId: Int?,
     selected: Set<Int>
-): androidx.compose.ui.graphics.Color {
+): Color {
     val current = dialogues[index]
-    val next = dialogues.getOrNull(index + 1) ?: return DarkDivider
+    val next = dialogues.getOrNull(index + 1) ?: return Mid.copy(alpha = 0.3f)
     val active = current.id == playingId || current.id in selected ||
         next.id == playingId || next.id in selected
-    return if (active) Accent.copy(alpha = 0.4f) else DarkDivider
+    return if (active) Accent.copy(alpha = 0.4f) else Mid.copy(alpha = 0.3f)
 }

@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 // ── Twilight Amber palette ────────────────────────────────────────────────────
 // Dark indigo background with a warm amber accent. Cozy, inviting, warm.
+// This is the ONE color combination used across the entire app.
 
 // Primary surfaces
 val Deep = Color(0xFF0F0F1A)      // near-black indigo — main background
@@ -15,13 +16,6 @@ val Dark = Color(0xFFF5F5FA)      // off-white — primary text
 // Warm amber accent
 val Accent = Color(0xFFF59E0B)    // amber-500 — primary highlight
 val AccentSoft = Color(0xFFFBBF24) // amber-400 — secondary highlight
-
-// White color combination — for light/white surfaces (dialogue list)
-val White = Color(0xFFFFFFFF)
-val WhiteSurface = Color(0xFFFAFAFA)
-val DarkText = Color(0xFF0F0F1A)  // matches new Deep
-val DarkMuted = Color(0xFF6B6B80) // cool gray for muted text on white
-val DarkDivider = Color(0xFFE4E4E7)
 
 // Translucent white overlays (for tints, search bar, etc.)
 val White15 = Color(0x26FFFFFF)
