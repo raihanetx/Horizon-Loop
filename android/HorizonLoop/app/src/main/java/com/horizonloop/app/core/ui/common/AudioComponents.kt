@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.horizonloop.app.core.ui.theme.AppIcons
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowLeft
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -85,7 +87,7 @@ fun AudioListItem(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = AppIcons.AudioFile,
+                imageVector = Icons.Filled.MusicNote,
                 contentDescription = null,
                 tint = TextPri,
                 modifier = Modifier.size(24.dp)
@@ -128,8 +130,8 @@ fun AudioListItem(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = AppIcons.Play,
-                contentDescription = "Play",
+                imageVector = Icons.Filled.ArrowLeft,
+                contentDescription = "Back",
                 tint = TextPri,
                 modifier = Modifier.size(18.dp)
             )

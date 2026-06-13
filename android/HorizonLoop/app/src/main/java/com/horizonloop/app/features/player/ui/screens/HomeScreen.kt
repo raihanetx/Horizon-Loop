@@ -67,8 +67,7 @@ fun HomeScreen(
         modifier = modifier
             .fillMaxSize()
             .background(AppBg)
-            .padding(horizontal = 16.dp)
-            .padding(top = 24.dp, bottom = 16.dp)
+            .padding(12.dp)
     ) {
         if (isScanning) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -82,7 +81,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = error, fontSize = 12.sp, color = Surface, modifier = Modifier.fillMaxWidth().background(Mid.copy(alpha = 0.2f), RoundedCornerShape(8.dp)).padding(12.dp))
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -103,7 +102,7 @@ fun HomeScreen(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Box(
             modifier = Modifier
                 .fillMaxWidth()
