@@ -41,11 +41,12 @@ import androidx.compose.ui.unit.sp
 import com.horizonloop.app.core.domain.model.Audio
 import com.horizonloop.app.core.domain.model.FilterType
 import com.horizonloop.app.core.ui.common.AudioListItem
+import com.horizonloop.app.core.ui.theme.AppBg
 import com.horizonloop.app.core.ui.theme.Dark
-import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
 import com.horizonloop.app.core.ui.theme.Muted
 import com.horizonloop.app.core.ui.theme.Surface
+import com.horizonloop.app.core.ui.theme.TextSec
 import com.horizonloop.app.core.ui.theme.White12
 
 @Composable
@@ -65,8 +66,9 @@ fun HomeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Deep)
-            .padding(10.dp)
+            .background(AppBg)
+            .padding(horizontal = 16.dp)
+            .padding(top = 24.dp, bottom = 16.dp)
     ) {
         if (isScanning) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -80,6 +82,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = error, fontSize = 12.sp, color = Surface, modifier = Modifier.fillMaxWidth().background(Mid.copy(alpha = 0.2f), RoundedCornerShape(8.dp)).padding(12.dp))
         }
+        Spacer(modifier = Modifier.height(20.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -100,7 +103,7 @@ fun HomeScreen(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -121,7 +124,7 @@ fun HomeScreen(
             }
         }
         if (showFilters) {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 val filters = listOf(
                     FilterType.ALL to "All",
@@ -136,11 +139,11 @@ fun HomeScreen(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            contentPadding = PaddingValues(0.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(audioFiles, key = { it.id }) { audio ->
                 AudioListItem(audio = audio, onClick = { onAudioClick(audio) })
@@ -158,6 +161,6 @@ private fun FilterChip(label: String, isActive: Boolean, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
-        Text(text = label, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = if (isActive) Deep else Mid)
+        Text(text = label, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = if (isActive) Dark else Mid)
     }
 }

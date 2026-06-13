@@ -1,6 +1,7 @@
 package com.horizonloop.app.core.ui.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,87 +30,109 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horizonloop.app.core.domain.model.Audio
 import com.horizonloop.app.core.ui.theme.Accent
-import com.horizonloop.app.core.ui.theme.Dark
+import com.horizonloop.app.core.ui.theme.CardBg
 import com.horizonloop.app.core.ui.theme.Mid
 import com.horizonloop.app.core.ui.theme.Muted
-import com.horizonloop.app.core.ui.theme.Surface
+import com.horizonloop.app.core.ui.theme.TextMut
+import com.horizonloop.app.core.ui.theme.TextPri
+import com.horizonloop.app.core.ui.theme.TextSec
+import com.horizonloop.app.core.ui.theme.Brd
 
 @Composable
 fun AudioListItem(
     audio: Audio,
     onClick: () -> Unit,
+    onPlayClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    // Meta line as a single AnnotatedString so it truncates gracefully as one
-    // unit (maxLines=1 + Ellipsis). Order: size · subtitle status · duration.
-    // Subtitle status is the visual highlight: emerald + SemiBold when yes.
-    // Cached in remember so it doesn't rebuild on every recomposition.
-    val metaText = remember(audio.size, audio.subtitle, audio.duration) {
+    // Subtitle (size · divider · Subtitle: Yes/No) — single AnnotatedString so it
+    // truncates as one unit. Cached so it doesn't rebuild on recomposition.
+    val subtitleText = remember(audio.size, audio.subtitle) {
         buildAnnotatedString {
             append(audio.size)
-            append(" \u00B7 ")
+            append("  \u00B7  ")
+            withStyle(SpanStyle(color = TextSec)) {
+                append("Subtitle: ")
+            }
             if (audio.subtitle) {
                 withStyle(SpanStyle(color = Accent, fontWeight = FontWeight.SemiBold)) {
-                    append("\u2713 Subtitle")
+                    append("Yes")
                 }
             } else {
-                append("No subtitle")
+                withStyle(SpanStyle(color = TextMut)) {
+                    append("No")
+                }
             }
-            append(" \u00B7 ")
-            append(audio.duration)
         }
     }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(88.dp)
+            .height(80.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(Surface)
+            .background(CardBg)
+            .border(1.dp, Brd, RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 14.dp),
+            .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
                 .size(52.dp)
-                .clip(RoundedCornerShape(13.dp))
-                .background(Muted.copy(alpha = 0.5f)),
+                .clip(RoundedCornerShape(12.dp))
+                .background(Muted),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = AppIcons.AudioFile,
                 contentDescription = null,
-                tint = Accent,
-                modifier = Modifier.size(30.dp)
+                tint = TextPri,
+                modifier = Modifier.size(24.dp)
             )
         }
-        Spacer(modifier = Modifier.width(14.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = audio.title,
                 fontSize = 15.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Dark,
+                fontWeight = FontWeight.SemiBold,
+                color = TextPri,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = metaText,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium,
-                color = Mid,
+                text = subtitleText,
+                fontSize = 12.5.sp,
+                fontWeight = FontWeight.Normal,
+                color = TextSec,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
-        Spacer(modifier = Modifier.width(8.dp))
-        Icon(
-            imageVector = AppIcons.ChevronRight,
-            contentDescription = null,
-            tint = Mid,
-            modifier = Modifier.size(18.dp)
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = audio.duration,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            color = TextPri
         )
+        Spacer(modifier = Modifier.width(12.dp))
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Muted)
+                .clickable(enabled = onPlayClick != null) { onPlayClick?.invoke() },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = AppIcons.Play,
+                contentDescription = "Play",
+                tint = TextPri,
+                modifier = Modifier.size(18.dp)
+            )
+        }
     }
 }

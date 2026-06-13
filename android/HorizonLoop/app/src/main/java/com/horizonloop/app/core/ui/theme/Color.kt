@@ -13,6 +13,15 @@ val Muted = Color(0xFF2A2A2A)     // slightly lighter dark — subtle background
 val Mid = Color(0xFF8A8A8A)       // cool gray — muted text & icons
 val Dark = Color(0xFFF5F5F5)      // off-white — primary text
 
+// Home page design tokens (matches web spec)
+val AppBg = Color(0xFF1A1A1A)     // spec appBg
+val CardBg = Color(0xFF212121)    // spec cardBg
+val SurfLight = Color(0xFF333333) // spec surfaceLight
+val TextPri = Color(0xFFD4D4D4)   // spec textPrimary
+val TextSec = Color(0xFF8A8A8A)   // spec textSecondary (alias of Mid)
+val TextMut = Color(0xFF5A5A5A)   // spec textMuted
+val Brd = Color(0xFF2E2E2E)       // spec border
+
 // Emerald green — 10% brand accent
 val Accent = Color(0xFF10B981)    // emerald-500 — primary brand highlight
 val AccentSoft = Color(0xFF34D399) // emerald-400 — secondary brand highlight
