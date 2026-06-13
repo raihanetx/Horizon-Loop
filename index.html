@@ -18,7 +18,18 @@
             muted: '#27272a',
             mid: '#71717a',
             dark: '#e4e4e7',
-            accent: '#10b981'
+            accent: '#10b981',
+            app: '#1a1a1a',
+            card: '#212121',
+            surf: '#2a2a2a',
+            surflight: '#333333',
+            'text-pri': '#d4d4d4',
+            'text-sec': '#8a8a8a',
+            'text-mut': '#5a5a5a',
+            brd: '#2e2e2e'
+          },
+          spacing: {
+            '3.5': '14px'
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -60,13 +71,21 @@
     .hidden { display: none !important; }
     .muted { opacity: 0.4; }
     .pinned { /* marker class for pinned state */ }
-    .edu-card { width: 100%; background: #202023; border: none; border-radius: 12px; padding: 21px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; gap: 12px; }
-    .edu-card.pinned { border: 1px solid #71717a; }
-    .card-content { display: flex; align-items: center; gap: 12px; min-width: 0; }
-    .card-title { color: #e4e4e7; font-weight: 800; font-size: 13px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-    .card-meta-text { font-size: 13px; color: #71717a; font-weight: 500; }
-    .card-meta-sep { width: 1px; height: 10px; background: #e4e4e7; flex-shrink: 0; opacity: 0.3; }
+    .edu-card { width: 100%; height: 80px; background: #212121; border: 1px solid #2e2e2e; border-radius: 16px; padding: 14px; display: flex; align-items: center; cursor: pointer; user-select: none; gap: 12px; box-sizing: border-box; transition: border-color 0.15s ease, background 0.15s ease; }
+    .edu-card:hover { border-color: #3a3a3a; }
+    .edu-card.pinned { border-color: #8a8a8a; }
+    .card-content { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+    .card-icon { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 12px; background: #2a2a2a; flex-shrink: 0; }
+    .card-icon svg { width: 24px; height: 24px; color: #d4d4d4; }
+    .card-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+    .card-title { color: #d4d4d4; font-weight: 600; font-size: 15px; line-height: 1.3; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-meta { display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    .card-meta-text { font-size: 12.5px; line-height: 1.4; color: #8a8a8a; font-weight: 400; }
+    .card-meta-sep { width: 2px; height: 2px; border-radius: 50%; background: #5a5a5a; flex-shrink: 0; }
+    .card-duration { font-size: 13px; line-height: 1.3; color: #d4d4d4; font-weight: 500; flex-shrink: 0; }
+    .card-action-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 12px; background: #2a2a2a; border: none; color: #d4d4d4; cursor: pointer; flex-shrink: 0; transition: background 0.15s ease, color 0.15s ease; }
+    .card-action-btn:hover { background: #333333; }
+    .card-action-btn svg { width: 18px; height: 18px; }
     .content-card { width: 100%; background: rgba(255,255,255,0.04); backdrop-filter: blur(8px); border: 1px solid #27272a; border-radius: 12px; padding: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; transition: border-color 0.15s ease; min-height: 60px; }
     .content-card.selected { background: rgba(255,255,255,0.08); border-color: #71717a; }
     .content-card-text { font-size: 13px; line-height: 1.5; color: #e4e4e7; margin: 0; flex: 1; }
@@ -113,13 +132,13 @@
   </style>
 </head>
 <body class="bg-deep text-dark font-sans antialiased moz-osx-font-smoothing select-none flex justify-center items-start min-h-dvh sm:items-center">
-<div class="relative w-full max-w-[440px] h-dvh flex flex-col mx-auto sm:h-[840px] sm:rounded-3xl overflow-hidden">
+<div class="relative w-full max-w-md h-dvh flex flex-col mx-auto sm:h-[840px] sm:rounded-3xl overflow-hidden">
 
 <!-- HOME VIEW -->
-<div id="homeView" class="flex flex-col h-full overflow-y-auto overflow-x-hidden">
+<div id="homeView" class="flex flex-col h-full overflow-y-auto overflow-x-hidden px-4 pt-6 pb-4">
   <!-- Sticky Header -->
   <div class="sticky top-0 z-10 bg-deep">
-    <header class="flex items-center justify-between px-[15px] pt-[15px] pb-3">
+    <header class="flex items-center justify-between mb-5">
       <div class="flex flex-col">
         <span class="text-2xl font-extrabold text-dark tracking-tight leading-none">Horizon Loop</span>
         <span class="text-[11px] text-mid font-semibold tracking-wide uppercase mt-1.5">Master English by Listening</span>
@@ -134,14 +153,14 @@
       </div>
     </header>
     <!-- Search -->
-    <div class="w-full px-[15px] pb-3">
+    <div class="w-full mb-3">
       <div class="relative">
         <svg class="w-4 h-4 text-mid absolute top-1/2 left-3.5 -translate-y-1/2 z-10 pointer-events-none" viewBox="0 0 256 256" fill="currentColor"><path d="M226.83,221.17l-52.7-52.7a84.1,84.1,0,1,0-5.66,5.66l52.7,52.7a4,4,0,0,0,5.66-5.66ZM36,112a76,76,0,1,1,76,76A76.08,76.08,0,0,1,36,112Z"/></svg>
         <input id="searchInput" type="text" placeholder="Search lessons..." class="w-full py-2.5 pr-4 pl-10 bg-white/12 backdrop-blur border border-muted rounded-full text-sm text-dark outline-none transition-colors duration-150 focus:border-mid focus:bg-white/15 placeholder:text-mid">
       </div>
     </div>
     <!-- Filter Dropdown -->
-    <div id="filterDropdown" class="px-[15px] pb-3 hidden">
+    <div id="filterDropdown" class="mb-3 hidden">
       <div class="flex flex-row gap-2 overflow-x-auto no-scrollbar">
         <button data-filter="all" class="filter-option text-xs font-semibold px-4 py-2 rounded-full border border-mid whitespace-nowrap shrink-0 bg-white/4 backdrop-blur text-mid cursor-pointer transition-all duration-150 hover:bg-mid hover:text-deep active">All</button>
         <button data-filter="size-desc" class="filter-option text-xs font-semibold px-4 py-2 rounded-full border border-mid whitespace-nowrap shrink-0 bg-white/4 backdrop-blur text-mid cursor-pointer transition-all duration-150 hover:bg-mid hover:text-deep">Size: High to Low</button>
@@ -153,7 +172,7 @@
     </div>
   </div>
   <!-- Audio List -->
-  <div id="audioList" class="flex-1 flex flex-col gap-3 px-[15px] pt-0 pb-[15px]"></div>
+  <div id="audioList" class="flex-1 flex flex-col gap-3"></div>
   <!-- Settings Popup -->
   <div id="settingsPopup" class="fixed inset-0 bg-mid/60 backdrop-blur-sm items-center justify-center z-200 hidden">
     <div class="bg-surface border border-muted rounded-3xl w-[88vw] max-w-[360px] p-5 flex flex-col gap-4 animate-slideUp">

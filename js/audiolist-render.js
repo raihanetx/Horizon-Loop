@@ -48,20 +48,21 @@ function renderAudioList() {
     card.setAttribute('data-id', audio.id);
 
     card.innerHTML =
-      '<div class="card-content">' +
-        '<div class="flex items-center justify-center w-12 h-12 rounded-lg bg-muted/50 shrink-0"><svg class="w-7 h-7 text-mid" viewBox="0 0 256 256" fill="currentColor"><path d="M224,64H154.67L126.93,43.2a16.12,16.12,0,0,0-9.6-3.2H72A16,16,0,0,0,56,56V72H40A16,16,0,0,0,24,88V200a16,16,0,0,0,16,16H192.89A15.13,15.13,0,0,0,208,200.89V184h16.89A15.13,15.13,0,0,0,240,168.89V80A16,16,0,0,0,224,64ZM192,200H40V88H85.33l29.87,22.4A8,8,0,0,0,120,112h72Zm32-32H208V112a16,16,0,0,0-16-16H122.67L94.93,75.2a16.12,16.12,0,0,0-9.6-3.2H72V56h45.33L147.2,78.4A8,8,0,0,0,152,80h72Z"/></svg></div>' +
-        '<div class="min-w-0">' +
-          '<h3 class="card-title">' + escapeHtml(audio.title) + '</h3>' +
-          '<div class="card-meta">' +
-            '<span class="card-meta-text">' + escapeHtml(audio.duration) + '</span>' +
-            '<span class="card-meta-sep"></span>' +
-            '<span class="card-meta-text">' + escapeHtml(audio.size) + '</span>' +
-            '<span class="card-meta-sep"></span>' +
-            '<span class="card-meta-text">Translation: ' + (audio.subtitle ? 'Yes' : 'No') + '</span>' +
-          '</div>' +
-          '</div>' +
+      '<div class="card-icon">' +
+        '<svg viewBox="0 0 256 256" fill="currentColor"><path d="M224,64H154.67L126.93,43.2a16.12,16.12,0,0,0-9.6-3.2H72A16,16,0,0,0,56,56V72H40A16,16,0,0,0,24,88V200a16,16,0,0,0,16,16H192.89A15.13,15.13,0,0,0,208,200.89V184h16.89A15.13,15.13,0,0,0,240,168.89V80A16,16,0,0,0,224,64ZM192,200H40V88H85.33l29.87,22.4A8,8,0,0,0,120,112h72Zm32-32H208V112a16,16,0,0,0-16-16H122.67L94.93,75.2a16.12,16.12,0,0,0-9.6-3.2H72V56h45.33L147.2,78.4A8,8,0,0,0,152,80h72Z"/></svg>' +
+      '</div>' +
+      '<div class="card-info">' +
+        '<h3 class="card-title">' + escapeHtml(audio.title) + '</h3>' +
+        '<div class="card-meta">' +
+          '<span class="card-meta-text">' + escapeHtml(audio.size) + '</span>' +
+          '<span class="card-meta-sep"></span>' +
+          '<span class="card-meta-text">Subtitle: ' + (audio.subtitle ? 'Yes' : 'No') + '</span>' +
         '</div>' +
-        '<svg class="w-4 h-4 text-mid shrink-0" viewBox="0 0 256 256" fill="currentColor"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg>';
+      '</div>' +
+      '<span class="card-duration">' + escapeHtml(audio.duration) + '</span>' +
+      '<button class="card-action-btn" aria-label="Play ' + escapeHtml(audio.title) + '">' +
+        '<svg viewBox="0 0 256 256" fill="currentColor"><path d="M232.4,114.49,88.32,26.35a16,16,0,0,0-16.2-.3A15.86,15.86,0,0,0,64,39.87V216.13A15.94,15.94,0,0,0,80,232a16.07,16.07,0,0,0,8.36-2.35L232.4,141.51a15.81,15.81,0,0,0,0-27ZM80,215.94V40l143.83,88Z"/></svg>' +
+      '</button>';
 
     list.appendChild(card);
   });
