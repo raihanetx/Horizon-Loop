@@ -18,11 +18,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,18 +42,15 @@ import com.horizonloop.app.core.ui.theme.Accent
 import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
-import com.horizonloop.app.core.ui.theme.Muted
 
 @Composable
 fun DialogueCard(
     dialogue: Dialogue,
-    displayNumber: Int,
     isPlaying: Boolean = false,
     isSelected: Boolean = false,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Subtle pulse for the time prefix when playing
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseAlpha by infiniteTransition.animateFloat(
         initialValue = 1f, targetValue = 0.55f,
@@ -73,7 +67,6 @@ fun DialogueCard(
     }
     val englishWeight = if (isActive) FontWeight.SemiBold else FontWeight.Medium
 
-    val durationSec = (dialogue.endTime - dialogue.startTime).toInt().coerceAtLeast(0)
     val timeText = formatTimeRange(dialogue.startTime, dialogue.endTime)
 
     val firstLine = buildAnnotatedString {
@@ -97,10 +90,9 @@ fun DialogueCard(
         }
     }
 
-    // Flat list item — not a separate card. No background, no always-on border.
-    // When active (playing/selected), a 1dp Accent border with 14dp rounded
-    // corners appears. Numbered circle on the left identifies order (1, 2, 3…).
-    // Total seconds of the segment shown on the right.
+    // Flat list item — content centered horizontally. No number circle, no
+    // duration on the right. When active (playing/selected), a 1dp Accent
+    // border with 14dp rounded corners appears.
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -112,27 +104,13 @@ fun DialogueCard(
             )
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
-        Box(
-            modifier = Modifier
-                .size(28.dp)
-            .clip(CircleShape)
-                .background(if (isActive) Accent else Muted),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = displayNumber.toString(),
-                color = if (isActive) Deep else Mid,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-        Spacer(modifier = Modifier.width(10.dp))
-        Column(modifier = Modifier.weight(1f)) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = firstLine,
-                textAlign = TextAlign.Start,
+                textAlign = TextAlign.Center,
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis
             )
@@ -142,18 +120,11 @@ fun DialogueCard(
                 fontSize = 16.sp,
                 fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal,
                 color = textColor.copy(alpha = if (isActive) 1f else 0.75f),
-                textAlign = TextAlign.Start,
+                textAlign = TextAlign.Center,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
         }
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = "${durationSec}s",
-            color = if (isActive) Accent else Mid,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Medium
-        )
     }
 }
 
@@ -190,10 +161,9 @@ fun DialogueTab(
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            itemsIndexed(dialogues) { index, dialogue ->
+            itemsIndexed(dialogues) { _, dialogue ->
                 DialogueCard(
                     dialogue = dialogue,
-                    displayNumber = index + 1,
                     isPlaying = dialogue.id == playingDialogueId,
                     isSelected = dialogue.id in selectedDialogueIds,
                     onClick = { onDialogueClick(context, dialogue) }
