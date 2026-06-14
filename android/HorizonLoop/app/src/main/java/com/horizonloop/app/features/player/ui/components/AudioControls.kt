@@ -61,12 +61,12 @@ fun AudioControls(
         modifier = modifier
             .fillMaxWidth()
             .background(Surface)
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(horizontal = 20.dp, vertical = 8.dp)
     ) {
         // ── 1. Title ────────────────────────────────────────────────────
         Text(
             text = title,
-            fontSize = 15.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Dark,
             maxLines = 1,
@@ -75,40 +75,40 @@ fun AudioControls(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(3.dp))
 
         // ── 2. Mode / Loop / Speed ─────────────────────────────────────
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Mode: ${activeTab.replaceFirstChar { it.uppercase() }}", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid)
-            Text("•", fontSize = 11.sp, color = Muted)
-            Text("Loop: ${activeLoopId ?: "None"}", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid)
-            Text("•", fontSize = 11.sp, color = Muted)
-            Text("Speed: ${currentSpeed}x", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid)
+            Text("Mode: ${activeTab.replaceFirstChar { it.uppercase() }}", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid)
+            Text("•", fontSize = 10.sp, color = Muted)
+            Text("Loop: ${activeLoopId ?: "None"}", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid)
+            Text("•", fontSize = 10.sp, color = Muted)
+            Text("Speed: ${currentSpeed}x", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid)
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(6.dp))
 
         // ── 3. Progress ─────────────────────────────────────────────────
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(currentTime, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
-            Spacer(Modifier.width(12.dp))
+            Text(currentTime, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
+            Spacer(Modifier.width(10.dp))
             ProgressBar(
                 progress = progress,
                 onSeek = onSeek,
                 modifier = Modifier.weight(1f)
             )
-            Spacer(Modifier.width(12.dp))
-            Text(totalTime, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
+            Spacer(Modifier.width(10.dp))
+            Text(totalTime, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
         }
 
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(8.dp))
 
         // ── 4. Transport (− | Play | +) ─────────────────────────────────
         Row(
@@ -117,9 +117,9 @@ fun AudioControls(
             verticalAlignment = Alignment.CenterVertically
         ) {
             TransportTextButton(primary = "−", onClick = onRewind)
-            Spacer(Modifier.width(14.dp))
+            Spacer(Modifier.width(12.dp))
             TransportTextButton(primary = if (isPlaying) "Pause" else "Play", onClick = onPlayPause)
-            Spacer(Modifier.width(14.dp))
+            Spacer(Modifier.width(12.dp))
             TransportTextButton(primary = "+", onClick = onForward)
         }
     }
@@ -141,12 +141,12 @@ private fun TransportTextButton(
             .background(androidx.compose.ui.graphics.Color.Transparent)
             .border(1.dp, Mid, RoundedCornerShape(28.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 6.dp),
+            .padding(horizontal = 18.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = primary,
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Dark
         )
