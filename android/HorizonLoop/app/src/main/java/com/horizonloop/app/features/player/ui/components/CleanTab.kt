@@ -32,7 +32,7 @@ import com.horizonloop.app.core.domain.model.Dialogue
 import com.horizonloop.app.core.ui.theme.AppIcons
 import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Mid
-import com.horizonloop.app.core.ui.theme.White15
+import com.horizonloop.app.core.ui.theme.Black15
 
 @Composable
 fun CleanTab(
@@ -79,7 +79,7 @@ fun CleanTab(
             }
             if (showAudioIcon && !isTranslating) {
                 Box(modifier = Modifier.size(64.dp), contentAlignment = Alignment.Center) {
-                    Icon(AppIcons.AudioMode, contentDescription = null, tint = White15, modifier = Modifier.size(56.dp).alpha(if (isPlaying) alpha else 1f))
+                    Icon(AppIcons.AudioMode, contentDescription = null, tint = Black15, modifier = Modifier.size(56.dp).alpha(if (isPlaying) alpha else 1f))
                 }
                 Spacer(modifier = Modifier.height(20.dp))
             }

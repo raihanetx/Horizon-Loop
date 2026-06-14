@@ -45,7 +45,7 @@ import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
 import com.horizonloop.app.core.ui.theme.Muted
 import com.horizonloop.app.core.ui.theme.Surface
-import com.horizonloop.app.core.ui.theme.White12
+import com.horizonloop.app.core.ui.theme.Black12
 import kotlinx.coroutines.launch
 
 @Composable
@@ -135,7 +135,7 @@ fun TranslationDebugPanel(
                                     entry.contains("ERROR") -> Surface
                                     entry.startsWith("[+]") -> Muted
                                     entry.startsWith("[STEP") -> Dark
-                                    else -> White12
+                                    else -> Black12
                                 },
                                 modifier = Modifier.padding(vertical = 2.dp)
                             )

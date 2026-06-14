@@ -1,2 +1,8 @@
 .gradle/
 .env
+android/HorizonLoop/local.properties
+android/HorizonLoop/.gradle/
+android/HorizonLoop/app/build/
+android/HorizonLoop/build/
+*.iml
+.idea/
