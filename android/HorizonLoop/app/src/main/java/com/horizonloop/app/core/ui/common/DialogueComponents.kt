@@ -18,8 +18,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,10 +45,12 @@ import com.horizonloop.app.core.ui.theme.Accent
 import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
+import com.horizonloop.app.core.ui.theme.Muted
 
 @Composable
 fun DialogueCard(
     dialogue: Dialogue,
+    displayNumber: Int,
     isPlaying: Boolean = false,
     isSelected: Boolean = false,
     onClick: () -> Unit,
@@ -94,7 +99,8 @@ fun DialogueCard(
 
     // Flat list item — not a separate card. No background, no always-on border.
     // When active (playing/selected), a 1dp Accent border with 14dp rounded
-    // corners appears. Total seconds of the segment shown on the right.
+    // corners appears. Numbered circle on the left identifies order (1, 2, 3…).
+    // Total seconds of the segment shown on the right.
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -108,6 +114,21 @@ fun DialogueCard(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+            .clip(CircleShape)
+                .background(if (isActive) Accent else Muted),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = displayNumber.toString(),
+                color = if (isActive) Deep else Mid,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        Spacer(modifier = Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = firstLine,
@@ -169,10 +190,10 @@ fun DialogueTab(
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(dialogues.size) { index ->
-                val dialogue = dialogues[index]
+            itemsIndexed(dialogues) { index, dialogue ->
                 DialogueCard(
                     dialogue = dialogue,
+                    displayNumber = index + 1,
                     isPlaying = dialogue.id == playingDialogueId,
                     isSelected = dialogue.id in selectedDialogueIds,
                     onClick = { onDialogueClick(context, dialogue) }

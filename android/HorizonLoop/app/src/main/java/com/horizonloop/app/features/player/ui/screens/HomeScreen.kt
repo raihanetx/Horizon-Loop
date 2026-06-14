@@ -396,23 +396,30 @@ private fun PodcastCard(
                     Text(
                         text = item.size,
                         color = HomeTextSecondary,
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "¦",
                         color = HomeDivider,
-                        fontSize = 12.sp
+                        fontSize = 12.sp,
+                        maxLines = 1
                     )
                     Text(
                         text = "Subtitle:",
                         color = HomeTextTertiary,
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = subtitleText,
                         color = if (item.subtitle) HomeAccent else HomeSubtitleNo,
                         fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
