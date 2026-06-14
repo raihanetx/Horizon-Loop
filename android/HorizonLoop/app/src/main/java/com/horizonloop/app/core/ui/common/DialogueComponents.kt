@@ -1,11 +1,6 @@
 package com.horizonloop.app.core.ui.common
 
 import android.content.Context
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,21 +17,17 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horizonloop.app.core.data.formatTimeRange
 import com.horizonloop.app.core.domain.model.Dialogue
-import com.horizonloop.app.core.ui.theme.Accent
 import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
@@ -49,45 +40,21 @@ fun DialogueCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-    val pulseAlpha by infiniteTransition.animateFloat(
-        initialValue = 1f, targetValue = 0.55f,
-        animationSpec = infiniteRepeatable(animation = tween(900), repeatMode = RepeatMode.Reverse),
-        label = "pulseAnim"
-    )
-
     val isActive = isPlaying || isSelected
-    val textColor = Dark  // always white — selected just goes SemiBold
-    val timeColor = Mid
-    val englishWeight = if (isActive) FontWeight.SemiBold else FontWeight.Medium
-    val banglaWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal
-    val banglaAlpha = if (isActive) 1f else 0.75f
+    // English + Bangla share the same color/size/weight. Default gray,
+    // white on select/playing. Only the font weight flips.
+    val textColor = if (isActive) Dark else Mid
+    val textWeight = if (isActive) FontWeight.SemiBold else FontWeight.Medium
 
     val timeText = formatTimeRange(dialogue.startTime, dialogue.endTime)
 
+    // Single AnnotatedString: "[time] english" — same color/size/weight
+    // as the bangla line below for visual parity.
     val firstLine = buildAnnotatedString {
-        withStyle(
-            SpanStyle(
-                color = timeColor,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-        ) {
-            append("[$timeText] ")
-        }
-        withStyle(
-            SpanStyle(
-                color = textColor,
-                fontSize = 16.sp,
-                fontWeight = englishWeight
-            )
-        ) {
-            append(dialogue.english)
-        }
+        append("[$timeText] ")
+        append(dialogue.english)
     }
 
-    // Flat list item — no border, no background. Content centered.
-    // On select/playing: English + Bangla go SemiBold, otherwise Medium/Normal.
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -100,6 +67,9 @@ fun DialogueCard(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = firstLine,
+                color = textColor,
+                fontSize = 16.sp,
+                fontWeight = textWeight,
                 textAlign = TextAlign.Center,
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis
@@ -107,9 +77,9 @@ fun DialogueCard(
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = dialogue.bangla,
+                color = textColor,
                 fontSize = 16.sp,
-                fontWeight = banglaWeight,
-                color = textColor.copy(alpha = banglaAlpha),
+                fontWeight = textWeight,
                 textAlign = TextAlign.Center,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis

@@ -1,34 +1,28 @@
 package com.horizonloop.app.features.player.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.horizonloop.app.core.ui.theme.AppIcons
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.horizonloop.app.core.ui.theme.Accent
 import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Mid
 import com.horizonloop.app.core.ui.theme.Muted
@@ -116,79 +110,77 @@ fun AudioControls(
 
         Spacer(Modifier.height(20.dp))
 
-        // ── 4. Transport (rewind | play | forward) ──────────────────────
+        // ── 4. Transport (rewind | play | forward) — text buttons ──────
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SkipButton(
+            TransportTextButton(
                 primary = "-5s",
                 secondary = "Backward",
+                emphasis = false,
                 onClick = onRewind
             )
-            Spacer(Modifier.width(20.dp))
-            PlayPauseButton(
-                isPlaying = isPlaying,
+            Spacer(Modifier.width(16.dp))
+            TransportTextButton(
+                primary = if (isPlaying) "Pause" else "Play",
+                secondary = null,
+                emphasis = true,
                 onClick = onPlayPause
             )
-            Spacer(Modifier.width(20.dp))
-            SkipButton(
+            Spacer(Modifier.width(16.dp))
+            TransportTextButton(
                 primary = "+5s",
                 secondary = "Forward",
+                emphasis = false,
                 onClick = onForward
             )
         }
     }
 }
 
+/**
+ * Outlined text button with fully rounded corners. No icon, no fill —
+ * just text inside a rounded rectangle stroke. The `emphasis` flag
+ * thickens the stroke and uses white (Dark) for the primary action
+ * (play/pause); the skip buttons use the gray (Mid) stroke.
+ */
 @Composable
-private fun SkipButton(
+private fun TransportTextButton(
     primary: String,
-    secondary: String,
+    secondary: String?,
+    emphasis: Boolean,
     onClick: () -> Unit
 ) {
+    val borderColor = if (emphasis) Dark else Mid
+    val textColor = Dark
+    val borderWidth = if (emphasis) 1.5.dp else 1.dp
+    val horizontalPad = if (emphasis) 28.dp else 20.dp
+    val verticalPad = if (emphasis) 14.dp else 12.dp
+
     Column(
         modifier = Modifier
-            .clip(RoundedCornerShape(24.dp))
-            .background(Muted)
+            .clip(RoundedCornerShape(28.dp))
+            .background(androidx.compose.ui.graphics.Color.Transparent)
+            .border(borderWidth, borderColor, RoundedCornerShape(28.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 10.dp),
+            .padding(horizontal = horizontalPad, vertical = verticalPad),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = primary,
-            fontSize = 13.sp,
+            fontSize = if (emphasis) 15.sp else 13.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = Dark
+            color = textColor
         )
-        Text(
-            text = secondary,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Medium,
-            color = Dark.copy(alpha = 0.65f)
-        )
-    }
-}
-
-@Composable
-private fun PlayPauseButton(
-    isPlaying: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .size(64.dp)
-            .clip(CircleShape)
-            .background(Accent)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = if (isPlaying) AppIcons.Pause else AppIcons.Play,
-            contentDescription = if (isPlaying) "Pause" else "Play",
-            tint = Color.White,
-            modifier = Modifier.size(28.dp)
-        )
+        if (secondary != null) {
+            Text(
+                text = secondary,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Medium,
+                color = textColor.copy(alpha = 0.6f)
+            )
+        }
     }
 }

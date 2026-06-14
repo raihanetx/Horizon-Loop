@@ -354,8 +354,8 @@ private fun PodcastCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .size(52.dp)
+                    .clip(RoundedCornerShape(12.dp))
                     .background(HomeElevated),
                 contentAlignment = Alignment.Center
             ) {
@@ -363,11 +363,11 @@ private fun PodcastCard(
                     imageVector = Icons.Filled.Headphones,
                     contentDescription = "Podcast",
                     tint = HomeTextPrimary,
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(28.dp)
                 )
             }
 
-            Spacer(Modifier.width(14.dp))
+            Spacer(Modifier.width(16.dp))
 
             Column(
                 modifier = Modifier
