@@ -1,53 +1,68 @@
 package com.horizonloop.app.features.player.ui.screens
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import com.horizonloop.app.core.ui.theme.AppIcons
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Headphones
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horizonloop.app.core.domain.model.Audio
 import com.horizonloop.app.core.domain.model.FilterType
-import com.horizonloop.app.core.ui.common.AudioListItem
-import com.horizonloop.app.core.ui.theme.AppBg
-import com.horizonloop.app.core.ui.theme.Dark
-import com.horizonloop.app.core.ui.theme.Mid
-import com.horizonloop.app.core.ui.theme.Muted
-import com.horizonloop.app.core.ui.theme.Surface
-import com.horizonloop.app.core.ui.theme.TextSec
-import com.horizonloop.app.core.ui.theme.White12
+import com.horizonloop.app.core.ui.theme.HomeAccent
+import com.horizonloop.app.core.ui.theme.HomeBg
+import com.horizonloop.app.core.ui.theme.HomeCard
+import com.horizonloop.app.core.ui.theme.HomeDivider
+import com.horizonloop.app.core.ui.theme.HomeElevated
+import com.horizonloop.app.core.ui.theme.HomeGradientEnd
+import com.horizonloop.app.core.ui.theme.HomeGradientStart
+import com.horizonloop.app.core.ui.theme.HomeSubtitleNo
+import com.horizonloop.app.core.ui.theme.HomeTextPrimary
+import com.horizonloop.app.core.ui.theme.HomeTextSecondary
+import com.horizonloop.app.core.ui.theme.HomeTextTertiary
+
+private val filterOptions = listOf(
+    "All" to FilterType.ALL,
+    "Size: Low to High" to FilterType.SIZE_ASC,
+    "Size: High to Low" to FilterType.SIZE_DESC,
+    "Pinned" to FilterType.PINNED,
+    "With Subtitle" to FilterType.SUBTITLE_YES,
+    "No Subtitle" to FilterType.SUBTITLE_NO
+)
+
+private fun selectedFilterLabel(type: FilterType): String =
+    filterOptions.firstOrNull { it.second == type }?.first ?: "All"
+
+private fun parseSizeMb(sizeText: String): Float =
+    Regex("""([0-9]+(?:\.[0-9]+)?)""").find(sizeText)?.groupValues?.get(1)?.toFloatOrNull() ?: 0f
 
 @Composable
 fun HomeScreen(
@@ -62,104 +77,347 @@ fun HomeScreen(
     scanError: String? = null,
     modifier: Modifier = Modifier
 ) {
-    var showFilters by remember { mutableStateOf(false) }
-    Column(
+    var filterVisible by remember { mutableStateOf(false) }
+    val actionStates = remember(audioFiles) { mutableStateMapOf<Int, Boolean>() }
+
+    val displayItems = remember(audioFiles, currentFilter, actionStates.toMap(), searchQuery) {
+        val q = searchQuery.trim().lowercase()
+        var result = audioFiles.filter { audio ->
+            q.isEmpty() || audio.title.lowercase().contains(q)
+        }
+        when (currentFilter) {
+            FilterType.SIZE_ASC -> result = result.sortedBy { parseSizeMb(it.size) }
+            FilterType.SIZE_DESC -> result = result.sortedByDescending { parseSizeMb(it.size) }
+            FilterType.PINNED -> result = result.filter { (actionStates[it.id] ?: it.pin) }
+            FilterType.SUBTITLE_YES -> result = result.filter { it.subtitle }
+            FilterType.SUBTITLE_NO -> result = result.filter { !it.subtitle }
+            FilterType.ALL -> Unit
+        }
+        result
+    }
+
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .background(AppBg)
-            .padding(12.dp)
+            .background(HomeBg)
     ) {
-        if (isScanning) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Mid, strokeWidth = 2.dp)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Scanning device for media...", fontSize = 12.sp, color = Mid)
-            }
-        }
-        scanError?.let { error ->
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = error, fontSize = 12.sp, color = Surface, modifier = Modifier.fillMaxWidth().background(Mid.copy(alpha = 0.2f), RoundedCornerShape(8.dp)).padding(12.dp))
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            Column {
-                Text("Horizon Loop", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Dark, letterSpacing = (-0.5).sp)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("Master English by Listening", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, letterSpacing = 1.sp)
-            }
-            Row {
-                IconButton(onClick = { showFilters = !showFilters }) {
-                    Icon(AppIcons.Filter, contentDescription = "Filter", tint = Dark, modifier = Modifier.size(20.dp))
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                IconButton(onClick = onSettingsClick) {
-                    Icon(AppIcons.Settings, contentDescription = "Settings", tint = Dark, modifier = Modifier.size(20.dp))
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(50.dp))
-                .background(White12)
-                .padding(horizontal = 14.dp, vertical = 9.dp)
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(AppIcons.Search, contentDescription = null, tint = Mid, modifier = Modifier.size(15.dp))
-                BasicTextField(
-                    value = searchQuery,
-                    onValueChange = onSearchChange,
-                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
-                    textStyle = TextStyle(fontSize = 14.sp, color = Dark),
-                    cursorBrush = SolidColor(Dark),
-                    decorationBox = { innerTextField -> Box { if (searchQuery.isEmpty()) Text("Search lessons...", color = Mid, fontSize = 14.sp) else innerTextField() } }
+            Header(onSettingsClick = onSettingsClick)
+            Spacer(Modifier.height(24.dp))
+
+            SearchBar(
+                searchQuery = searchQuery,
+                onSearchChange = onSearchChange,
+                onFilterClick = { filterVisible = !filterVisible }
+            )
+            Spacer(Modifier.height(16.dp))
+
+            if (filterVisible) {
+                FilterDropdown(
+                    options = filterOptions.map { it.first },
+                    selected = selectedFilterLabel(currentFilter),
+                    onOptionSelected = { label ->
+                        filterOptions.firstOrNull { it.first == label }?.let { onFilterChange(it.second) }
+                    }
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+
+            if (isScanning) {
+                Text(
+                    "Scanning device for media...",
+                    color = HomeTextSecondary,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
-        }
-        if (showFilters) {
-            Spacer(modifier = Modifier.height(12.dp))
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                val filters = listOf(
-                    FilterType.ALL to "All",
-                    FilterType.SIZE_DESC to "Size: High to Low",
-                    FilterType.SIZE_ASC to "Size: Low to High",
-                    FilterType.SUBTITLE_YES to "Subtitle: Yes",
-                    FilterType.SUBTITLE_NO to "Subtitle: No",
-                    FilterType.PINNED to "Pinned"
+            scanError?.let { error ->
+                Text(
+                    text = error,
+                    color = HomeCard,
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(HomeTextSecondary.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                        .padding(12.dp)
                 )
-                items(filters) { (filter, label) ->
-                    FilterChip(label = label, isActive = currentFilter == filter, onClick = { onFilterChange(filter) })
+            }
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(displayItems, key = { it.id }) { item ->
+                    PodcastCard(
+                        item = item,
+                        isPinned = actionStates[item.id] ?: item.pin,
+                        onPinToggle = {
+                            actionStates[item.id] = !(actionStates[item.id] ?: item.pin)
+                        },
+                        onClick = { onAudioClick(item) }
+                    )
                 }
-            }
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(0.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(audioFiles, key = { it.id }) { audio ->
-                AudioListItem(audio = audio, onClick = { onAudioClick(audio) })
             }
         }
     }
 }
 
 @Composable
-private fun FilterChip(label: String, isActive: Boolean, onClick: () -> Unit) {
+private fun Header(onSettingsClick: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top
+    ) {
+        Column {
+            Text(
+                text = "Horizon Loop",
+                color = HomeTextPrimary,
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.5).sp
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "Learn through listening, discover through stories",
+                color = HomeTextSecondary,
+                fontSize = 14.sp
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+            Icon(
+                imageVector = Icons.Filled.Notifications,
+                contentDescription = "Notifications",
+                tint = HomeTextPrimary,
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { }
+            )
+            Icon(
+                imageVector = Icons.Filled.Settings,
+                contentDescription = "Settings",
+                tint = HomeTextPrimary,
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { onSettingsClick() }
+            )
+        }
+    }
+}
+
+@Composable
+private fun SearchBar(
+    searchQuery: String,
+    onSearchChange: (String) -> Unit,
+    onFilterClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(HomeElevated)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Search,
+            contentDescription = "Search",
+            tint = HomeTextSecondary,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        TextField(
+            value = searchQuery,
+            onValueChange = onSearchChange,
+            placeholder = {
+                Text(
+                    "Search podcasts, music...",
+                    color = HomeTextTertiary,
+                    fontSize = 14.sp
+                )
+            },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = HomeAccent
+            ),
+            modifier = Modifier.weight(1f),
+            singleLine = true
+        )
+        Spacer(Modifier.width(4.dp))
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { onFilterClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Tune,
+                contentDescription = "Filter",
+                tint = HomeAccent,
+                modifier = Modifier.size(22.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun FilterDropdown(
+    options: List<String>,
+    selected: String,
+    onOptionSelected: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(HomeElevated)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(options) { option ->
+                val isSelected = option == selected
+                val textColor by animateColorAsState(
+                    if (isSelected) HomeAccent else HomeTextSecondary
+                )
+                Text(
+                    text = option,
+                    color = textColor,
+                    fontSize = 14.sp,
+                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                    maxLines = 1,
+                    modifier = Modifier.clickable { onOptionSelected(option) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PodcastCard(
+    item: Audio,
+    isPinned: Boolean,
+    onPinToggle: () -> Unit,
+    onClick: () -> Unit
+) {
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(HomeGradientStart, HomeGradientEnd)
+    )
+    val subtitleText = if (item.subtitle) "Yes" else "No"
+
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(50.dp))
-            .then(if (isActive) Modifier.background(Dark) else Modifier.border(1.dp, Mid.copy(alpha = 0.4f), RoundedCornerShape(50.dp)))
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(HomeCard)
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .padding(start = 20.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
     ) {
-        Text(text = label, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = if (isActive) Dark else Mid)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(gradientBrush),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Headphones,
+                    contentDescription = "Podcast",
+                    tint = Color.White,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+
+            Spacer(Modifier.width(16.dp))
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 96.dp)
+            ) {
+                Text(
+                    text = item.title,
+                    color = HomeTextPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(Modifier.height(6.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = item.size,
+                        color = HomeTextSecondary,
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = "¦",
+                        color = HomeDivider,
+                        fontSize = 12.sp
+                    )
+                    Text(
+                        text = "Subtitle:",
+                        color = HomeTextTertiary,
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = subtitleText,
+                        color = if (item.subtitle) HomeAccent else HomeSubtitleNo,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        ) {
+            Text(
+                text = item.duration,
+                color = HomeTextTertiary,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { onPinToggle() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowForward,
+                    contentDescription = "Action",
+                    tint = if (isPinned) HomeAccent else HomeTextTertiary,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .graphicsLayer {
+                            scaleX = if (isPinned) -1f else 1f
+                        }
+                )
+            }
+        }
     }
 }

@@ -22,6 +22,19 @@ val TextSec = Color(0xFF8A8A8A)   // spec textSecondary (alias of Mid)
 val TextMut = Color(0xFF5A5A5A)   // spec textMuted
 val Brd = Color(0xFF2E2E2E)       // spec border
 
+// Home page redesign palette (from github.com/raihanetx/ui "Home page ui")
+val HomeBg = Color(0xFF121212)
+val HomeCard = Color(0xFF1E1E1E)
+val HomeElevated = Color(0xFF2D2D2D)
+val HomeAccent = Color(0xFFA052D4)
+val HomeGradientStart = Color(0xFF667EEA)
+val HomeGradientEnd = Color(0xFF764BA2)
+val HomeTextPrimary = Color.White
+val HomeTextSecondary = Color(0xFF9CA3AF)
+val HomeTextTertiary = Color(0xFF6B7280)
+val HomeDivider = Color(0xFF4B5563)
+val HomeSubtitleNo = Color(0xFF6B7280)
+
 // Emerald green — 10% brand accent
 val Accent = Color(0xFF10B981)    // emerald-500 — primary brand highlight
 val AccentSoft = Color(0xFF34D399) // emerald-400 — secondary brand highlight
