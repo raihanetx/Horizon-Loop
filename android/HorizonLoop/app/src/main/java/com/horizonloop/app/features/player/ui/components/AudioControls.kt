@@ -24,9 +24,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horizonloop.app.core.ui.theme.Dark
+import com.horizonloop.app.core.ui.theme.Deep
 import com.horizonloop.app.core.ui.theme.Mid
 import com.horizonloop.app.core.ui.theme.Muted
-import com.horizonloop.app.core.ui.theme.Surface
 
 /**
  * Bottom audio control bar.
@@ -60,8 +60,8 @@ fun AudioControls(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(Surface)
-            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .background(Deep)
+            .padding(horizontal = 20.dp, vertical = 14.dp)
     ) {
         // ── 1. Title ────────────────────────────────────────────────────
         Text(
@@ -108,7 +108,7 @@ fun AudioControls(
             Text(totalTime, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(20.dp))
 
         // ── 4. Transport (− | Play | +) ─────────────────────────────────
         Row(
