@@ -24,7 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.content.Context
-import com.horizonloop.app.core.ui.theme.Accent
 import com.horizonloop.app.core.ui.theme.Dark
 import com.horizonloop.app.core.ui.theme.Mid
 import com.horizonloop.app.core.ui.theme.Muted
@@ -62,14 +61,15 @@ fun CapsuleMenu(
         Spacer(modifier = Modifier.height(16.dp))
         // Hide the "Translate" option when translation is already generated —
         // re-translating an already-translated audio is a no-op for the user.
+        // Every click also dismisses the menu.
         val menuItems = buildList {
-            add(CapsuleMenuItem("Subtitle", "Enable or disable subtitles display", AppIcons.Subtitles, activeTab == "clean") { onTabClick("clean") })
-            add(CapsuleMenuItem("List", "View full dialogue and transcript list", AppIcons.List, activeTab == "save") { onTabClick("save") })
-            add(CapsuleMenuItem("Save time frame", "Set start and end time markers", AppIcons.Loop, activeTab == "loop") { onTabClick("loop") })
-            add(CapsuleMenuItem("Note", "Add and manage your personal notes", AppIcons.Note, activeTab == "notes") { onTabClick("notes") })
-            add(CapsuleMenuItem("Audio", "Toggle audio only mode for listening", AppIcons.AudioMode, audioMode) { onAudioModeToggle() })
+            add(CapsuleMenuItem("Subtitle", "Enable or disable subtitles display", AppIcons.Subtitles, activeTab == "clean") { onTabClick("clean"); onDismiss() })
+            add(CapsuleMenuItem("List", "View full dialogue and transcript list", AppIcons.List, activeTab == "save") { onTabClick("save"); onDismiss() })
+            add(CapsuleMenuItem("Save time frame", "Set start and end time markers", AppIcons.Loop, activeTab == "loop") { onTabClick("loop"); onDismiss() })
+            add(CapsuleMenuItem("Note", "Add and manage your personal notes", AppIcons.Note, activeTab == "notes") { onTabClick("notes"); onDismiss() })
+            add(CapsuleMenuItem("Audio", "Toggle audio only mode for listening", AppIcons.AudioMode, audioMode) { onAudioModeToggle(); onDismiss() })
             if (!hasTranslation) {
-                add(CapsuleMenuItem("Translate", "Generate English and Bangla subtitles", AppIcons.Translate) { onTranslate(context) })
+                add(CapsuleMenuItem("Translate", "Generate English and Bangla subtitles", AppIcons.Translate) { onTranslate(context); onDismiss() })
             }
         }
         menuItems.forEachIndexed { index, item ->
@@ -87,7 +87,6 @@ private fun CapsuleMenuRow(item: CapsuleMenuItem, isLast: Boolean) {
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
                 .clickable(onClick = item.onClick)
-                .background(if (item.isActive) Accent.copy(alpha = 0.15f) else androidx.compose.ui.graphics.Color.Transparent)
                 .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

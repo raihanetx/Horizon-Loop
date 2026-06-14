@@ -32,13 +32,13 @@ import com.horizonloop.app.core.ui.theme.Surface
  * Bottom audio control bar.
  *
  * Hierarchy (top → bottom):
- *   1. Title          — 15sp ExtraBold, primary text
+ *   1. Title           — 15sp ExtraBold, primary text
  *   2. Mode/Loop/Speed — 11sp SemiBold, muted text, bullet-separated
- *   3. Progress       — 11sp SemiBold Monospace time labels
- *   4. Transport      — 64dp Accent circular play, pill-shaped ±5s flanks
+ *   3. Progress        — 11sp SemiBold Monospace time labels
+ *   4. Transport       — three identical outlined text buttons (−, Play, +)
  *
- * Spacing follows an 8-point grid: 8 / 16 / 20 dp vertical gaps,
- * 20 dp between transport buttons.
+ * Spacing on a tight 8-point grid: 6 / 12 / 14 dp vertical gaps.
+ * Card vertical padding: 16 dp.
  */
 @Composable
 fun AudioControls(
@@ -61,7 +61,7 @@ fun AudioControls(
         modifier = modifier
             .fillMaxWidth()
             .background(Surface)
-            .padding(horizontal = 20.dp, vertical = 24.dp)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         // ── 1. Title ────────────────────────────────────────────────────
         Text(
@@ -75,7 +75,7 @@ fun AudioControls(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(6.dp))
 
         // ── 2. Mode / Loop / Speed ─────────────────────────────────────
         Row(
@@ -90,7 +90,7 @@ fun AudioControls(
             Text("Speed: ${currentSpeed}x", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid)
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
 
         // ── 3. Progress ─────────────────────────────────────────────────
         Row(
@@ -108,79 +108,47 @@ fun AudioControls(
             Text(totalTime, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(14.dp))
 
-        // ── 4. Transport (rewind | play | forward) — text buttons ──────
+        // ── 4. Transport (− | Play | +) ─────────────────────────────────
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TransportTextButton(
-                primary = "−",
-                secondary = null,
-                emphasis = false,
-                onClick = onRewind
-            )
-            Spacer(Modifier.width(16.dp))
-            TransportTextButton(
-                primary = if (isPlaying) "Pause" else "Play",
-                secondary = null,
-                emphasis = true,
-                onClick = onPlayPause
-            )
-            Spacer(Modifier.width(16.dp))
-            TransportTextButton(
-                primary = "+",
-                secondary = null,
-                emphasis = false,
-                onClick = onForward
-            )
+            TransportTextButton(primary = "−", onClick = onRewind)
+            Spacer(Modifier.width(14.dp))
+            TransportTextButton(primary = if (isPlaying) "Pause" else "Play", onClick = onPlayPause)
+            Spacer(Modifier.width(14.dp))
+            TransportTextButton(primary = "+", onClick = onForward)
         }
     }
 }
 
 /**
- * Outlined text button with fully rounded corners. No icon, no fill —
- * just text inside a rounded rectangle stroke. The `emphasis` flag
- * thickens the stroke and uses white (Dark) for the primary action
- * (play/pause); the skip buttons use the gray (Mid) stroke.
+ * Uniform outlined text button. All three transport buttons (−, Play, +)
+ * use the same shape, border, padding, and text size — only the glyph
+ * and the label text differ.
  */
 @Composable
 private fun TransportTextButton(
     primary: String,
-    secondary: String?,
-    emphasis: Boolean,
     onClick: () -> Unit
 ) {
-    val borderColor = if (emphasis) Dark else Mid
-    val textColor = Dark
-    val borderWidth = if (emphasis) 1.5.dp else 1.dp
-    val horizontalPad = if (emphasis) 28.dp else 18.dp
-    val verticalPad = if (emphasis) 7.dp else 7.dp
-
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(28.dp))
             .background(androidx.compose.ui.graphics.Color.Transparent)
-            .border(borderWidth, borderColor, RoundedCornerShape(28.dp))
+            .border(1.dp, Mid, RoundedCornerShape(28.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = horizontalPad, vertical = verticalPad),
+            .padding(horizontal = 20.dp, vertical = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = primary,
-            fontSize = if (emphasis) 15.sp else 13.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = textColor
+            color = Dark
         )
-        if (secondary != null) {
-            Text(
-                text = secondary,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Medium,
-                color = textColor.copy(alpha = 0.6f)
-            )
-        }
     }
 }

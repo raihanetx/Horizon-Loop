@@ -105,7 +105,11 @@ fun HomeScreen(
     var filterVisible by remember { mutableStateOf(false) }
     val actionStates = remember(audioFiles) { mutableStateMapOf<Int, Boolean>() }
 
-    val displayItems = remember(audioFiles, currentFilter, actionStates.toMap(), searchQuery) {
+    // Stable keys — no mutableStateMap.toMap() in the key (would create a
+    // fresh Map on every read and force the filter lambda to run every
+    // recomposition). PINNED filter is applied after this step using the
+    // raw actionStates reference (SnapshotStateMap equality is stable).
+    val baseItems = remember(audioFiles, currentFilter, searchQuery) {
         val q = searchQuery.trim().lowercase()
         var result = audioFiles.filter { audio ->
             q.isEmpty() || audio.title.lowercase().contains(q)
@@ -113,12 +117,16 @@ fun HomeScreen(
         when (currentFilter) {
             FilterType.SIZE_ASC -> result = result.sortedBy { parseSizeMb(it.size) }
             FilterType.SIZE_DESC -> result = result.sortedByDescending { parseSizeMb(it.size) }
-            FilterType.PINNED -> result = result.filter { (actionStates[it.id] ?: it.pin) }
             FilterType.SUBTITLE_YES -> result = result.filter { it.subtitle }
             FilterType.SUBTITLE_NO -> result = result.filter { !it.subtitle }
-            FilterType.ALL -> Unit
+            FilterType.PINNED, FilterType.ALL -> Unit
         }
         result
+    }
+    val displayItems = if (currentFilter == FilterType.PINNED) {
+        baseItems.filter { actionStates[it.id] ?: it.pin }
+    } else {
+        baseItems
     }
 
     Box(
@@ -173,6 +181,8 @@ fun HomeScreen(
             }
 
             LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(bottom = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(displayItems, key = { it.id }) { item ->
@@ -200,7 +210,7 @@ private fun Header(onSettingsClick: () -> Unit) {
         Column {
             Text(
                 text = "Horizon Loop",
-                color = HomeCard,
+                color = HomeTextPrimary,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.5).sp
@@ -208,7 +218,7 @@ private fun Header(onSettingsClick: () -> Unit) {
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "Learn through listening, discover through stories",
-                color = HomeBg,
+                color = HomeTextSecondary,
                 fontSize = 14.sp
             )
         }
@@ -216,7 +226,7 @@ private fun Header(onSettingsClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Filled.Notifications,
                 contentDescription = "Notifications",
-                tint = HomeCard,
+                tint = HomeTextPrimary,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { }
@@ -224,7 +234,7 @@ private fun Header(onSettingsClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Filled.Settings,
                 contentDescription = "Settings",
-                tint = HomeCard,
+                tint = HomeTextPrimary,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { onSettingsClick() }
