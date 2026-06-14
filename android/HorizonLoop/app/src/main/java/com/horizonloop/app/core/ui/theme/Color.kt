@@ -9,16 +9,14 @@ import androidx.compose.ui.graphics.Color
 // usage in the player, settings, dialogues, notes, loops, … picks up
 // the new palette automatically.
 
-// Primary surfaces — values mirror the home page Home* palette so the
-// whole app (player, settings, dialogues, notes, loops, …) keeps the
-// same purple/gradient look as the home screen.
-val Deep = Color(0xFF121212)      // app background (was #0F0F0F)
-val Surface = Color(0xFF1E1E1E)   // cards / dialog background
-val Muted = Color(0xFF2D2D2D)     // subtle backgrounds & buttons (was #2A2A2A)
-val Mid = Color(0xFF9CA3AF)       // secondary text & icons (was #8A8A8A)
-val Dark = Color.White            // primary text (was #F5F5F5)
-val Accent = Color.White          // primary emphasis (was purple #A052D4)
-val AccentSoft = Color(0xFFD4D4D4) // secondary emphasis — light gray
+// Primary surfaces — pure black and white (no dark grays)
+val Deep = Color(0xFF000000)      // pure black — app background
+val Surface = Color(0xFF111111)   // near-black — cards (subtle distinction)
+val Muted = Color(0xFF1A1A1A)     // very dark gray — buttons/elevated
+val Mid = Color(0xFF9CA3AF)       // cool gray — secondary text & icons
+val Dark = Color.White            // pure white — primary text
+val Accent = Color.White          // primary emphasis
+val AccentSoft = Color(0xFFD4D4D4) // light gray — secondary emphasis
 
 // Home page design tokens (matches web spec)
 val AppBg = Color(0xFF1A1A1A)     // spec appBg
@@ -29,10 +27,10 @@ val TextSec = Color(0xFF8A8A8A)   // spec textSecondary (alias of Mid)
 val TextMut = Color(0xFF5A5A5A)   // spec textMuted
 val Brd = Color(0xFF2E2E2E)       // spec border
 
-// Home page redesign palette — simple black / white / gray (no purple)
-val HomeBg = Color(0xFF121212)
-val HomeCard = Color(0xFF1E1E1E)
-val HomeElevated = Color(0xFF2D2D2D)
+// Home page redesign palette — pure black and white
+val HomeBg = Color(0xFF000000)
+val HomeCard = Color(0xFF111111)
+val HomeElevated = Color(0xFF1A1A1A)
 val HomeAccent = Color.White
 val HomeGradientStart = Color(0xFF9CA3AF)
 val HomeGradientEnd = Color(0xFF6B7280)
