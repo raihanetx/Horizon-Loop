@@ -200,7 +200,7 @@ private fun Header(onSettingsClick: () -> Unit) {
         Column {
             Text(
                 text = "Horizon Loop",
-                color = HomeTextPrimary,
+                color = HomeCard,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.5).sp
@@ -208,7 +208,7 @@ private fun Header(onSettingsClick: () -> Unit) {
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "Learn through listening, discover through stories",
-                color = HomeTextSecondary,
+                color = HomeBg,
                 fontSize = 14.sp
             )
         }
@@ -216,7 +216,7 @@ private fun Header(onSettingsClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Filled.Notifications,
                 contentDescription = "Notifications",
-                tint = HomeTextPrimary,
+                tint = HomeCard,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { }
@@ -224,7 +224,7 @@ private fun Header(onSettingsClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Filled.Settings,
                 contentDescription = "Settings",
-                tint = HomeTextPrimary,
+                tint = HomeCard,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { onSettingsClick() }

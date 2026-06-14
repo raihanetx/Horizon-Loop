@@ -61,7 +61,7 @@ fun AudioControls(
         modifier = modifier
             .fillMaxWidth()
             .background(Surface)
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(horizontal = 20.dp, vertical = 24.dp)
     ) {
         // ── 1. Title ────────────────────────────────────────────────────
         Text(
@@ -157,7 +157,7 @@ private fun TransportTextButton(
     val textColor = Dark
     val borderWidth = if (emphasis) 1.5.dp else 1.dp
     val horizontalPad = if (emphasis) 28.dp else 20.dp
-    val verticalPad = if (emphasis) 14.dp else 12.dp
+    val verticalPad = if (emphasis) 7.dp else 12.dp
 
     Column(
         modifier = Modifier
