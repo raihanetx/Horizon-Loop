@@ -352,14 +352,22 @@ private fun PodcastCard(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Icon(
-                imageVector = Icons.Filled.Headphones,
-                contentDescription = "Podcast",
-                tint = HomeTextPrimary,
-                modifier = Modifier.size(30.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(HomeElevated),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Headphones,
+                    contentDescription = "Podcast",
+                    tint = HomeTextPrimary,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
 
-            Spacer(Modifier.width(16.dp))
+            Spacer(Modifier.width(14.dp))
 
             Column(
                 modifier = Modifier
