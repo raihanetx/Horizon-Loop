@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
@@ -45,8 +44,6 @@ import com.horizonloop.app.core.ui.theme.HomeBg
 import com.horizonloop.app.core.ui.theme.HomeCard
 import com.horizonloop.app.core.ui.theme.HomeDivider
 import com.horizonloop.app.core.ui.theme.HomeElevated
-import com.horizonloop.app.core.ui.theme.HomeGradientEnd
-import com.horizonloop.app.core.ui.theme.HomeGradientStart
 import com.horizonloop.app.core.ui.theme.HomeSubtitleNo
 import com.horizonloop.app.core.ui.theme.HomeTextPrimary
 import com.horizonloop.app.core.ui.theme.HomeTextSecondary
@@ -341,9 +338,6 @@ private fun PodcastCard(
     onPinToggle: () -> Unit,
     onClick: () -> Unit
 ) {
-    val gradientBrush = Brush.linearGradient(
-        colors = listOf(HomeGradientStart, HomeGradientEnd)
-    )
     val subtitleText = if (item.subtitle) "Yes" else "No"
 
     Box(
@@ -358,20 +352,12 @@ private fun PodcastCard(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(gradientBrush),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Headphones,
-                    contentDescription = "Podcast",
-                    tint = Color.White,
-                    modifier = Modifier.size(30.dp)
-                )
-            }
+            Icon(
+                imageVector = Icons.Filled.Headphones,
+                contentDescription = "Podcast",
+                tint = HomeTextPrimary,
+                modifier = Modifier.size(30.dp)
+            )
 
             Spacer(Modifier.width(16.dp))
 

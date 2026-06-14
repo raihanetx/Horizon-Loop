@@ -7,7 +7,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -59,13 +57,11 @@ fun DialogueCard(
     )
 
     val isActive = isPlaying || isSelected
-    val textColor = if (isActive) Accent else Dark
-    val timeColor = when {
-        isPlaying -> Accent.copy(alpha = pulseAlpha)
-        isSelected -> Accent
-        else -> Mid
-    }
+    val textColor = Dark  // always white — selected just goes SemiBold
+    val timeColor = Mid
     val englishWeight = if (isActive) FontWeight.SemiBold else FontWeight.Medium
+    val banglaWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal
+    val banglaAlpha = if (isActive) 1f else 0.75f
 
     val timeText = formatTimeRange(dialogue.startTime, dialogue.endTime)
 
@@ -90,18 +86,12 @@ fun DialogueCard(
         }
     }
 
-    // Flat list item — content centered horizontally. No number circle, no
-    // duration on the right. When active (playing/selected), a 1dp Accent
-    // border with 14dp rounded corners appears.
+    // Flat list item — no border, no background. Content centered.
+    // On select/playing: English + Bangla go SemiBold, otherwise Medium/Normal.
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .border(
-                width = 1.dp,
-                color = if (isActive) Accent else Color.Transparent,
-                shape = RoundedCornerShape(14.dp)
-            )
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -118,8 +108,8 @@ fun DialogueCard(
             Text(
                 text = dialogue.bangla,
                 fontSize = 16.sp,
-                fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal,
-                color = textColor.copy(alpha = if (isActive) 1f else 0.75f),
+                fontWeight = banglaWeight,
+                color = textColor.copy(alpha = banglaAlpha),
                 textAlign = TextAlign.Center,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis

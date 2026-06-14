@@ -46,8 +46,6 @@ fun AudioControls(
     onRewind: () -> Unit,
     onForward: () -> Unit,
     onSeek: (Float) -> Unit,
-    onSubtitleClick: () -> Unit = {},
-    onListClick: () -> Unit = {},
 
     modifier: Modifier = Modifier
 ) {
@@ -85,24 +83,6 @@ fun AudioControls(
         }
         Spacer(modifier = Modifier.height(12.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            // Subtitle icon button (left side, outside -5s)
-            // CRITICAL: .clickable must be AFTER .padding so the padded area is clickable.
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(Muted)
-                    .clickable { onSubtitleClick() }
-                    .padding(horizontal = 12.dp, vertical = 12.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = AppIcons.Subtitles,
-                    contentDescription = "Subtitles",
-                    tint = Dark,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(12.dp))
             // Rewind button — tap calls onRewind() once.
             // CRITICAL: .clickable must be AFTER .padding so the padded area is clickable.
             Column(
@@ -146,24 +126,6 @@ fun AudioControls(
             ) {
                 Text("+5s", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Dark)
                 Text("Forward", fontSize = 9.sp, fontWeight = FontWeight.Medium, color = Dark.copy(alpha = 0.65f))
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            // List icon button (right side, outside +5s)
-            // CRITICAL: .clickable must be AFTER .padding so the padded area is clickable.
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(Muted)
-                    .clickable { onListClick() }
-                    .padding(horizontal = 12.dp, vertical = 12.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = AppIcons.List,
-                    contentDescription = "List",
-                    tint = Dark,
-                    modifier = Modifier.size(22.dp)
-                )
             }
         }
     }
