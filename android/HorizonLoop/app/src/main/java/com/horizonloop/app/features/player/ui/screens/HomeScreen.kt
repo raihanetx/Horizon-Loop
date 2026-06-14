@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
@@ -30,7 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathFillType
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -60,6 +63,31 @@ private val filterOptions = listOf(
 
 private fun selectedFilterLabel(type: FilterType): String =
     filterOptions.firstOrNull { it.second == type }?.first ?: "All"
+
+private val ChevronRightIcon: ImageVector by lazy {
+    ImageVector.Builder(
+        name = "ChevronRight",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).apply {
+        path(
+            fill = SolidColor(Color.Black),
+            fillAlpha = 1.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(13.1717f, 12.0007f)
+            lineTo(8.22192f, 7.05093f)
+            lineTo(9.63614f, 5.63672f)
+            lineTo(16.0001f, 12.0007f)
+            lineTo(9.63614f, 18.3646f)
+            lineTo(8.22192f, 16.9504f)
+            lineTo(13.1717f, 12.0007f)
+            close()
+        }
+    }.build()
+}
 
 private fun parseSizeMb(sizeText: String): Float =
     Regex("""([0-9]+(?:\.[0-9]+)?)""").find(sizeText)?.groupValues?.get(1)?.toFloatOrNull() ?: 0f
@@ -408,7 +436,7 @@ private fun PodcastCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowForward,
+                    imageVector = ChevronRightIcon,
                     contentDescription = "Action",
                     tint = if (isPinned) HomeAccent else HomeTextTertiary,
                     modifier = Modifier
