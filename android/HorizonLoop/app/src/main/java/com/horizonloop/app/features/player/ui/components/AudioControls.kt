@@ -117,8 +117,8 @@ fun AudioControls(
             verticalAlignment = Alignment.CenterVertically
         ) {
             TransportTextButton(
-                primary = "-5s",
-                secondary = "Backward",
+                primary = "−",
+                secondary = null,
                 emphasis = false,
                 onClick = onRewind
             )
@@ -131,8 +131,8 @@ fun AudioControls(
             )
             Spacer(Modifier.width(16.dp))
             TransportTextButton(
-                primary = "+5s",
-                secondary = "Forward",
+                primary = "+",
+                secondary = null,
                 emphasis = false,
                 onClick = onForward
             )
@@ -156,8 +156,8 @@ private fun TransportTextButton(
     val borderColor = if (emphasis) Dark else Mid
     val textColor = Dark
     val borderWidth = if (emphasis) 1.5.dp else 1.dp
-    val horizontalPad = if (emphasis) 28.dp else 20.dp
-    val verticalPad = if (emphasis) 7.dp else 12.dp
+    val horizontalPad = if (emphasis) 28.dp else 18.dp
+    val verticalPad = if (emphasis) 7.dp else 7.dp
 
     Column(
         modifier = Modifier
