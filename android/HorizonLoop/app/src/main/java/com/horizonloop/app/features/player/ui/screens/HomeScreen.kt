@@ -378,7 +378,7 @@ private fun PodcastCard(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 96.dp)
+                    .padding(end = 80.dp)
             ) {
                 Text(
                     text = item.title,
@@ -398,7 +398,8 @@ private fun PodcastCard(
                         color = HomeTextSecondary,
                         fontSize = 14.sp,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
                     Text(
                         text = "¦",
@@ -432,12 +433,12 @@ private fun PodcastCard(
             Text(
                 text = item.duration,
                 color = HomeTextTertiary,
-                fontSize = 15.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Medium
             )
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(32.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .clickable { onPinToggle() },
                 contentAlignment = Alignment.Center
