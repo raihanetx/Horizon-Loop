@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,14 +32,18 @@ import com.horizonloop.app.core.ui.theme.Muted
 /**
  * Bottom audio control bar.
  *
+ * Fixed-height card (134dp) with a thin 6dp strong fade at the top edge —
+ * the exact fixed-height boundary.
+ *
  * Hierarchy (top → bottom):
- *   1. Title           — 15sp ExtraBold, primary text
- *   2. Mode/Loop/Speed — 11sp SemiBold, muted text, bullet-separated
- *   3. Progress        — 11sp SemiBold Monospace time labels
- *   4. Transport       — three identical outlined text buttons (−, Play, +)
+ *   0. Thin strong fade (6dp)  — Muted → Deep, marks the card's top edge
+ *   1. Title                    — 14sp ExtraBold, primary text
+ *   2. Mode/Loop/Speed          — 10sp SemiBold, muted text, bullet-separated
+ *   3. Progress                 — 10sp SemiBold Monospace time labels
+ *   4. Transport                — three identical outlined text buttons (−, Play, +)
  *
  * Spacing on a tight 8-point grid: 6 / 12 / 14 dp vertical gaps.
- * Card vertical padding: 16 dp.
+ * Card vertical padding: 14 dp.
  */
 @Composable
 fun AudioControls(
@@ -60,67 +65,85 @@ fun AudioControls(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .height(134.dp)
             .background(Deep)
-            .padding(horizontal = 20.dp, vertical = 14.dp)
     ) {
-        // ── 1. Title ────────────────────────────────────────────────────
-        Text(
-            text = title,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Dark,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+        // Thin strong fade at the top edge — exact fixed-height boundary
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Muted, Deep)
+                    )
+                )
         )
 
-        Spacer(Modifier.height(3.dp))
-
-        // ── 2. Mode / Loop / Speed ─────────────────────────────────────
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 14.dp)
         ) {
-            Text("Mode: ${activeTab.replaceFirstChar { it.uppercase() }}", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid)
-            Text("•", fontSize = 10.sp, color = Muted)
-            Text("Loop: ${activeLoopId ?: "None"}", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid)
-            Text("•", fontSize = 10.sp, color = Muted)
-            Text("Speed: ${currentSpeed}x", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid)
-        }
-
-        Spacer(Modifier.height(6.dp))
-
-        // ── 3. Progress ─────────────────────────────────────────────────
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(currentTime, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
-            Spacer(Modifier.width(10.dp))
-            ProgressBar(
-                progress = progress,
-                onSeek = onSeek,
-                modifier = Modifier.weight(1f)
+            // ── 1. Title ────────────────────────────────────────────────
+            Text(
+                text = title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Dark,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.width(10.dp))
-            Text(totalTime, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
-        }
 
-        Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(3.dp))
 
-        // ── 4. Transport (− | Play | +) ─────────────────────────────────
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TransportTextButton(primary = "−", onClick = onRewind)
-            Spacer(Modifier.width(12.dp))
-            TransportTextButton(primary = if (isPlaying) "Pause" else "Play", onClick = onPlayPause)
-            Spacer(Modifier.width(12.dp))
-            TransportTextButton(primary = "+", onClick = onForward)
+            // ── 2. Mode / Loop / Speed ─────────────────────────────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Mode: ${activeTab.replaceFirstChar { it.uppercase() }}", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid)
+                Text("•", fontSize = 10.sp, color = Muted)
+                Text("Loop: ${activeLoopId ?: "None"}", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid)
+                Text("•", fontSize = 10.sp, color = Muted)
+                Text("Speed: ${currentSpeed}x", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid)
+            }
+
+            Spacer(Modifier.height(6.dp))
+
+            // ── 3. Progress ─────────────────────────────────────────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(currentTime, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
+                Spacer(Modifier.width(10.dp))
+                ProgressBar(
+                    progress = progress,
+                    onSeek = onSeek,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(Modifier.width(10.dp))
+                Text(totalTime, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Mid, fontFamily = FontFamily.Monospace)
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            // ── 4. Transport (− | Play | +) ─────────────────────────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TransportTextButton(primary = "−", onClick = onRewind)
+                Spacer(Modifier.width(12.dp))
+                TransportTextButton(primary = if (isPlaying) "Pause" else "Play", onClick = onPlayPause)
+                Spacer(Modifier.width(12.dp))
+                TransportTextButton(primary = "+", onClick = onForward)
+            }
         }
     }
 }
