@@ -32,15 +32,15 @@ import com.horizonloop.app.core.ui.theme.Muted
 /**
  * Bottom audio control bar.
  *
- * Fixed-height card (134dp) with a thin 6dp strong fade at the top edge —
- * the exact fixed-height boundary.
+ * Fixed-height card (140dp) on a Muted background, with a smooth 12dp fade
+ * at the bottom edge (Muted → Deep) — the exact fixed-height boundary.
  *
  * Hierarchy (top → bottom):
- *   0. Thin strong fade (6dp)  — Muted → Deep, marks the card's top edge
- *   1. Title                    — 14sp ExtraBold, primary text
- *   2. Mode/Loop/Speed          — 10sp SemiBold, muted text, bullet-separated
- *   3. Progress                 — 10sp SemiBold Monospace time labels
- *   4. Transport                — three identical outlined text buttons (−, Play, +)
+ *   1. Title           — 14sp ExtraBold, primary text
+ *   2. Mode/Loop/Speed — 10sp SemiBold, muted text, bullet-separated
+ *   3. Progress        — 10sp SemiBold Monospace time labels
+ *   4. Transport       — three identical outlined text buttons (−, Play, +)
+ *   5. Smooth fade     — 12dp, Muted → Muted@0.5 → Deep, marks the card's bottom edge
  *
  * Spacing on a tight 8-point grid: 6 / 12 / 14 dp vertical gaps.
  * Card vertical padding: 14 dp.
@@ -65,21 +65,9 @@ fun AudioControls(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(134.dp)
-            .background(Deep)
+            .height(140.dp)
+            .background(Muted)
     ) {
-        // Thin strong fade at the top edge — exact fixed-height boundary
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(6.dp)
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Muted, Deep)
-                    )
-                )
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -145,6 +133,18 @@ fun AudioControls(
                 TransportTextButton(primary = "+", onClick = onForward)
             }
         }
+
+        // Smooth fade at the bottom edge — proper gradient, not a hard line
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(12.dp)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Muted, Muted.copy(alpha = 0.5f), Deep)
+                    )
+                )
+        )
     }
 }
 

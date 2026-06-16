@@ -34,7 +34,7 @@ fun PlayerHeader(title: String, onBack: () -> Unit, onMenuClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(70.dp)
+            .height(76.dp)
             .background(Muted)
             .padding(horizontal = 8.dp)
     ) {
@@ -70,15 +70,15 @@ fun PlayerHeader(title: String, onBack: () -> Unit, onMenuClick: () -> Unit) {
                 Icon(Icons.Default.MoreVert, contentDescription = "Menu", tint = Mid, modifier = Modifier.size(22.dp))
             }
         }
-        // Thin strong fade at the bottom edge — exact fixed-height boundary
+        // Smooth fade at the bottom edge — proper gradient, not a hard line
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(6.dp)
+                .height(12.dp)
                 .align(Alignment.BottomCenter)
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Muted, Deep)
+                        colors = listOf(Muted, Muted.copy(alpha = 0.5f), Deep)
                     )
                 )
         )
